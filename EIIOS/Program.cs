@@ -1,14 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using EIIOS.Data;
-using DbContext = EIIOS.Data.DbContext; 
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Configure MySQL Entity Framework - empty database for now
-builder.Services.AddDbContext<DbContext>(options =>
+// Configure MySQL Entity Framework with new EIIOSDbContext name
+builder.Services.AddDbContext<EIIOSDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         new MySqlServerVersion(new Version(9, 3, 0))
@@ -25,6 +24,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseRouting();
 app.UseAuthorization();
 
