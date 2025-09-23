@@ -9,6 +9,7 @@
   <ItemGroup>
     <Folder Include="Data\Scripts\" />
     <Folder Include="Resources\Views\" />
+    <Folder Include="Resources\Controllers\" />
   </ItemGroup>
 
   <ItemGroup>
