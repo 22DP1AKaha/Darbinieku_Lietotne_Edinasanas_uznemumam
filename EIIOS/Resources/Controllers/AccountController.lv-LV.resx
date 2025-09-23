@@ -118,27 +118,27 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="EmailExists" xml:space="preserve">
-    <value>This email address is already registered.</value>
+    <value>Šī e-pasta adrese jau ir reģistrēta.</value>
   </data>
   <data name="InvalidCredentials" xml:space="preserve">
-    <value>Invalid username or password.</value>
+    <value>Nepareizs lietotājvārds vai parole.</value>
   </data>
   <data name="LoginError" xml:space="preserve">
-    <value>An error occurred during login. Please try again.</value>
+    <value>Radās kļūda pieslēgšanās laikā. Lūdzu mēģiniet vēlreiz.</value>
   </data>
   <data name="LogoutSuccess" xml:space="preserve">
-    <value>You have been logged out successfully.</value>
+    <value>Jūs esat veiksmīgi izrakstījies.</value>
   </data>
   <data name="RegistrationError" xml:space="preserve">
-    <value>An error occurred during registration. Please try again.</value>
+    <value>Radās kļūda reģistrācijas laikā. Lūdzu mēģiniet vēlreiz.</value>
   </data>
   <data name="RegistrationSuccess" xml:space="preserve">
-    <value>Registration successful! Please log in.</value>
+    <value>Reģistrācija veiksmīga! Lūdzu pieslēdzieties.</value>
   </data>
   <data name="UsernameExists" xml:space="preserve">
-    <value>This username is already taken.</value>
+    <value>Šis lietotājvārds jau tiek izmantots.</value>
   </data>
   <data name="WelcomeBack" xml:space="preserve">
-    <value>Welcome back, {0}!</value>
+    <value>Laipni lūdzam atpakaļ, {0}!</value>
   </data>
 </root>

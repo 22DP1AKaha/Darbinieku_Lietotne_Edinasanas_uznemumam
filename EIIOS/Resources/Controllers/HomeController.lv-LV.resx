@@ -117,19 +117,19 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="MenuNotAvailable" xml:space="preserve">
-    <value>Menu will be available after adding products!</value>
-  </data>
-  <data name="Register" xml:space="preserve">
-    <value>Register</value>
-  </data>
-  <data name="ViewMenu" xml:space="preserve">
-    <value>View Menu</value>
+  <data name="WelcomeTitle" xml:space="preserve">
+    <value>Laipni lūdzam</value>
   </data>
   <data name="WelcomeSubtitle" xml:space="preserve">
-    <value>Food Service Internal Organization System</value>
+    <value>Ēdināšanas iestāžu iekšējās organizācijas sistēma</value>
   </data>
-  <data name="WelcomeTitle" xml:space="preserve">
-    <value>Welcome to</value>
+  <data name="ViewMenu" xml:space="preserve">
+    <value>Skatīt ēdienkarti</value>
+  </data>
+  <data name="Register" xml:space="preserve">
+    <value>Reģistrēties</value>
+  </data>
+  <data name="MenuNotAvailable" xml:space="preserve">
+    <value>Ēdienkarte būs pieejama pēc produktu pievienošanas!</value>
   </data>
 </root>
