@@ -1,8 +1,3 @@
-
-
-
-
-// First, update your Program.cs to enable localization
 using Microsoft.EntityFrameworkCore;
 using EIIOS.Data;
 using Microsoft.AspNetCore.Localization;
@@ -14,10 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews()
     .AddDataAnnotationsLocalization(options =>
     {
-        // Use SharedResource for data annotations
         options.DataAnnotationLocalizerProvider = (type, factory) =>
             factory.Create(typeof(EIIOS.Resources.SharedResource));
-    });
+    })
+    .AddViewLocalization(); // ? This fixes the IViewLocalizer error
 
 // Configure MySQL Entity Framework
 builder.Services.AddDbContext<EIIOSDbContext>(options =>
@@ -60,7 +55,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-// Add Localization Middleware (IMPORTANT: Before routing)
+// Add Localization Middleware (BEFORE routing!)
 app.UseRequestLocalization();
 
 app.UseRouting();

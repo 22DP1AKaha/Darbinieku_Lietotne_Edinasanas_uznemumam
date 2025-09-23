@@ -1,0 +1,159 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+    <div class="container">
+        <!-- Brand Logo -->
+        <a class="navbar-brand fw-bold" href="@Url.Action("Index", "Home")">
+            <i class="fas fa-utensils me-2"></i>
+            EIIOS
+        </a>
+
+        <!-- Mobile Toggle Button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navbar Links -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- Left Side Navigation -->
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Index", "Home")">
+                        <i class="fas fa-home me-1"></i>@Localizer["Home"]
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Menu", "Home")">
+                        <i class="fas fa-book-open me-1"></i>@Localizer["Menu"]
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("About", "Home")">
+                        <i class="fas fa-info-circle me-1"></i>@Localizer["About"]
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Right Side Navigation -->
+            <ul class="navbar-nav">
+                <!-- Language Selector -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-globe me-1"></i>@Localizer["Language"]
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <form asp-controller="Language" asp-action="SetLanguage" method="post" class="d-inline">
+                                <input type="hidden" name="culture" value="lv-LV" />
+                                <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                                <button type="submit" class="dropdown-item @(System.Globalization.CultureInfo.CurrentUICulture.Name == "lv-LV" ? "active" : "")">
+                                    <img src="https://flagcdn.com/16x12/lv.png" alt="LV" class="me-2" style="width: 16px;">
+                                    Latviešu
+                                </button>
+                            </form>
+                        </li>
+                        <li>
+                            <form asp-controller="Language" asp-action="SetLanguage" method="post" class="d-inline">
+                                <input type="hidden" name="culture" value="en-US" />
+                                <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                                <button type="submit" class="dropdown-item @(System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US" ? "active" : "")">
+                                    <img src="https://flagcdn.com/16x12/us.png" alt="US" class="me-2" style="width: 16px;">
+                                    English
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- User Authentication Section -->
+                @* Replace this section when you implement proper authentication *@
+                @if (TempData["UserId"] != null)
+                {
+                    <!-- Logged in user -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i>@TempData.Peek("UserName")
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><h6 class="dropdown-header">@TempData.Peek("UserRole")</h6></li>
+                            <li><hr class="dropdown-divider"></li>
+
+                            @if (TempData.Peek("UserRole")?.ToString() == "Employee" || TempData.Peek("UserRole")?.ToString() == "Administrator")
+                            {
+                                <!-- Employee/Admin Management Links -->
+                                <li>
+                                    <a class="dropdown-item" href="@Url.Action("Index", "Products")">
+                                        <i class="fas fa-pizza-slice me-2"></i>@Localizer["Products"]
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="@Url.Action("Index", "Inventory")">
+                                        <i class="fas fa-boxes me-2"></i>@Localizer["Inventory"]
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="@Url.Action("Index", "DailyMenu")">
+                                        <i class="fas fa-calendar-day me-2"></i>@Localizer["DailyMenu"]
+                                    </a>
+                                </li>
+
+                                @if (TempData.Peek("UserRole")?.ToString() == "Administrator")
+                                {
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("Index", "TimeSchedule")">
+                                            <i class="fas fa-clock me-2"></i>@Localizer["WorkTime"]
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("Index", "Users")">
+                                            <i class="fas fa-users me-2"></i>@Localizer["Users"]
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("Index", "Reports")">
+                                            <i class="fas fa-chart-bar me-2"></i>@Localizer["Reports"]
+                                        </a>
+                                    </li>
+                                }
+                            }
+
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="@Url.Action("Profile", "Account")">
+                                    <i class="fas fa-user me-2"></i>@Localizer["Profile"]
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="@Url.Action("Settings", "Account")">
+                                    <i class="fas fa-cog me-2"></i>@Localizer["Settings"]
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="@Url.Action("Logout", "Account")">
+                                    <i class="fas fa-sign-out-alt me-2"></i>@Localizer["Logout"]
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                else
+                {
+                    <!-- Guest user - Login/Register Links -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Login", "Account")">
+                            <i class="fas fa-sign-in-alt me-1"></i>@Localizer["Login"]
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-outline-light ms-2 px-3" href="@Url.Action("Register", "Account")">
+                            <i class="fas fa-user-plus me-1"></i>@Localizer["Register"]
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</nav>

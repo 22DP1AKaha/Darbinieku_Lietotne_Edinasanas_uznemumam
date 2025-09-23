@@ -1,8 +1,135 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["Home"];
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- Hero Section -->
+<section class="hero-section bg-primary text-white py-5">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">
+                    @Localizer["WelcomeTitle"] <span class="text-warning">EIIOS</span>
+                </h1>
+                <p class="lead mb-4">
+                    @Localizer["WelcomeSubtitle"]
+                </p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="@Url.Action("Menu", "Home")" class="btn btn-warning btn-lg">
+                        <i class="fas fa-book-open me-2"></i>@Localizer["ViewMenu"]
+                    </a>
+                    <a href="@Url.Action("Register", "Account")" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-user-plus me-2"></i>@Localizer["Register"]
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <i class="fas fa-utensils display-1 text-warning opacity-75"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="fw-bold mb-3">@Localizer["Features"]</h2>
+                <p class="lead text-muted">@Localizer["FeaturesDesc"]</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Menu Management -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-book-open fa-2x text-primary"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">@Localizer["MenuManagement"]</h4>
+                        <p class="text-muted">@Localizer["MenuManagementDesc"]</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory Management -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-boxes fa-2x text-success"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">@Localizer["InventoryManagement"]</h4>
+                        <p class="text-muted">@Localizer["InventoryManagementDesc"]</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Time Tracking -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-clock fa-2x text-warning"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">@Localizer["TimeTracking"]</h4>
+                        <p class="text-muted">@Localizer["TimeTrackingDesc"]</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Discounts -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-tags fa-2x text-danger"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">@Localizer["DiscountSystem"]</h4>
+                        <p class="text-muted">@Localizer["DiscountSystemDesc"]</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Roles -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-users fa-2x text-info"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">@Localizer["UserRoles"]</h4>
+                        <p class="text-muted">@Localizer["UserRolesDesc"]</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Easy to Use -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-secondary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-heart fa-2x text-secondary"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">@Localizer["EasyToUse"]</h4>
+                        <p class="text-muted">@Localizer["EasyToUseDesc"]</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="bg-primary text-white py-5">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-4">@Localizer["ReadyToStart"]</h2>
+        <p class="lead mb-4">@Localizer["ReadyToStartDesc"]</p>
+        <a href="@Url.Action("Register", "Account")" class="btn btn-warning btn-lg">
+            <i class="fas fa-rocket me-2"></i>@Localizer["StartWorking"]
+        </a>
+    </div>
+</section>
