@@ -120,10 +120,37 @@
   <data name="Email" xml:space="preserve">
     <value>E-pasts</value>
   </data>
+  <data name="EmailInvalid" xml:space="preserve">
+    <value>Please enter a valid email address.</value>
+  </data>
+  <data name="EmailRequired" xml:space="preserve">
+    <value>Email address is required.</value>
+  </data>
+  <data name="FirstName" xml:space="preserve">
+    <value>First Name</value>
+  </data>
+  <data name="FirstNameRequired" xml:space="preserve">
+    <value>First name is required.</value>
+  </data>
+  <data name="LastName" xml:space="preserve">
+    <value>Last Name</value>
+  </data>
+  <data name="LastNameRequired" xml:space="preserve">
+    <value>Last name is required.</value>
+  </data>
   <data name="Password" xml:space="preserve">
     <value>Parole</value>
   </data>
+  <data name="PasswordRequired" xml:space="preserve">
+    <value>Password is required</value>
+  </data>
   <data name="RememberMe" xml:space="preserve">
     <value>Atcerēties mani</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>Username or Email</value>
+  </data>
+  <data name="UsernameRequired" xml:space="preserve">
+    <value>Username or email is required.</value>
   </data>
 </root>
