@@ -1,0 +1,55 @@
+﻿<footer class="footer mt-auto py-4">
+    <div class="container text-center text-md-start">
+        <div class="row align-items-center mb-3">
+            <!-- Left Column: Brand -->
+            <div class="col-md-6 mb-3 mb-md-0">
+                <h5 class="fw-bold mb-1">
+                    <i class="fas fa-utensils me-2 text-gradient"></i>EIIOS
+                </h5>
+                <p class="text-muted mb-0">Ēdināšanas iestāžu iekšējās organizācijas sistēma</p>
+            </div>
+
+            <!-- Right Column: Copyright -->
+            <div class="col-md-6 text-md-end">
+                <p class="text-muted mb-0">&copy; @DateTime.Now.Year EIIOS. Visas tiesības aizsargātas.</p>
+            </div>
+        </div>
+
+        <!-- Social Links -->
+        <div class="d-flex justify-content-center gap-3">
+            <a href="#" class="text-muted footer-link"><i class="fab fa-facebook fa-lg"></i></a>
+            <a href="#" class="text-muted footer-link"><i class="fab fa-twitter fa-lg"></i></a>
+            <a href="#" class="text-muted footer-link"><i class="fab fa-linkedin fa-lg"></i></a>
+        </div>
+    </div>
+</footer>
+
+<style>
+
+    :root {
+        --gradient-primary: linear-gradient(135deg, #fdfdb4 0%, #d9d7b6 100%);
+        --gradient-secondary: linear-gradient(135deg, #f7dc6f 0%, #e6b800 100%);
+        --gradient-accent: linear-gradient(135deg, #f9e79f 0%, #d68910 100%);
+        --shadow-soft: 0 10px 40px rgba(0,0,0,0.1);
+        --shadow-hover: 0 20px 60px rgba(0,0,0,0.15);
+    }
+
+    .footer {
+        background: #f9e79f;
+        border-top: 20px solid white
+    }
+
+    .text-muted .footer {
+        color: black !important;
+    }
+
+    .footer-link {
+        transition: 0.3s ease;
+    }
+
+    .footer-link:hover {
+        transform: scale(1.1);
+        color: #d35400;
+    }
+
+</style>
