@@ -15,5 +15,7 @@ namespace EIIOS.ViewModels
 
         [Display(Name = "RememberMe")]
         public bool RememberMe { get; set; }
+
+        public string? ReturnUrl { get; set; }
     }
 }

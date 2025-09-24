@@ -1,0 +1,226 @@
+﻿@model EIIOS.ViewModels.RegisterViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["Register"];
+}
+
+<div class="min-vh-100 d-flex align-items-center bg-light py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-lg border-0">
+                    <div class="card-body p-5">
+                        <!-- Header -->
+                        <div class="text-center mb-4">
+                            <div class="mb-3">
+                                <i class="fas fa-utensils fa-3x text-primary"></i>
+                            </div>
+                            <h2 class="fw-bold">Reģistrācija</h2>
+                            <p class="text-muted">Izveidojiet jaunu kontu EIIOS sistēmā</p>
+                        </div>
+
+                        <!-- Registration Form -->
+                        <form asp-action="Register" method="post" id="registerForm">
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                            <!-- First Name & Last Name Row -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label asp-for="FirstName" class="form-label">Vārds</label>
+                                        <input asp-for="FirstName" class="form-control" placeholder="Jānis" />
+                                        <span asp-validation-for="FirstName" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label asp-for="LastName" class="form-label">Uzvārds</label>
+                                        <input asp-for="LastName" class="form-control" placeholder="Bērziņš" />
+                                        <span asp-validation-for="LastName" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Username -->
+                            <div class="mb-3">
+                                <label asp-for="Username" class="form-label">Lietotājvārds</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-user"></i>
+                                    </span>
+                                    <input asp-for="Username" class="form-control" placeholder="lietotajvards" />
+                                </div>
+                                <span asp-validation-for="Username" class="text-danger small"></span>
+                                <div class="form-text">
+                                    <small>Lietotājvārdam jābūt vismaz 3 simbolus garam</small>
+                                </div>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="mb-3">
+                                <label asp-for="Email" class="form-label">E-pasta adrese</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-envelope"></i>
+                                    </span>
+                                    <input asp-for="Email" type="email" class="form-control" placeholder="janis@example.com" />
+                                </div>
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Password -->
+                            <div class="mb-3">
+                                <label asp-for="Password" class="form-label">Parole</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-lock"></i>
+                                    </span>
+                                    <input asp-for="Password" type="password" class="form-control" id="registerPassword" placeholder="Vismaz 6 simboli" />
+                                    <button class="btn btn-outline-secondary" type="button" id="toggleRegisterPassword">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <span asp-validation-for="Password" class="text-danger small"></span>
+                                <div class="form-text">
+                                    <small>Parolei jābūt vismaz 6 simbolus garai</small>
+                                </div>
+                            </div>
+
+                            <!-- Confirm Password -->
+                            <div class="mb-3">
+                                <label asp-for="ConfirmPassword" class="form-label">Apstiprināt paroli</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-lock"></i>
+                                    </span>
+                                    <input asp-for="ConfirmPassword" type="password" class="form-control" id="confirmPassword" placeholder="Atkārtojiet paroli" />
+                                    <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                                <span id="confirmPasswordError" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Terms -->
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    <input asp-for="AcceptTerms" type="checkbox" class="form-check-input" />
+                                    <label asp-for="AcceptTerms" class="form-check-label">
+                                        Es piekrītu lietošanas noteikumiem un privātuma politikai
+                                    </label>
+                                </div>
+                                <span asp-validation-for="AcceptTerms" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                    <i class="fas fa-user-plus me-2"></i>Reģistrēties
+                                </button>
+                            </div>
+
+                            <!-- Login Link -->
+                            <div class="text-center">
+                                <p class="mb-0">
+                                    Jau ir konts?
+                                    <a href="@Url.Action("Login", "Account")" class="text-decoration-none fw-bold">
+                                        Pieslēgties šeit
+                                    </a>
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Back to Home -->
+                <div class="text-center mt-3">
+                    <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Atpakaļ uz sākumu
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Toggle password visibility
+        document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
+            const password = document.getElementById('registerPassword');
+            const icon = this.querySelector('i');
+
+            if (password.type === 'password') {
+                password.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                password.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        document.getElementById('toggleConfirmPassword').addEventListener('click', function() {
+            const password = document.getElementById('confirmPassword');
+            const icon = this.querySelector('i');
+
+            if (password.type === 'password') {
+                password.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                password.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        // Password confirmation validation
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = this.value;
+            const errorSpan = document.getElementById('confirmPasswordError');
+
+            if (password !== confirmPassword) {
+                errorSpan.textContent = 'Paroles nesakrīt';
+                this.classList.add('is-invalid');
+            } else {
+                errorSpan.textContent = '';
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+
+        // Form submission validation
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const acceptTerms = document.getElementById('AcceptTerms').checked;
+
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                document.getElementById('confirmPasswordError').textContent = 'Paroles nesakrīt';
+                document.getElementById('confirmPassword').focus();
+                return;
+            }
+
+            if (!acceptTerms) {
+                e.preventDefault();
+                alert('Lūdzu apstipriniet lietošanas noteikumus');
+                document.getElementById('AcceptTerms').focus();
+                return;
+            }
+
+            // Show loading state
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Apstrādā...';
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
