@@ -79,7 +79,7 @@ namespace EIIOS.Controllers
                 // Check if email is verified (if required)
                 if (!user.IsEmailVerified)
                 {
-                    TempData["WarningMessage"] = _localizer["EmailNotVerified"];
+                    TempData["WarningMessage"] = _localizer["EmailNotVerified"].Value;
                 }
 
                 // Store user info in session (simple approach)
@@ -174,7 +174,7 @@ namespace EIIOS.Controllers
 
                 _logger.LogInformation("New user registered: {Username} ({Email})", newUser.Username, newUser.Email);
 
-                TempData["SuccessMessage"] = _localizer["RegistrationSuccess"];
+                TempData["SuccessMessage"] = _localizer["RegistrationSuccess"].Value;
                 return RedirectToAction("Login");
             }
             catch (Exception ex)
@@ -191,7 +191,7 @@ namespace EIIOS.Controllers
             // Clear session
             HttpContext.Session.Clear();
 
-            TempData["SuccessMessage"] = _localizer["LogoutSuccess"];
+            TempData["SuccessMessage"] = _localizer["LogoutSuccess"].Value;
             return RedirectToAction("Index", "Home");
         }
 
