@@ -12,7 +12,17 @@ builder.Services.AddControllersWithViews()
         options.DataAnnotationLocalizerProvider = (type, factory) =>
             factory.Create(typeof(EIIOS.Resources.SharedResource));
     })
-    .AddViewLocalization(); // ? This fixes the IViewLocalizer error
+    .AddViewLocalization();
+
+// Add Session services
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(2); // Session timeout
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+});
 
 // Configure MySQL Entity Framework
 builder.Services.AddDbContext<EIIOSDbContext>(options =>
@@ -55,7 +65,10 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-// Add Localization Middleware (BEFORE routing!)
+// Add Session middleware (BEFORE routing!)
+app.UseSession();
+
+// Add Localization Middleware
 app.UseRequestLocalization();
 
 app.UseRouting();

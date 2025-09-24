@@ -10,7 +10,7 @@
         </a>
 
         <!-- Mobile Toggle Button -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
 
@@ -39,7 +39,7 @@
             <ul class="navbar-nav">
                 <!-- Language Selector -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                         <i class="fas fa-globe me-1"></i>@Localizer["Language"]
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
@@ -47,9 +47,8 @@
                             <form asp-controller="Language" asp-action="SetLanguage" method="post" class="d-inline">
                                 <input type="hidden" name="culture" value="lv-LV" />
                                 <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                                <button type="submit" class="dropdown-item @(System.Globalization.CultureInfo.CurrentUICulture.Name == "lv-LV" ? "active" : "")">
-                                    <img src="https://flagcdn.com/16x12/lv.png" alt="LV" class="me-2" style="width: 16px;">
-                                    Latviešu
+                                <button type="submit" class="dropdown-item">
+                                    🇱🇻 Latviešu
                                 </button>
                             </form>
                         </li>
@@ -57,9 +56,8 @@
                             <form asp-controller="Language" asp-action="SetLanguage" method="post" class="d-inline">
                                 <input type="hidden" name="culture" value="en-US" />
                                 <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                                <button type="submit" class="dropdown-item @(System.Globalization.CultureInfo.CurrentUICulture.Name == "en-US" ? "active" : "")">
-                                    <img src="https://flagcdn.com/16x12/us.png" alt="US" class="me-2" style="width: 16px;">
-                                    English
+                                <button type="submit" class="dropdown-item">
+                                    🇺🇸 English
                                 </button>
                             </form>
                         </li>
@@ -67,19 +65,18 @@
                 </li>
 
                 <!-- User Authentication Section -->
-                @* Replace this section when you implement proper authentication *@
-                @if (TempData["UserId"] != null)
+                @if (Context.Session.GetInt32("UserId") != null)
                 {
                     <!-- Logged in user -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-user-circle me-1"></i>@TempData.Peek("UserName")
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i>@Context.Session.GetString("UserName")
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><h6 class="dropdown-header">@TempData.Peek("UserRole")</h6></li>
+                            <li><h6 class="dropdown-header">@Context.Session.GetString("UserRole")</h6></li>
                             <li><hr class="dropdown-divider"></li>
 
-                            @if (TempData.Peek("UserRole")?.ToString() == "Employee" || TempData.Peek("UserRole")?.ToString() == "Administrator")
+                            @if (Context.Session.GetString("UserRole") == "Employee" || Context.Session.GetString("UserRole") == "Administrator")
                             {
                                 <!-- Employee/Admin Management Links -->
                                 <li>
@@ -98,7 +95,7 @@
                                     </a>
                                 </li>
 
-                                @if (TempData.Peek("UserRole")?.ToString() == "Administrator")
+                                @if (Context.Session.GetString("UserRole") == "Administrator")
                                 {
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
@@ -111,11 +108,6 @@
                                             <i class="fas fa-users me-2"></i>@Localizer["Users"]
                                         </a>
                                     </li>
-                                    <li>
-                                        <a class="dropdown-item" href="@Url.Action("Index", "Reports")">
-                                            <i class="fas fa-chart-bar me-2"></i>@Localizer["Reports"]
-                                        </a>
-                                    </li>
                                 }
                             }
 
@@ -125,12 +117,6 @@
                                     <i class="fas fa-user me-2"></i>@Localizer["Profile"]
                                 </a>
                             </li>
-                            <li>
-                                <a class="dropdown-item" href="@Url.Action("Settings", "Account")">
-                                    <i class="fas fa-cog me-2"></i>@Localizer["Settings"]
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item" href="@Url.Action("Logout", "Account")">
                                     <i class="fas fa-sign-out-alt me-2"></i>@Localizer["Logout"]
