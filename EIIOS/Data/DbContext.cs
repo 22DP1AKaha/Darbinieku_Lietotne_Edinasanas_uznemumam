@@ -91,6 +91,8 @@ namespace EIIOS.Data
             // Configure relationships and constraints
             ConfigureRelationships(modelBuilder);
             ConfigureConstraints(modelBuilder);
+
+            SeedInitialData(modelBuilder);
         }
 
         private void ConfigureRelationships(ModelBuilder modelBuilder)
@@ -276,5 +278,24 @@ namespace EIIOS.Data
                 }
             }
         }
+
+        private void SeedInitialData(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<AllergenModel>().HasData(
+                new AllergenModel { Id = 1, Code = "GLU", Name = "Gluten" },
+                new AllergenModel { Id = 2, Code = "NUT", Name = "Nuts" },
+                new AllergenModel { Id = 3, Code = "DUI", Name = "Dairy" },
+                new AllergenModel { Id = 4, Code = "EGA", Name = "Eggs" },
+                new AllergenModel { Id = 5, Code = "SOY", Name = "Soy" },
+                new AllergenModel { Id = 6, Code = "FIS", Name = "Fish" },
+                new AllergenModel { Id = 7, Code = "SHE", Name = "Shellfish" },
+                new AllergenModel { Id = 8, Code = "CEL", Name = "Celery" },
+                new AllergenModel { Id = 9, Code = "MUS", Name = "Mustard" },
+                new AllergenModel { Id = 10, Code = "SES", Name = "Sesame Seeds" },
+                new AllergenModel { Id = 11, Code = "LUP", Name = "Lupin" },
+                new AllergenModel { Id = 12, Code = "SUL", Name = "Sulphites" }
+            );
+        }
+
     }
 }
