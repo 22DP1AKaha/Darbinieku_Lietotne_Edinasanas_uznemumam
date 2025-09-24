@@ -302,7 +302,7 @@ namespace EIIOS.Data
                     Id = 1,
                     Username = "admin",
                     Email = "admin@eiios.com",
-                    PasswordHash = "HASHED_ADMIN_PASS",
+                    PasswordHash = "1234",
                     FirstName = "System",
                     LastName = "Administrator",
                     Role = UserRole.Administrator,
