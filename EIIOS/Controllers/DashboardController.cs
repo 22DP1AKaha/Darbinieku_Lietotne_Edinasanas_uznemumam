@@ -15,12 +15,12 @@ namespace EIIOS.Controllers
             _localizer = localizer;
         }
 
-        public IActionResult Index()
+        public IActionResult Dashboard()
         {
             // Example localized values you might want to pass to the view
             ViewBag.DashboardTitle = _localizer["Dashboard"];
             ViewBag.ChooseAction = _localizer["ChooseAction"];
-            return View("Dashboard");
+            return View();
         }
     }
 }
