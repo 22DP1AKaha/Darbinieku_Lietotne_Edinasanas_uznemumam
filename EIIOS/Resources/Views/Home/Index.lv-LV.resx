@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AllCategories" xml:space="preserve">
+    <value>Visas kategorijas</value>
+  </data>
   <data name="DiscountSystem" xml:space="preserve">
     <value>Atlaižu sistēma</value>
   </data>
@@ -126,14 +129,44 @@
   <data name="Features" xml:space="preserve">
     <value>Sistēmas iespējas</value>
   </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filtrēt</value>
+  </data>
   <data name="InventoryManagement" xml:space="preserve">
     <value>Noliktavas uzskaite</value>
+  </data>
+  <data name="MenuDescription" xml:space="preserve">
+    <value>Apskataties mūsu ēdienkarti.</value>
   </data>
   <data name="MenuManagement" xml:space="preserve">
     <value>Ēdienkartes pārvaldība</value>
   </data>
+  <data name="NoDiscounts" xml:space="preserve">
+    <value>Nav atlaides</value>
+  </data>
+  <data name="OurMenu" xml:space="preserve">
+    <value>Ēdienkarte</value>
+  </data>
   <data name="ReadyToStart" xml:space="preserve">
     <value>Gatavs sākt?</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Meklēt</value>
+  </data>
+  <data name="SortByCategory" xml:space="preserve">
+    <value>Kārtot pēc kategorijas</value>
+  </data>
+  <data name="SortByDiscount" xml:space="preserve">
+    <value>Kārtot pēc akcijas</value>
+  </data>
+  <data name="SortByName" xml:space="preserve">
+    <value>Kārtot pēc vārda</value>
+  </data>
+  <data name="SortByPriceHigh" xml:space="preserve">
+    <value>Dilstoša cena</value>
+  </data>
+  <data name="SortByPriceLow" xml:space="preserve">
+    <value>Augoša cena</value>
   </data>
   <data name="StartWorking" xml:space="preserve">
     <value>Sākt darbu ar EIIOS</value>
