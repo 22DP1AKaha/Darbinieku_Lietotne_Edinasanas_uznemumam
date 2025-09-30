@@ -1,6 +1,7 @@
-using Microsoft.EntityFrameworkCore;
 using EIIOS.Data;
+using EIIOS.Services;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,6 +53,8 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.RequestCultureProviders.Insert(0, new QueryStringRequestCultureProvider());
     options.RequestCultureProviders.Insert(1, new CookieRequestCultureProvider());
 });
+
+builder.Services.AddScoped<EIIOSDataQuery>();
 
 var app = builder.Build();
 

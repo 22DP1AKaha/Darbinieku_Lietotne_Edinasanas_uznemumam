@@ -1,9 +1,8 @@
-﻿@model IEnumerable<ProductModel>
+﻿@model EIIOS.ViewModels.MenuViewModel
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
 @{
-    ViewData["Title"] = "Menu - EIIOS";
-    var categories = ViewBag.Categories as List<CategoryModel> ?? new List<CategoryModel>();
+    ViewData["Title"] = Localizer["MenuTitle"];
 }
 
 <!-- Header Section -->
@@ -11,8 +10,8 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-6">
-                <h1 class="fw-bold mb-2">Our Menu</h1>
-                <p class="mb-0">Discover our delicious offerings with special discounts</p>
+                <h1 class="fw-bold mb-2">@Localizer["OurMenu"]</h1>
+                <p class="mb-0">@Localizer["MenuDescription"]</p>
             </div>
         </div>
     </div>
@@ -23,10 +22,10 @@
     <div class="container">
         <div class="row">
             <div class="col-12">
-                @if (Model != null && Model.Any(p => p.DiscountProducts?.Any(dp => dp.Discount.IsCurrentlyActive) == true))
+                @if (Model != null && Model.Products.Any(p => p.DiscountProducts?.Any(dp => dp.Discount.IsCurrentlyActive) == true))
                 {
                     <div class="discount-carousel d-flex gap-3 overflow-auto pb-3">
-                        @foreach (var product in Model
+                        @foreach (var product in Model.Products
                                             .Where(p => p.DiscountProducts?.Any(dp => dp.Discount.IsCurrentlyActive) == true)
                                             .Take(6))
                         {
@@ -75,7 +74,7 @@
                 }
                 else
                 {
-                    <p class="text-center text-muted">No discounted products available.</p>
+                    <p class="text-center text-muted">@Localizer["NoDiscounts"]</p>
                 }
             </div>
         </div>
@@ -85,33 +84,33 @@
 <!-- Search and Filter Section -->
 <section class="search-filters py-4">
     <div class="container">
-        <form method="get" asp-action="Index" class="row g-3">
+        <form method="get" asp-action="Index" asp-controller="Home" class="row g-3">
             <div class="col-md-4">
                 <div class="input-group">
                     <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
-                    <input type="text" name="searchTerm" value="@ViewBag.SearchTerm" class="form-control border-start-0" placeholder="Search menu items...">
+                    <input type="text" name="searchTerm" value="@Model.SearchTerm" class="form-control border-start-0" placeholder="@Localizer["SearchPlaceholder"]">
                 </div>
             </div>
             <div class="col-md-3">
                 <select name="category" class="form-select">
-                    <option value="">All Categories</option>
-                    @foreach (var category in categories)
+                    <option value="">@Localizer["AllCategories"]</option>
+                    @foreach (var category in Model.Categories)
                     {
-                        <option value="@category.Name" selected="@(ViewBag.Category == category.Name)">@category.Name</option>
+                        <option value="@category.Name" selected="@(Model.Category == category.Name)">@category.Name</option>
                     }
                 </select>
             </div>
             <div class="col-md-3">
                 <select name="sortBy" class="form-select">
-                    <option value="name" selected="@(ViewBag.SortBy == "name")">Sort by Name</option>
-                    <option value="price" selected="@(ViewBag.SortBy == "price")">Price: Low to High</option>
-                    <option value="pricedesc" selected="@(ViewBag.SortBy == "pricedesc")">Price: High to Low</option>
-                    <option value="category" selected="@(ViewBag.SortBy == "category")">Category</option>
-                    <option value="discount" selected="@(ViewBag.SortBy == "discount")">Best Discounts</option>
+                    <option value="name" selected="@(Model.SortBy == "name")">@Localizer["SortByName"]</option>
+                    <option value="price" selected="@(Model.SortBy == "price")">@Localizer["SortByPriceLow"]</option>
+                    <option value="pricedesc" selected="@(Model.SortBy == "pricedesc")">@Localizer["SortByPriceHigh"]</option>
+                    <option value="category" selected="@(Model.SortBy == "category")">@Localizer["SortByCategory"]</option>
+                    <option value="discount" selected="@(Model.SortBy == "discount")">@Localizer["SortByDiscount"]</option>
                 </select>
             </div>
             <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter me-1"></i>Filter</button>
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter me-1"></i>@Localizer["Filter"]</button>
             </div>
         </form>
     </div>
@@ -120,10 +119,10 @@
 <!-- Menu Items Section -->
 <section class="menu-items py-4">
     <div class="container">
-        @if (Model != null && Model.Any())
+        @if (Model != null && Model.Products.Any())
         {
             <div class="row g-4">
-                @foreach (var product in Model)
+                @foreach (var product in Model.Products)
                 {
                     var activeDiscount = product.DiscountProducts?.FirstOrDefault(dp => dp.Discount.IsCurrentlyActive)?.Discount;
                     <div class="col-lg-3 col-md-4 col-sm-6">
@@ -160,30 +159,25 @@
                                 @if (product.PreparationTime.HasValue)
                                 {
                                     <div class="mb-2">
-                                        <small class="text-muted"><i class="fas fa-clock me-1"></i>@product.PreparationTime mins</small>
+                                        <small class="text-muted"><i class="fas fa-clock me-1"></i>@product.PreparationTime @Localizer["Minutes"]</small>
                                     </div>
                                 }
-                                <div class="d-flex justify-content-between align-items-center mt-auto">
-                                    <div class="price-info">
-                                        @if (activeDiscount != null)
-                                        {
-                                            var discountedPrice = activeDiscount.DiscountType == DiscountType.Percentage
-                                            ? product.BasePrice * (1 - activeDiscount.DiscountValue / 100)
-                                            : product.BasePrice - activeDiscount.DiscountValue;
+                                <div class="price-info mt-auto">
+                                    @if (activeDiscount != null)
+                                    {
+                                        var discountedPrice = activeDiscount.DiscountType == DiscountType.Percentage
+                                        ? product.BasePrice * (1 - activeDiscount.DiscountValue / 100)
+                                        : product.BasePrice - activeDiscount.DiscountValue;
 
-                                            <div>
-                                                <span class="text-decoration-line-through text-muted small">$@product.BasePrice.ToString("0.00")</span>
-                                                <span class="text-success fw-bold fs-5">$@discountedPrice.ToString("0.00")</span>
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-primary fw-bold fs-5">$@product.BasePrice.ToString("0.00")</span>
-                                        }
-                                    </div>
-                                    <button class="btn btn-warning btn-sm add-to-cart-btn" data-product-id="@product.Id">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
+                                        <div>
+                                            <span class="text-decoration-line-through text-muted small">$@product.BasePrice.ToString("0.00")</span>
+                                            <span class="text-success fw-bold fs-5">$@discountedPrice.ToString("0.00")</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-primary fw-bold fs-5">$@product.BasePrice.ToString("0.00")</span>
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -196,15 +190,14 @@
             <div class="row">
                 <div class="col-12 text-center py-5">
                     <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                    <h4 class="text-muted">No menu items found</h4>
-                    <p class="text-muted">Try adjusting your search criteria or browse all categories.</p>
-                    <a href="@Url.Action("Index")" class="btn btn-primary">View All Items</a>
+                    <h4 class="text-muted">@Localizer["NoMenuItems"]</h4>
+                    <p class="text-muted">@Localizer["NoMenuItemsDescription"]</p>
+                    <a href="@Url.Action("Index", "Home")" class="btn btn-primary">@Localizer["ViewAllItems"]</a>
                 </div>
             </div>
         }
     </div>
 </section>
-
 
 <style>
     :root {
@@ -223,16 +216,6 @@
         .menu-header p {
             color: #333 !important;
         }
-
-    .theme-toggle {
-        background: rgba(255,255,255,0.2);
-        border-radius: 20px;
-        padding: 5px 10px;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        cursor: pointer;
-    }
 
     .discount-carousel {
         scrollbar-width: thin;
@@ -267,20 +250,6 @@
         padding: 5px 8px;
     }
 
-    .add-to-cart-btn {
-        border-radius: 50%;
-        width: 35px;
-        height: 35px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-    }
-
-        .add-to-cart-btn:hover {
-            transform: scale(1.1);
-        }
-
     .hover-scale {
         transition: all 0.3s ease;
     }
@@ -304,68 +273,3 @@
             background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
         }
 </style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add to cart functionality
-        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const productId = this.getAttribute('data-product-id');
-
-                // Show loading state
-                const originalContent = this.innerHTML;
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                this.disabled = true;
-
-                fetch('@Url.Action("AddToCart", "Menu")', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'RequestVerificationToken': document.querySelector('[name="__RequestVerificationToken"]')?.value || ''
-                    },
-                    body: JSON.stringify({
-                        productId: productId,
-                        quantity: 1
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Show success feedback
-                        this.innerHTML = '<i class="fas fa-check"></i>';
-                        this.classList.remove('btn-warning');
-                        this.classList.add('btn-success');
-
-                        // Reset after 2 seconds
-                        setTimeout(() => {
-                            this.innerHTML = originalContent;
-                            this.classList.remove('btn-success');
-                            this.classList.add('btn-warning');
-                            this.disabled = false;
-                        }, 2000);
-                    } else {
-                        // Show error feedback
-                        this.innerHTML = '<i class="fas fa-times"></i>';
-                        this.classList.add('btn-danger');
-
-                        setTimeout(() => {
-                            this.innerHTML = originalContent;
-                            this.classList.remove('btn-danger');
-                            this.disabled = false;
-                        }, 2000);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    this.innerHTML = originalContent;
-                    this.disabled = false;
-                });
-            });
-        });
-
-        // Theme toggle functionality
-        document.querySelector('.theme-toggle')?.addEventListener('click', function() {
-            document.body.classList.toggle('dark-theme');
-        });
-    });
-</script>
