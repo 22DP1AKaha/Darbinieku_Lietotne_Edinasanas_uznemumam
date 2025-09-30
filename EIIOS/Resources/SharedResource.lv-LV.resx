@@ -135,17 +135,29 @@
   <data name="FirstNameRequired" xml:space="preserve">
     <value>Vārds ir obligāts.</value>
   </data>
+  <data name="Home" xml:space="preserve">
+    <value>Sākums</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Valoda</value>
+  </data>
   <data name="LastName" xml:space="preserve">
     <value>Uzvārds</value>
   </data>
   <data name="LastNameRequired" xml:space="preserve">
     <value>Uzvārds ir obligāts.</value>
   </data>
+  <data name="Login" xml:space="preserve">
+    <value>Pieslēgšanās</value>
+  </data>
   <data name="Password" xml:space="preserve">
     <value>Parole</value>
   </data>
   <data name="PasswordRequired" xml:space="preserve">
     <value>Parole ir obligāta.</value>
+  </data>
+  <data name="Register" xml:space="preserve">
+    <value>Reģistrēties</value>
   </data>
   <data name="RememberMe" xml:space="preserve">
     <value>Atcerēties mani</value>
