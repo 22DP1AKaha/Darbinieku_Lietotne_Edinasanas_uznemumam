@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AllCategories" xml:space="preserve">
+    <value>All categories</value>
+  </data>
   <data name="DiscountSystem" xml:space="preserve">
     <value>Discount System</value>
   </data>
@@ -126,14 +129,44 @@
   <data name="Features" xml:space="preserve">
     <value>System Features</value>
   </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filter</value>
+  </data>
   <data name="InventoryManagement" xml:space="preserve">
     <value>Inventory Management</value>
+  </data>
+  <data name="MenuDescription" xml:space="preserve">
+    <value>Check out our menu</value>
   </data>
   <data name="MenuManagement" xml:space="preserve">
     <value>Menu Management</value>
   </data>
+  <data name="NoDiscounts" xml:space="preserve">
+    <value>No Discounts</value>
+  </data>
+  <data name="OurMenu" xml:space="preserve">
+    <value>Menu</value>
+  </data>
   <data name="ReadyToStart" xml:space="preserve">
     <value>Ready to Start?</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="SortByCategory" xml:space="preserve">
+    <value>Sort by category</value>
+  </data>
+  <data name="SortByDiscount" xml:space="preserve">
+    <value>Sort by discount</value>
+  </data>
+  <data name="SortByName" xml:space="preserve">
+    <value>Sort by name</value>
+  </data>
+  <data name="SortByPriceHigh" xml:space="preserve">
+    <value>Sort by price high-low</value>
+  </data>
+  <data name="SortByPriceLow" xml:space="preserve">
+    <value>Sort by price low-high</value>
   </data>
   <data name="StartWorking" xml:space="preserve">
     <value>Start Working with EIIOS</value>
