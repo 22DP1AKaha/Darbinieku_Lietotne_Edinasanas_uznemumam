@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="EIIOSName" xml:space="preserve">
+    <value>Ēdināšanas iestāžu iekšējās organizācijas sistēma</value>
+  </data>
   <data name="Email" xml:space="preserve">
     <value>E-pasta adrese</value>
   </data>
@@ -146,6 +149,9 @@
   </data>
   <data name="RememberMe" xml:space="preserve">
     <value>Atcerēties mani</value>
+  </data>
+  <data name="RightsReserved" xml:space="preserve">
+    <value>Visas tiesības aizsargātas</value>
   </data>
   <data name="Username" xml:space="preserve">
     <value>Lietotājvārds vai e-pasts</value>
