@@ -1,181 +1,275 @@
-﻿@using Microsoft.AspNetCore.Mvc.Localization
+﻿@model EIIOS.ViewModels.MenuViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
 @{
-    ViewData["Title"] = Localizer["Home"];
+    ViewData["Title"] = Localizer["MenuTitle"];
 }
 
-<!-- Hero Section -->
-<section class="hero-section bg-primary text-white py-5">
-    <div class="container py-5">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <h1 class="display-4 fw-bold mb-4 welcome-title">
-                    @Localizer["WelcomeTitle"] <span class="text-warning">EIIOS</span>
-                </h1>
-                <p class="lead mb-4 welcome-subtitle">
-                    @Localizer["WelcomeSubtitle"]
-                </p>
-                <div class="d-flex gap-3 flex-wrap">
-                    <a href="@Url.Action("Menu", "Home")" class="btn btn-warning btn-lg hover-scale">
-                        <i class="fas fa-book-open me-2"></i>@Localizer["ViewMenu"]
-                    </a>
-                    <a href="@Url.Action("Register", "Account")" class="btn btn-light bg-white text-dark btn-lg shadow-lg hover-scale">
-                        <i class="fas fa-user-plus me-2"></i>@Localizer["Register"]
-                    </a>
-                </div>
-            </div>
-            <div class="col-lg-6 text-center">
-                <i class="fas fa-utensils display-1 text-warning opacity-75"></i>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Features Section -->
-<section class="py-5">
+<!-- Header Section -->
+<section class="menu-header bg-primary text-white py-4">
     <div class="container">
-        <div class="row text-center mb-5">
-            <div class="col-12">
-                <h2 class="fw-bold mb-3">@Localizer["Features"]</h2>
-                <p class="lead text-muted">@Localizer["FeaturesDesc"]</p>
-            </div>
-        </div>
-
-        <div class="row g-4">
-            <!-- Menu Management -->
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body text-center p-4">
-                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                            <i class="fas fa-book-open fa-2x text-primary"></i>
-                        </div>
-                        <h4 class="fw-bold mb-3">@Localizer["MenuManagement"]</h4>
-                        <p class="text-muted">@Localizer["MenuManagementDesc"]</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Inventory Management -->
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body text-center p-4">
-                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                            <i class="fas fa-boxes fa-2x text-success"></i>
-                        </div>
-                        <h4 class="fw-bold mb-3">@Localizer["InventoryManagement"]</h4>
-                        <p class="text-muted">@Localizer["InventoryManagementDesc"]</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Time Tracking -->
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body text-center p-4">
-                        <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                            <i class="fas fa-clock fa-2x text-warning"></i>
-                        </div>
-                        <h4 class="fw-bold mb-3">@Localizer["TimeTracking"]</h4>
-                        <p class="text-muted">@Localizer["TimeTrackingDesc"]</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Discounts -->
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body text-center p-4">
-                        <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                            <i class="fas fa-tags fa-2x text-danger"></i>
-                        </div>
-                        <h4 class="fw-bold mb-3">@Localizer["DiscountSystem"]</h4>
-                        <p class="text-muted">@Localizer["DiscountSystemDesc"]</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- User Roles -->
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body text-center p-4">
-                        <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                            <i class="fas fa-users fa-2x text-info"></i>
-                        </div>
-                        <h4 class="fw-bold mb-3">@Localizer["UserRoles"]</h4>
-                        <p class="text-muted">@Localizer["UserRolesDesc"]</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Easy to Use -->
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body text-center p-4">
-                        <div class="bg-secondary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                            <i class="fas fa-heart fa-2x text-secondary"></i>
-                        </div>
-                        <h4 class="fw-bold mb-3">@Localizer["EasyToUse"]</h4>
-                        <p class="text-muted">@Localizer["EasyToUseDesc"]</p>
-                    </div>
-                </div>
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="fw-bold mb-2">@Localizer["OurMenu"]</h1>
+                <p class="mb-0">@Localizer["MenuDescription"]</p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- CTA Section -->
-<section class="bg-primary text-white py-5 cta-section">
-    <div class="container text-center">
-        <h2 class="fw-bold mb-4">@Localizer["ReadyToStart"]</h2>
-        <p class="lead mb-4">@Localizer["ReadyToStartDesc"]</p>
-        <a href="@Url.Action("Register", "Account")" class="btn btn-warning btn-lg hover-scale">
-            <i class="fas fa-rocket me-2"></i>@Localizer["StartWorking"]
-        </a>
+<!-- Featured Discounts Section -->
+<section class="featured-discounts py-4 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                @if (Model != null && Model.Products.Any(p => p.DiscountProducts?.Any(dp => dp.Discount.IsCurrentlyActive) == true))
+                {
+                    <div class="discount-carousel d-flex gap-3 overflow-auto pb-3">
+                        @foreach (var product in Model.Products
+                                            .Where(p => p.DiscountProducts?.Any(dp => dp.Discount.IsCurrentlyActive) == true)
+                                            .Take(6))
+                        {
+                            var activeDiscount = product.DiscountProducts?.FirstOrDefault(dp => dp.Discount.IsCurrentlyActive)?.Discount;
+                            if (activeDiscount != null)
+                            {
+                                <div class="discount-card bg-white rounded shadow-sm p-3 flex-shrink-0" style="min-width: 200px;">
+                                    <div class="position-relative">
+                                        <div class="product-image bg-light rounded mb-2" style="height: 120px;">
+                                            @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                            {
+                                                <img src="@product.ImageUrl" alt="@product.Name" class="img-fluid rounded" style="height: 100%; width: 100%; object-fit: cover;">
+                                            }
+                                            else
+                                            {
+                                                <div class="d-flex align-items-center justify-content-center h-100">
+                                                    <i class="fas fa-utensils fa-2x text-muted"></i>
+                                                </div>
+                                            }
+                                        </div>
+                                        <div class="discount-badge position-absolute top-0 end-0">
+                                            <span class="badge bg-danger rounded-circle">
+                                                -@(activeDiscount.DiscountType == DiscountType.Percentage ? $"{activeDiscount.DiscountValue:0}%" : $"${activeDiscount.DiscountValue:0.00}")
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <h6 class="mb-1">@product.Name</h6>
+                                    <div class="price-info">
+                                        @if (activeDiscount.DiscountType == DiscountType.Percentage)
+                                        {
+                                            var discountedPrice = product.BasePrice * (1 - activeDiscount.DiscountValue / 100);
+                                            <span class="text-decoration-line-through text-muted small">$@product.BasePrice.ToString("0.00")</span>
+                                            <span class="text-success fw-bold">$@discountedPrice.ToString("0.00")</span>
+                                        }
+                                        else
+                                        {
+                                            var discountedPrice = product.BasePrice - activeDiscount.DiscountValue;
+                                            <span class="text-decoration-line-through text-muted small">$@product.BasePrice.ToString("0.00")</span>
+                                            <span class="text-success fw-bold">$@discountedPrice.ToString("0.00")</span>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-center text-muted">@Localizer["NoDiscounts"]</p>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Search and Filter Section -->
+<section class="search-filters py-4">
+    <div class="container">
+        <form method="get" asp-action="Index" asp-controller="Home" class="row g-3">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                    <input type="text" name="searchTerm" value="@Model.SearchTerm" class="form-control border-start-0" placeholder="@Localizer["SearchPlaceholder"]">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select name="category" class="form-select">
+                    <option value="">@Localizer["AllCategories"]</option>
+                    @foreach (var category in Model.Categories)
+                    {
+                        <option value="@category.Name" selected="@(Model.Category == category.Name)">@category.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="sortBy" class="form-select">
+                    <option value="name" selected="@(Model.SortBy == "name")">@Localizer["SortByName"]</option>
+                    <option value="price" selected="@(Model.SortBy == "price")">@Localizer["SortByPriceLow"]</option>
+                    <option value="pricedesc" selected="@(Model.SortBy == "pricedesc")">@Localizer["SortByPriceHigh"]</option>
+                    <option value="category" selected="@(Model.SortBy == "category")">@Localizer["SortByCategory"]</option>
+                    <option value="discount" selected="@(Model.SortBy == "discount")">@Localizer["SortByDiscount"]</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter me-1"></i>@Localizer["Filter"]</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- Menu Items Section -->
+<section class="menu-items py-4">
+    <div class="container">
+        @if (Model != null && Model.Products.Any())
+        {
+            <div class="row g-4">
+                @foreach (var product in Model.Products)
+                {
+                    var activeDiscount = product.DiscountProducts?.FirstOrDefault(dp => dp.Discount.IsCurrentlyActive)?.Discount;
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="card menu-item-card h-100 border-0 shadow-sm hover-scale">
+                            <div class="position-relative">
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                    {
+                                        <img src="@product.ImageUrl" alt="@product.Name" class="img-fluid rounded-top" style="height: 100%; width: 100%; object-fit: cover;">
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-utensils fa-3x text-muted"></i>
+                                    }
+                                </div>
+                                @if (activeDiscount != null)
+                                {
+                                    <div class="discount-badge position-absolute top-0 end-0 m-2">
+                                        <span class="badge bg-danger fs-6">
+                                            -@(activeDiscount.DiscountType == DiscountType.Percentage ? $"{activeDiscount.DiscountValue:0}%" : $"${activeDiscount.DiscountValue:0.00}")
+                                        </span>
+                                    </div>
+                                }
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                @if (product.ProductCategories?.Any() == true)
+                                {
+                                    <span class="badge bg-light text-dark small">@product.ProductCategories.First().Category?.Name</span>
+                                }
+                                <h5 class="card-title mb-2">@product.Name</h5>
+                                <p class="card-text text-muted small flex-grow-1">
+                                    @(product.Description?.Length > 80 ? product.Description.Substring(0, 80) + "..." : product.Description)
+                                </p>
+                                @if (product.PreparationTime.HasValue)
+                                {
+                                    <div class="mb-2">
+                                        <small class="text-muted"><i class="fas fa-clock me-1"></i>@product.PreparationTime @Localizer["Minutes"]</small>
+                                    </div>
+                                }
+                                <div class="price-info mt-auto">
+                                    @if (activeDiscount != null)
+                                    {
+                                        var discountedPrice = activeDiscount.DiscountType == DiscountType.Percentage
+                                        ? product.BasePrice * (1 - activeDiscount.DiscountValue / 100)
+                                        : product.BasePrice - activeDiscount.DiscountValue;
+
+                                        <div>
+                                            <span class="text-decoration-line-through text-muted small">$@product.BasePrice.ToString("0.00")</span>
+                                            <span class="text-success fw-bold fs-5">$@discountedPrice.ToString("0.00")</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-primary fw-bold fs-5">$@product.BasePrice.ToString("0.00")</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-12 text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">@Localizer["NoMenuItems"]</h4>
+                    <p class="text-muted">@Localizer["NoMenuItemsDescription"]</p>
+                    <a href="@Url.Action("Index", "Home")" class="btn btn-primary">@Localizer["ViewAllItems"]</a>
+                </div>
+            </div>
+        }
     </div>
 </section>
 
 <style>
-
-    :root{
+    :root {
         --gradient-primary: linear-gradient(135deg, #fdfdb4 0%, #d9d7b6 100%);
         --gradient-secondary: linear-gradient(135deg, #f7dc6f 0%, #e6b800 100%);
-        --gradient-accent: linear-gradient(135deg, #f9e79f 0%, #d68910 100%);
         --shadow-soft: 0 10px 40px rgba(0,0,0,0.1);
         --shadow-hover: 0 20px 60px rgba(0,0,0,0.15);
     }
 
-    .hero-section {
-        background: linear-gradient(135deg, #f9e79f 0%, #fdfdb4 100%);
-        position: relative;
-        min-height: 80vh;
-        display: flex;
-        align-items: center;     
-    }
-
-    .welcome-title {
-        color: black
-    }
-
-    .welcome-subtitle {
-        color: black
-    }
-
-    .cta-section {
+    .menu-header {
         background: var(--gradient-primary);
+        color: #333 !important;
     }
 
-    .cta-section h2,
-    .cta-section p {
-        color: black;
+        .menu-header h1,
+        .menu-header p {
+            color: #333 !important;
+        }
+
+    .discount-carousel {
+        scrollbar-width: thin;
+        scrollbar-color: #ffc107 transparent;
+    }
+
+        .discount-carousel::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .discount-carousel::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .discount-carousel::-webkit-scrollbar-thumb {
+            background: #ffc107;
+            border-radius: 3px;
+        }
+
+    .menu-item-card {
+        transition: all 0.3s ease;
+        border: 1px solid #e9ecef;
+    }
+
+        .menu-item-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover) !important;
+        }
+
+    .discount-badge .badge {
+        font-size: 0.8rem;
+        padding: 5px 8px;
     }
 
     .hover-scale {
         transition: all 0.3s ease;
     }
 
-    .hover-scale:hover {
-        transform: scale(1.05);
-        box-shadow: var(--shadow-hover) !important;
+    .search-filters {
+        background: #f8f9fa;
     }
 
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #ffc107;
+        box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        border: none;
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+        }
 </style>
