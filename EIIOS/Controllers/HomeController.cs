@@ -93,15 +93,19 @@ namespace EIIOS.Controllers
             var allergenIds = Request.Form["SelectedAllergenIds"].Select(int.Parse).ToList();
             var imageFile = Request.Form.Files.GetFile("ImageFile");
 
-            if (!decimal.TryParse(basePriceStr, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal basePrice))
+            if (!decimal.TryParse(basePriceStr, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal basePrice) || basePrice < 0)
             {
-                return Json(new { success = false, message = "Invalid price format" });
+                return Json(new { success = false, message = _localizer["InvalidPriceFormat"].Value });
             }
 
             int? prepTime = null;
             if (!string.IsNullOrEmpty(prepTimeStr))
             {
-                prepTime = int.Parse(prepTimeStr);
+                if (!int.TryParse(prepTimeStr, out int parsedPrepTime) || parsedPrepTime < 0)
+                {
+                    return Json(new { success = false, message = _localizer["InvalidPrepTimeFormat"].Value });
+                }
+                prepTime = parsedPrepTime;
             }
 
             var imageService = HttpContext.RequestServices.GetRequiredService<ImageService>();
@@ -170,15 +174,19 @@ namespace EIIOS.Controllers
             var imageFile = Request.Form.Files.GetFile("ImageFile");
 
             // Parse decimal using invariant culture
-            if (!decimal.TryParse(basePriceStr, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal basePrice))
+            if (!decimal.TryParse(basePriceStr, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal basePrice) || basePrice < 0)
             {
-                return Json(new { success = false, message = "Invalid price format" });
+                return Json(new { success = false, message = _localizer["InvalidPriceFormat"].Value });
             }
 
             int? prepTime = null;
             if (!string.IsNullOrEmpty(prepTimeStr))
             {
-                prepTime = int.Parse(prepTimeStr);
+                if (!int.TryParse(prepTimeStr, out int parsedPrepTime) || parsedPrepTime < 0)
+                {
+                    return Json(new { success = false, message = _localizer["InvalidPrepTimeFormat"].Value });
+                }
+                prepTime = parsedPrepTime;
             }
 
             var product = await _context.Products
