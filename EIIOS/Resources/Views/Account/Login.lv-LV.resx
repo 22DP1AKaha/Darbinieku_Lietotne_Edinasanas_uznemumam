@@ -139,7 +139,7 @@
     <value>Parole</value>
   </data>
   <data name="PasswordPlaceholder" xml:space="preserve">
-    <value>1234</value>
+    <value>Parole</value>
   </data>
   <data name="RegisterHere" xml:space="preserve">
     <value>Reģistrēties šeit</value>
@@ -151,6 +151,6 @@
     <value>Lietotājvārds</value>
   </data>
   <data name="UsernamePlaceholder" xml:space="preserve">
-    <value>Janis.berzins@example.com</value>
+    <value>JanisBerzins@piemers.lv</value>
   </data>
 </root>
