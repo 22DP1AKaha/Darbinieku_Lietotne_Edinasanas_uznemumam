@@ -82,7 +82,12 @@ namespace EIIOS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateProduct()
         {
-            // Manually parse form data
+            if (!await IsCurrentUserAdmin())
+            {
+                TempData["ErrorMessage"] = _localizer["Unauthorized"].Value;
+                return RedirectToAction("Index");
+            }
+
             var name = Request.Form["Name"].ToString();
             var description = Request.Form["Description"].ToString();
             var basePriceStr = Request.Form["BasePrice"].ToString();
@@ -115,7 +120,9 @@ namespace EIIOS.Controllers
             {
                 image = await imageService.SaveImageAsync(imageFile, null);
                 if (image == null)
+                {
                     return Json(new { success = false, message = _localizer["InvalidImageFile"].Value });
+                }
             }
 
             var product = new ProductModel
@@ -129,7 +136,7 @@ namespace EIIOS.Controllers
                 ImageId = image?.Id,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                CreatedById = 1
+                CreatedById = HttpContext.Session.GetInt32("UserId") ?? 1
             };
 
             _context.Products.Add(product);
@@ -155,14 +162,20 @@ namespace EIIOS.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Json(new { success = true, message = _localizer["ProductCreatedSuccess"].Value });
+            TempData["SuccessMessage"] = _localizer["ProductCreatedSuccess"].Value;
+            return Json(new { success = true });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateProduct(int id)
         {
-            // Manually parse the form data to avoid culture issues
+            if (!await IsCurrentUserAdmin())
+            {
+                TempData["ErrorMessage"] = _localizer["Unauthorized"].Value;
+                return RedirectToAction("Index");
+            }
+
             var name = Request.Form["Name"].ToString();
             var description = Request.Form["Description"].ToString();
             var basePriceStr = Request.Form["BasePrice"].ToString();
@@ -173,7 +186,6 @@ namespace EIIOS.Controllers
             var allergenIds = Request.Form["SelectedAllergenIds"].Select(int.Parse).ToList();
             var imageFile = Request.Form.Files.GetFile("ImageFile");
 
-            // Parse decimal using invariant culture
             if (!decimal.TryParse(basePriceStr, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal basePrice) || basePrice < 0)
             {
                 return Json(new { success = false, message = _localizer["InvalidPriceFormat"].Value });
@@ -195,7 +207,9 @@ namespace EIIOS.Controllers
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null)
+            {
                 return Json(new { success = false, message = _localizer["ProductNotFound"].Value });
+            }
 
             var imageService = HttpContext.RequestServices.GetRequiredService<ImageService>();
 
@@ -208,7 +222,9 @@ namespace EIIOS.Controllers
 
                 var newImage = await imageService.SaveImageAsync(imageFile, null);
                 if (newImage == null)
+                {
                     return Json(new { success = false, message = _localizer["InvalidImageFile"].Value });
+                }
 
                 product.ImageId = newImage?.Id;
             }
@@ -243,17 +259,26 @@ namespace EIIOS.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Json(new { success = true, message = _localizer["ProductUpdatedSuccess"].Value });
+            TempData["SuccessMessage"] = _localizer["ProductUpdatedSuccess"].Value;
+            return Json(new { success = true });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteProduct(int id)
         {
+            if (!await IsCurrentUserAdmin())
+            {
+                TempData["ErrorMessage"] = _localizer["Unauthorized"].Value;
+                return RedirectToAction("Index");
+            }
+
             var product = await _context.Products.FindAsync(id);
 
             if (product == null)
+            {
                 return Json(new { success = false, message = _localizer["ProductNotFound"].Value });
+            }
 
             var imageService = HttpContext.RequestServices.GetRequiredService<ImageService>();
 
@@ -265,7 +290,8 @@ namespace EIIOS.Controllers
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
 
-            return Json(new { success = true, message = _localizer["ProductDeletedSuccess"].Value });
+            TempData["SuccessMessage"] = _localizer["ProductDeletedSuccess"].Value;
+            return Json(new { success = true });
         }
 
         public async Task<bool> IsCurrentUserAdmin()

@@ -117,11 +117,35 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="InvalidImageFile" xml:space="preserve">
+    <value>Invalid image file</value>
+  </data>
+  <data name="InvalidPrepTimeFormat" xml:space="preserve">
+    <value>Invalid preperation time format</value>
+  </data>
+  <data name="InvalidPriceFormat" xml:space="preserve">
+    <value>Invalid price format</value>
+  </data>
   <data name="MenuNotAvailable" xml:space="preserve">
     <value>Menu will be available after adding products!</value>
   </data>
+  <data name="ProductCreatedSuccess" xml:space="preserve">
+    <value>Product created successfully!</value>
+  </data>
+  <data name="ProductDeletedSuccess" xml:space="preserve">
+    <value>Product has been deleted!</value>
+  </data>
+  <data name="ProductNotFound" xml:space="preserve">
+    <value>Product not found</value>
+  </data>
+  <data name="ProductUpdatedSuccess" xml:space="preserve">
+    <value>Product has been updated!</value>
+  </data>
   <data name="Register" xml:space="preserve">
     <value>Register</value>
+  </data>
+  <data name="Unauthorized" xml:space="preserve">
+    <value>Unauthorized action!</value>
   </data>
   <data name="ViewMenu" xml:space="preserve">
     <value>View Menu</value>

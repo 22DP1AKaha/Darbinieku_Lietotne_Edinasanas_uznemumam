@@ -117,19 +117,43 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="WelcomeTitle" xml:space="preserve">
-    <value>Laipni lūdzam</value>
+  <data name="InvalidImageFile" xml:space="preserve">
+    <value>Nekorekts bildes fails</value>
   </data>
-  <data name="WelcomeSubtitle" xml:space="preserve">
-    <value>Ēdināšanas iestāžu iekšējās organizācijas sistēma</value>
+  <data name="InvalidPrepTimeFormat" xml:space="preserve">
+    <value>Nekorekts pagatavošanas laika formāts</value>
   </data>
-  <data name="ViewMenu" xml:space="preserve">
-    <value>Skatīt ēdienkarti</value>
+  <data name="InvalidPriceFormat" xml:space="preserve">
+    <value>Nekorekts cenas formāts</value>
+  </data>
+  <data name="MenuNotAvailable" xml:space="preserve">
+    <value>Ēdienkarte būs pieejama pēc produktu pievienošanas!</value>
+  </data>
+  <data name="ProductCreatedSuccess" xml:space="preserve">
+    <value>Produkts veiksmīgi izveidots!</value>
+  </data>
+  <data name="ProductDeletedSuccess" xml:space="preserve">
+    <value>Produkts ir izdzēsts!</value>
+  </data>
+  <data name="ProductNotFound" xml:space="preserve">
+    <value>Produkts nav atrasts</value>
+  </data>
+  <data name="ProductUpdatedSuccess" xml:space="preserve">
+    <value>Produkts atjaunots!</value>
   </data>
   <data name="Register" xml:space="preserve">
     <value>Reģistrēties</value>
   </data>
-  <data name="MenuNotAvailable" xml:space="preserve">
-    <value>Ēdienkarte būs pieejama pēc produktu pievienošanas!</value>
+  <data name="Unauthorized" xml:space="preserve">
+    <value>Neautorizēta darbība!</value>
+  </data>
+  <data name="ViewMenu" xml:space="preserve">
+    <value>Skatīt ēdienkarti</value>
+  </data>
+  <data name="WelcomeSubtitle" xml:space="preserve">
+    <value>Ēdināšanas iestāžu iekšējās organizācijas sistēma</value>
+  </data>
+  <data name="WelcomeTitle" xml:space="preserve">
+    <value>Laipni lūdzam</value>
   </data>
 </root>
