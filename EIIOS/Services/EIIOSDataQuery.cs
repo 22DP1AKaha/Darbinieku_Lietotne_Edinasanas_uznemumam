@@ -21,6 +21,8 @@ namespace EIIOS.Services
             string category = "",
             string sortBy = "name")
         {
+            var now = DateTime.UtcNow;
+
             var query = _context.Products
                 .Include(p => p.ProductCategories)
                 .ThenInclude(pc => pc.Category)
@@ -47,11 +49,21 @@ namespace EIIOS.Services
             {
                 "price" => query.OrderBy(p => p.BasePrice),
                 "pricedesc" => query.OrderByDescending(p => p.BasePrice),
-                "category" => query.OrderBy(p => p.ProductCategories.FirstOrDefault().Category.Name)
+                "category" => query.OrderBy(p => p.ProductCategories
+                                                   .OrderBy(pc => pc.Category.Name)
+                                                   .Select(pc => pc.Category.Name)
+                                                   .FirstOrDefault())
                                    .ThenBy(p => p.Name),
-                "discount" => query.OrderByDescending(p => p.DiscountProducts
-                    .Where(dp => dp.Discount.IsCurrentlyActive)
-                    .Max(dp => (decimal?)dp.Discount.DiscountValue) ?? 0),
+                "discount" => query
+                    .Select(p => new
+                    {
+                        Product = p,
+                        MaxDiscount = p.DiscountProducts
+                                       .Where(dp => dp.Discount.StartDate <= now && dp.Discount.EndDate >= now)
+                                       .Max(dp => (decimal?)dp.Discount.DiscountValue) ?? 0
+                    })
+                    .OrderByDescending(x => x.MaxDiscount)
+                    .Select(x => x.Product),
                 _ => query.OrderBy(p => p.Name)
             };
 
@@ -91,6 +103,8 @@ namespace EIIOS.Services
         /// </summary>
         public async Task<List<ProductModel>> GetDiscountedProductsAsync(int count = 6)
         {
+            var now = DateTime.UtcNow;
+
             return await _context.Products
                 .Include(p => p.ProductCategories)
                 .ThenInclude(pc => pc.Category)
@@ -98,7 +112,7 @@ namespace EIIOS.Services
                 .ThenInclude(dp => dp.Discount)
                 .Where(p => p.IsActive &&
                            p.IsAvailable &&
-                           p.DiscountProducts.Any(dp => dp.Discount.IsCurrentlyActive))
+                           p.DiscountProducts.Any(dp => dp.Discount.StartDate <= now && dp.Discount.EndDate >= now))
                 .Take(count)
                 .ToListAsync();
         }

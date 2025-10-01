@@ -144,6 +144,9 @@
   <data name="NoDiscounts" xml:space="preserve">
     <value>Nav atlaides</value>
   </data>
+  <data name="NoMenuItems" xml:space="preserve">
+    <value>Nav neviens produkts kas atbilst kritērijiem</value>
+  </data>
   <data name="OurMenu" xml:space="preserve">
     <value>Ēdienkarte</value>
   </data>
@@ -160,7 +163,7 @@
     <value>Kārtot pēc akcijas</value>
   </data>
   <data name="SortByName" xml:space="preserve">
-    <value>Kārtot pēc vārda</value>
+    <value>Kārtot pēc nosaukuma</value>
   </data>
   <data name="SortByPriceHigh" xml:space="preserve">
     <value>Dilstoša cena</value>
@@ -176,6 +179,9 @@
   </data>
   <data name="UserRoles" xml:space="preserve">
     <value>Lietotāju lomas</value>
+  </data>
+  <data name="ViewAllItems" xml:space="preserve">
+    <value>Skatīt visu produktus</value>
   </data>
   <data name="WelcomeTitle" xml:space="preserve">
     <value>Laipni lūdzam</value>
