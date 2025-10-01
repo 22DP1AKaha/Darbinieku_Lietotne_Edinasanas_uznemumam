@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="About" xml:space="preserve">
-    <value>Par</value>
+    <value>Par mums</value>
   </data>
   <data name="Dashboard" xml:space="preserve">
     <value>Dashboard</value>
@@ -137,5 +137,8 @@
   </data>
   <data name="Register" xml:space="preserve">
     <value>Reģistrēties</value>
+  </data>
+  <data name="Signout" xml:space="preserve">
+    <value>Iziet</value>
   </data>
 </root>
