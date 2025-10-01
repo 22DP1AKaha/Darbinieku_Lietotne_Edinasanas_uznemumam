@@ -117,14 +117,47 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Active" xml:space="preserve">
+    <value>Aktīvs</value>
+  </data>
+  <data name="AddProduct" xml:space="preserve">
+    <value>Pievienot produktu</value>
+  </data>
   <data name="AllCategories" xml:space="preserve">
     <value>Visas kategorijas</value>
+  </data>
+  <data name="Allergens" xml:space="preserve">
+    <value>Allergēni</value>
+  </data>
+  <data name="Available" xml:space="preserve">
+    <value>Pieejams</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Atcelt</value>
+  </data>
+  <data name="Categories" xml:space="preserve">
+    <value>Kategorijas</value>
+  </data>
+  <data name="ConfirmDelete" xml:space="preserve">
+    <value>Apstiprināt dzēšanu</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Dzēst</value>
+  </data>
+  <data name="DeleteConfirmMessage" xml:space="preserve">
+    <value>Dzēšot produktu, tas pazudīs uz visiem laikiem.</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Apraksts</value>
   </data>
   <data name="DiscountSystem" xml:space="preserve">
     <value>Atlaižu sistēma</value>
   </data>
   <data name="EasyToUse" xml:space="preserve">
     <value>Viegli lietojams</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Rediģēt</value>
   </data>
   <data name="Features" xml:space="preserve">
     <value>Sistēmas iespējas</value>
@@ -141,6 +174,9 @@
   <data name="MenuManagement" xml:space="preserve">
     <value>Ēdienkartes pārvaldība</value>
   </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>Minūtes</value>
+  </data>
   <data name="NoDiscounts" xml:space="preserve">
     <value>Nav atlaides</value>
   </data>
@@ -150,8 +186,23 @@
   <data name="OurMenu" xml:space="preserve">
     <value>Ēdienkarte</value>
   </data>
+  <data name="PrepTime" xml:space="preserve">
+    <value>Gatavošanas laiks</value>
+  </data>
+  <data name="Price" xml:space="preserve">
+    <value>Cena</value>
+  </data>
+  <data name="ProductImage" xml:space="preserve">
+    <value>Produktu bilde</value>
+  </data>
+  <data name="ProductName" xml:space="preserve">
+    <value>Produktu vārds</value>
+  </data>
   <data name="ReadyToStart" xml:space="preserve">
     <value>Gatavs sākt?</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Saglabāt</value>
   </data>
   <data name="SearchPlaceholder" xml:space="preserve">
     <value>Meklēt</value>
