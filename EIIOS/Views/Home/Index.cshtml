@@ -62,7 +62,7 @@
                                         </div>
                                         <div class="discount-badge position-absolute top-0 end-0">
                                             <span class="badge bg-danger rounded-circle">
-                                                -@(activeDiscount.DiscountType == DiscountType.Percentage ? $"{activeDiscount.DiscountValue:0}%" : $"${activeDiscount.DiscountValue:0.00}")
+                                                -@(activeDiscount.DiscountType == DiscountType.Percentage ? $"{activeDiscount.DiscountValue:0}%" : $"€{activeDiscount.DiscountValue:0.00}")
                                             </span>
                                         </div>
                                     </div>
@@ -71,13 +71,13 @@
                                         @if (activeDiscount.DiscountType == DiscountType.Percentage)
                                         {
                                             var discountedPrice = product.BasePrice * (1 - activeDiscount.DiscountValue / 100);
-                                            <span class="text-decoration-line-through text-muted small">$@product.BasePrice.ToString("0.00")</span>
+                                            <span class="text-decoration-line-through text-muted small">€@product.BasePrice.ToString("0.00")</span>
                                             <span class="text-success fw-bold">$@discountedPrice.ToString("0.00")</span>
                                         }
                                         else
                                         {
                                             var discountedPrice = product.BasePrice - activeDiscount.DiscountValue;
-                                            <span class="text-decoration-line-through text-muted small">$@product.BasePrice.ToString("0.00")</span>
+                                            <span class="text-decoration-line-through text-muted small">€@product.BasePrice.ToString("0.00")</span>
                                             <span class="text-success fw-bold">$@discountedPrice.ToString("0.00")</span>
                                         }
                                     </div>
@@ -200,13 +200,13 @@
                                         : product.BasePrice - activeDiscount.DiscountValue;
 
                                         <div>
-                                            <span class="text-decoration-line-through text-muted small">$@product.BasePrice.ToString("0.00")</span>
-                                            <span class="text-success fw-bold fs-5">$@discountedPrice.ToString("0.00")</span>
+                                            <span class="text-decoration-line-through text-muted small">€@product.BasePrice.ToString("0.00")</span>
+                                            <span class="text-success fw-bold fs-5">€@discountedPrice.ToString("0.00")</span>
                                         </div>
                                     }
                                     else
                                     {
-                                        <span class="text-primary fw-bold fs-5">$@product.BasePrice.ToString("0.00")</span>
+                                        <span class="text-primary fw-bold fs-5">€@product.BasePrice.ToString("0.00")</span>
                                     }
                                 </div>
                             </div>
@@ -252,7 +252,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="basePrice" class="form-label">@Localizer["Price"] ($) *</label>
+                                <label for="basePrice" class="form-label">@Localizer["Price"] (€) *</label>
                                 <input type="number" step="0.01" class="form-control" id="basePrice" name="basePrice" required />
                             </div>
                             <div class="col-md-6 mb-3">
@@ -461,7 +461,45 @@
 
         document.getElementById('productForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const formData = new FormData(this);
+            const formData = new FormData();
+
+            // Add anti-forgery token
+            formData.append('__RequestVerificationToken', document.querySelector('[name="__RequestVerificationToken"]').value);
+
+            // Add basic fields
+            formData.append('Name', document.getElementById('name').value);
+            formData.append('Description', document.getElementById('description').value);
+
+            // Format decimal as invariant culture string
+            const basePriceInput = document.getElementById('basePrice').value;
+            const basePrice = parseFloat(basePriceInput.replace(',', '.'));
+            formData.append('BasePrice', basePrice.toFixed(2));
+
+            const prepTime = document.getElementById('preparationTime').value;
+            if (prepTime) {
+                formData.append('PreparationTime', parseInt(prepTime));
+            }
+
+            // Add boolean fields explicitly as true/false strings
+            formData.append('IsAvailable', document.getElementById('isAvailable').checked ? 'true' : 'false');
+            formData.append('IsActive', document.getElementById('isActive').checked ? 'true' : 'false');
+
+            // Add image file if selected
+            const imageFile = document.getElementById('imageFile').files[0];
+            if (imageFile) {
+                formData.append('ImageFile', imageFile);
+            }
+
+            // Add selected categories
+            document.querySelectorAll('.category-check:checked').forEach(cb => {
+                formData.append('SelectedCategoryIds', cb.value);
+            });
+
+            // Add selected allergens
+            document.querySelectorAll('.allergen-check:checked').forEach(cb => {
+                formData.append('SelectedAllergenIds', cb.value);
+            });
+
             const productId = document.getElementById('productId').value;
             const url = productId ? `/Home/UpdateProduct/${productId}` : '/Home/CreateProduct';
 
@@ -476,6 +514,10 @@
                 } else {
                     alert(data.message);
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred');
             });
         });
 

@@ -5,7 +5,9 @@ using EIIOS.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
+using System.Globalization;
 using System.Security.Claims;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace EIIOS.Controllers
 {
     public class HomeController : Controller
@@ -78,39 +80,58 @@ namespace EIIOS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateProduct([FromForm] CreateProductViewModel model)
+        public async Task<IActionResult> CreateProduct()
         {
-            if (!ModelState.IsValid)
-                return Json(new { success = false, message = _localizer["ValidationFailed"].Value });
+            // Manually parse form data
+            var name = Request.Form["Name"].ToString();
+            var description = Request.Form["Description"].ToString();
+            var basePriceStr = Request.Form["BasePrice"].ToString();
+            var prepTimeStr = Request.Form["PreparationTime"].ToString();
+            var isAvailable = Request.Form["IsAvailable"].ToString() == "true";
+            var isActive = Request.Form["IsActive"].ToString() == "true";
+            var categoryIds = Request.Form["SelectedCategoryIds"].Select(int.Parse).ToList();
+            var allergenIds = Request.Form["SelectedAllergenIds"].Select(int.Parse).ToList();
+            var imageFile = Request.Form.Files.GetFile("ImageFile");
+
+            if (!decimal.TryParse(basePriceStr, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal basePrice))
+            {
+                return Json(new { success = false, message = "Invalid price format" });
+            }
+
+            int? prepTime = null;
+            if (!string.IsNullOrEmpty(prepTimeStr))
+            {
+                prepTime = int.Parse(prepTimeStr);
+            }
 
             var imageService = HttpContext.RequestServices.GetRequiredService<ImageService>();
 
             ImageModel? image = null;
-            if (model.ImageFile != null)
+            if (imageFile != null)
             {
-                image = await imageService.SaveImageAsync(model.ImageFile, model.ImageAltText);
+                image = await imageService.SaveImageAsync(imageFile, null);
                 if (image == null)
                     return Json(new { success = false, message = _localizer["InvalidImageFile"].Value });
             }
 
             var product = new ProductModel
             {
-                Name = model.Name,
-                Description = model.Description,
-                BasePrice = model.BasePrice,
-                PreparationTime = model.PreparationTime,
-                IsAvailable = model.IsAvailable,
-                IsActive = model.IsActive,
+                Name = name,
+                Description = description,
+                BasePrice = basePrice,
+                PreparationTime = prepTime,
+                IsAvailable = isAvailable,
+                IsActive = isActive,
                 ImageId = image?.Id,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                CreatedById = 1 // TODO: Get from authenticated user
+                CreatedById = 1
             };
 
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
 
-            foreach (var categoryId in model.SelectedCategoryIds)
+            foreach (var categoryId in categoryIds)
             {
                 _context.ProductCategories.Add(new ProductCategoryModel
                 {
@@ -119,7 +140,7 @@ namespace EIIOS.Controllers
                 });
             }
 
-            foreach (var allergenId in model.SelectedAllergenIds)
+            foreach (var allergenId in allergenIds)
             {
                 _context.ProductAllergens.Add(new ProductAllergenModel
                 {
@@ -135,8 +156,31 @@ namespace EIIOS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateProduct(int id, [FromForm] CreateProductViewModel model)
+        public async Task<IActionResult> UpdateProduct(int id)
         {
+            // Manually parse the form data to avoid culture issues
+            var name = Request.Form["Name"].ToString();
+            var description = Request.Form["Description"].ToString();
+            var basePriceStr = Request.Form["BasePrice"].ToString();
+            var prepTimeStr = Request.Form["PreparationTime"].ToString();
+            var isAvailable = Request.Form["IsAvailable"].ToString() == "true";
+            var isActive = Request.Form["IsActive"].ToString() == "true";
+            var categoryIds = Request.Form["SelectedCategoryIds"].Select(int.Parse).ToList();
+            var allergenIds = Request.Form["SelectedAllergenIds"].Select(int.Parse).ToList();
+            var imageFile = Request.Form.Files.GetFile("ImageFile");
+
+            // Parse decimal using invariant culture
+            if (!decimal.TryParse(basePriceStr, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal basePrice))
+            {
+                return Json(new { success = false, message = "Invalid price format" });
+            }
+
+            int? prepTime = null;
+            if (!string.IsNullOrEmpty(prepTimeStr))
+            {
+                prepTime = int.Parse(prepTimeStr);
+            }
+
             var product = await _context.Products
                 .Include(p => p.ProductCategories)
                 .Include(p => p.ProductAllergens)
@@ -145,35 +189,32 @@ namespace EIIOS.Controllers
             if (product == null)
                 return Json(new { success = false, message = _localizer["ProductNotFound"].Value });
 
-            if (!ModelState.IsValid)
-                return Json(new { success = false, message = _localizer["ValidationFailed"].Value });
-
             var imageService = HttpContext.RequestServices.GetRequiredService<ImageService>();
 
-            if (model.ImageFile != null)
+            if (imageFile != null)
             {
                 if (product.ImageId.HasValue)
                 {
                     await imageService.DeleteImageAsync(product.ImageId.Value);
                 }
 
-                var newImage = await imageService.SaveImageAsync(model.ImageFile, model.ImageAltText);
+                var newImage = await imageService.SaveImageAsync(imageFile, null);
                 if (newImage == null)
                     return Json(new { success = false, message = _localizer["InvalidImageFile"].Value });
 
                 product.ImageId = newImage?.Id;
             }
 
-            product.Name = model.Name;
-            product.Description = model.Description;
-            product.BasePrice = model.BasePrice;
-            product.PreparationTime = model.PreparationTime;
-            product.IsAvailable = model.IsAvailable;
-            product.IsActive = model.IsActive;
+            product.Name = name;
+            product.Description = description;
+            product.BasePrice = basePrice;
+            product.PreparationTime = prepTime;
+            product.IsAvailable = isAvailable;
+            product.IsActive = isActive;
             product.UpdatedAt = DateTime.UtcNow;
 
             _context.ProductCategories.RemoveRange(product.ProductCategories);
-            foreach (var categoryId in model.SelectedCategoryIds)
+            foreach (var categoryId in categoryIds)
             {
                 _context.ProductCategories.Add(new ProductCategoryModel
                 {
@@ -183,7 +224,7 @@ namespace EIIOS.Controllers
             }
 
             _context.ProductAllergens.RemoveRange(product.ProductAllergens);
-            foreach (var allergenId in model.SelectedAllergenIds)
+            foreach (var allergenId in allergenIds)
             {
                 _context.ProductAllergens.Add(new ProductAllergenModel
                 {
