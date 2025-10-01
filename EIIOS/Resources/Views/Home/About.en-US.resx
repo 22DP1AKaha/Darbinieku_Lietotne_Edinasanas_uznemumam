@@ -117,28 +117,58 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Dashboard" xml:space="preserve">
-    <value>Dashboard</value>
+  <data name="AboutTitle" xml:space="preserve">
+    <value>EIIOS</value>
   </data>
-  <data name="Language" xml:space="preserve">
-    <value>Valoda</value>
+  <data name="AboutSubtitle" xml:space="preserve">
+    <value>About sub</value>
   </data>
-  <data name="Login" xml:space="preserve">
-    <value>Ieiet</value>
+  <data name="OurLocation" xml:space="preserve">
+    <value>Our location</value>
   </data>
-  <data name="Menu" xml:space="preserve">
-    <value>Ēdienkarte</value>
+  <data name="OurStoryTitle" xml:space="preserve">
+    <value>Out story</value>
   </data>
-  <data name="Profile" xml:space="preserve">
-    <value>Profils</value>
+  <data name="OurStoryContent" xml:space="preserve">
+    <value>Here is the story of how we came up with the idea</value>
   </data>
-  <data name="Register" xml:space="preserve">
-    <value>Reģistrēties</value>
+  <data name="OurMissionTitle" xml:space="preserve">
+    <value>Our Mission</value>
   </data>
-  <data name="About" xml:space="preserve">
-    <value>Par</value>
+  <data name="OurMissionContent" xml:space="preserve">
+    <value>Here is what we are trying to achieve with EIIOS</value>
   </data>
-  <data name="Logout" xml:space="preserve">
-    <value>Iziet</value>
+  <data name="OurValuesTitle" xml:space="preserve">
+    <value>Our values</value>
+  </data>
+  <data name="OurValuesContent" xml:space="preserve">
+    <value>Our values and aspirations</value>
+  </data>
+  <data name="OurTeamTitle" xml:space="preserve">
+    <value>Our team</value>
+  </data>
+  <data name="OurTeamContent" xml:space="preserve">
+    <value>Here is the information about our team members</value>
+  </data>
+  <data name="ContactInfoTitle" xml:space="preserve">
+    <value>Contact Information</value>
+  </data>
+  <data name="AddressTitle" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="AddressContent" xml:space="preserve">
+    <value>Our address</value>
+  </data>
+  <data name="PhoneTitle" xml:space="preserve">
+    <value>Numbers</value>
+  </data>
+  <data name="EmailTitle" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="EmailContent" xml:space="preserve">
+    <value>Here are the emails you can reach us with</value>
+  </data>
+  <data name="PhoneContent" xml:space="preserve">
+    <value>We can be reached via +371 000 000 00</value>
   </data>
 </root>

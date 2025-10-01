@@ -117,28 +117,58 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Dashboard" xml:space="preserve">
-    <value>Dashboard</value>
+  <data name="AboutTitle" xml:space="preserve">
+    <value>EIIOS</value>
   </data>
-  <data name="Language" xml:space="preserve">
-    <value>Valoda</value>
+  <data name="AboutSubtitle" xml:space="preserve">
+    <value>Par mums desc</value>
   </data>
-  <data name="Login" xml:space="preserve">
-    <value>Ieiet</value>
+  <data name="OurLocation" xml:space="preserve">
+    <value>Mūsu atrašanās vieta</value>
   </data>
-  <data name="Menu" xml:space="preserve">
-    <value>Ēdienkarte</value>
+  <data name="OurStoryTitle" xml:space="preserve">
+    <value>Mūsu stāsts</value>
   </data>
-  <data name="Profile" xml:space="preserve">
-    <value>Profils</value>
+  <data name="OurStoryContent" xml:space="preserve">
+    <value>Šeit ir informācija, kā mēs tikām līdz EIIOS idejai</value>
   </data>
-  <data name="Register" xml:space="preserve">
-    <value>Reģistrēties</value>
+  <data name="OurMissionTitle" xml:space="preserve">
+    <value>Mūsu mērķis</value>
   </data>
-  <data name="About" xml:space="preserve">
-    <value>Par</value>
+  <data name="OurMissionContent" xml:space="preserve">
+    <value>Informācija par to, ko mēs cenšamies paveikt ar EIIOS</value>
   </data>
-  <data name="Logout" xml:space="preserve">
-    <value>Iziet</value>
+  <data name="OurValuesTitle" xml:space="preserve">
+    <value>Mums svarīgais</value>
+  </data>
+  <data name="OurValuesContent" xml:space="preserve">
+    <value>Mums svarīgais un vēl kkas</value>
+  </data>
+  <data name="OurTeamTitle" xml:space="preserve">
+    <value>Mūsu komanda</value>
+  </data>
+  <data name="OurTeamContent" xml:space="preserve">
+    <value>Šeit ir informācija par projekta dalībniekiem</value>
+  </data>
+  <data name="ContactInfoTitle" xml:space="preserve">
+    <value>Mūsu kontaktinformācija</value>
+  </data>
+  <data name="AddressTitle" xml:space="preserve">
+    <value>Adrese</value>
+  </data>
+  <data name="AddressContent" xml:space="preserve">
+    <value>Mūsu adrese</value>
+  </data>
+  <data name="PhoneTitle" xml:space="preserve">
+    <value>Numuri</value>
+  </data>
+  <data name="EmailTitle" xml:space="preserve">
+    <value>E-pasti</value>
+  </data>
+  <data name="EmailContent" xml:space="preserve">
+    <value>Šeit ir e-pasti caur kuriem var ar mums sazināties</value>
+  </data>
+  <data name="PhoneContent" xml:space="preserve">
+    <value>Mūsu telefona numuri +371 000 000 00</value>
   </data>
 </root>
