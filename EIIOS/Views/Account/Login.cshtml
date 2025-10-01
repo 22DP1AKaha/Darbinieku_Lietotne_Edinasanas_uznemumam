@@ -28,7 +28,7 @@
 
                             <!-- Username/Email -->
                             <div class="mb-3">
-                                <label asp-for="Username" class="form-label"></label>
+                                <label asp-for="Username" class="form-label">@Localizer["UsernameD"]</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="fas fa-user"></i>
@@ -40,7 +40,7 @@
 
                             <!-- Password -->
                             <div class="mb-3">
-                                <label asp-for="Password" class="form-label"></label>
+                                <label asp-for="Password" class="form-label">@Localizer["PasswordD"]</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="fas fa-lock"></i>
@@ -57,7 +57,7 @@
                             <div class="mb-3">
                                 <div class="form-check">
                                     <input asp-for="RememberMe" type="checkbox" class="form-check-input" />
-                                    <label asp-for="RememberMe" class="form-check-label"></label>
+                                    <label asp-for="RememberMe" class="form-check-label">@Localizer["RememberMe"]</label>
                                 </div>
                             </div>
 

@@ -135,7 +135,22 @@
   <data name="NoAccount" xml:space="preserve">
     <value>Nav konta?</value>
   </data>
+  <data name="PasswordD" xml:space="preserve">
+    <value>Parole</value>
+  </data>
+  <data name="PasswordPlaceholder" xml:space="preserve">
+    <value>1234</value>
+  </data>
   <data name="RegisterHere" xml:space="preserve">
     <value>Reģistrēties šeit</value>
+  </data>
+  <data name="RememberMe" xml:space="preserve">
+    <value>Atcerēties mani</value>
+  </data>
+  <data name="UsernameD" xml:space="preserve">
+    <value>Lietotājvārds</value>
+  </data>
+  <data name="UsernamePlaceholder" xml:space="preserve">
+    <value>Janis.berzins@example.com</value>
   </data>
 </root>
