@@ -129,8 +129,35 @@
   <data name="ConfirmPassword" xml:space="preserve">
     <value>Confirm Password</value>
   </data>
+  <data name="Email" xml:space="preserve">
+    <value>E-mail</value>
+  </data>
+  <data name="EmailExample" xml:space="preserve">
+    <value>JohnDoe@example.com</value>
+  </data>
+  <data name="FirstName" xml:space="preserve">
+    <value>First name</value>
+  </data>
+  <data name="FirstNameExample" xml:space="preserve">
+    <value>John</value>
+  </data>
+  <data name="LastName" xml:space="preserve">
+    <value>Last name</value>
+  </data>
+  <data name="LastNameExample" xml:space="preserve">
+    <value>Doe</value>
+  </data>
   <data name="LoginHere" xml:space="preserve">
     <value>Login here</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="PasswordAtLeast6Symbols" xml:space="preserve">
+    <value>Password should be at least 6 symbols</value>
+  </data>
+  <data name="PasswordExample" xml:space="preserve">
+    <value>Password</value>
   </data>
   <data name="Register" xml:space="preserve">
     <value>Register</value>
@@ -140,5 +167,17 @@
   </data>
   <data name="RegisterTitle" xml:space="preserve">
     <value>Registration</value>
+  </data>
+  <data name="RepeatPassword" xml:space="preserve">
+    <value>Repeat password</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>Username</value>
+  </data>
+  <data name="UsernameAtleast3Symbols" xml:space="preserve">
+    <value>Username should be at least 3 symbols</value>
+  </data>
+  <data name="UsernameExample" xml:space="preserve">
+    <value>Username</value>
   </data>
 </root>

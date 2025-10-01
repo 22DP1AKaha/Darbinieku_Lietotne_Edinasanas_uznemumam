@@ -175,10 +175,7 @@
     <value>No Discounts</value>
   </data>
   <data name="NoMenuItems" xml:space="preserve">
-    <value>No menu items</value>
-  </data>
-  <data name="NoMenuItemsDescription" xml:space="preserve">
-    <value>No products found on the menu</value>
+    <value>No menu items fit your description</value>
   </data>
   <data name="OurMenu" xml:space="preserve">
     <value>Menu</value>
@@ -227,6 +224,9 @@
   </data>
   <data name="UserRoles" xml:space="preserve">
     <value>User Roles</value>
+  </data>
+  <data name="ViewAllItems" xml:space="preserve">
+    <value>View all items</value>
   </data>
   <data name="WelcomeTitle" xml:space="preserve">
     <value>Welcome to</value>
