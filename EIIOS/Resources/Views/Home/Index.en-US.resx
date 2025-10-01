@@ -117,14 +117,41 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="AddProduct" xml:space="preserve">
+    <value>Add product</value>
+  </data>
   <data name="AllCategories" xml:space="preserve">
     <value>All categories</value>
+  </data>
+  <data name="Allergens" xml:space="preserve">
+    <value>Allergens</value>
+  </data>
+  <data name="Available" xml:space="preserve">
+    <value>Available</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Categories" xml:space="preserve">
+    <value>Categories</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Description</value>
   </data>
   <data name="DiscountSystem" xml:space="preserve">
     <value>Discount System</value>
   </data>
   <data name="EasyToUse" xml:space="preserve">
     <value>Easy to Use</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
   </data>
   <data name="Features" xml:space="preserve">
     <value>System Features</value>
@@ -141,6 +168,9 @@
   <data name="MenuManagement" xml:space="preserve">
     <value>Menu Management</value>
   </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>Minutes</value>
+  </data>
   <data name="NoDiscounts" xml:space="preserve">
     <value>No Discounts</value>
   </data>
@@ -150,8 +180,23 @@
   <data name="OurMenu" xml:space="preserve">
     <value>Menu</value>
   </data>
+  <data name="PrepTime" xml:space="preserve">
+    <value>Prep time</value>
+  </data>
+  <data name="Price" xml:space="preserve">
+    <value>Price</value>
+  </data>
+  <data name="ProductImage" xml:space="preserve">
+    <value>Product image</value>
+  </data>
+  <data name="ProductName" xml:space="preserve">
+    <value>Product name</value>
+  </data>
   <data name="ReadyToStart" xml:space="preserve">
     <value>Ready to Start?</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
   </data>
   <data name="SearchPlaceholder" xml:space="preserve">
     <value>Search</value>
