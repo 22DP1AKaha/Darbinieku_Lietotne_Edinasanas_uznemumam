@@ -3,6 +3,9 @@
 @inject IViewLocalizer Localizer
 @{
     ViewData["Title"] = Localizer["MenuTitle"];
+    var isAdmin = ViewBag.IsAdmin ?? false;
+    var allCategories = ViewBag.AllCategories as List<CategoryModel> ?? new List<CategoryModel>();
+    var allergens = ViewBag.Allergens as List<AllergenModel> ?? new List<AllergenModel>();
 }
 
 <!-- Header Section -->
@@ -13,6 +16,14 @@
                 <h1 class="fw-bold mb-2">@Localizer["OurMenu"]</h1>
                 <p class="mb-0">@Localizer["MenuDescription"]</p>
             </div>
+            @if (isAdmin)
+            {
+                <div class="col-md-6 text-end">
+                    <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#createProductModal">
+                        <i class="fas fa-plus me-1"></i>@Localizer["AddProduct"]
+                    </button>
+                </div>
+            }
         </div>
     </div>
 </section>
@@ -35,9 +46,12 @@
                                 <div class="discount-card bg-white rounded shadow-sm p-3 flex-shrink-0" style="min-width: 200px;">
                                     <div class="position-relative">
                                         <div class="product-image bg-light rounded mb-2" style="height: 120px;">
-                                            @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                            @if (product.Image != null && !string.IsNullOrEmpty(product.Image.Base64Data))
                                             {
-                                                <img src="@product.ImageUrl" alt="@product.Name" class="img-fluid rounded" style="height: 100%; width: 100%; object-fit: cover;">
+                                                <img src="data:@product.Image.ContentType;base64,@product.Image.Base64Data"
+                                                     alt="@(product.Image.AltText ?? product.Name)"
+                                                     class="img-fluid rounded"
+                                                     style="height: 100%; width: 100%; object-fit: cover;">
                                             }
                                             else
                                             {
@@ -127,11 +141,27 @@
                     var activeDiscount = product.DiscountProducts?.FirstOrDefault(dp => dp.Discount.IsCurrentlyActive)?.Discount;
                     <div class="col-lg-3 col-md-4 col-sm-6">
                         <div class="card menu-item-card h-100 border-0 shadow-sm hover-scale">
+                            @if (isAdmin)
+                            {
+                                <div class="position-absolute top-0 start-0 m-2" style="z-index: 10;">
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-light" onclick="editProduct(@product.Id)" title="@Localizer["Edit"]">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-light text-danger" onclick="deleteProduct(@product.Id, '@product.Name')" title="@Localizer["Delete"]">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
                             <div class="position-relative">
                                 <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                                    @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                    @if (product.Image != null && !string.IsNullOrEmpty(product.Image.Base64Data))
                                     {
-                                        <img src="@product.ImageUrl" alt="@product.Name" class="img-fluid rounded-top" style="height: 100%; width: 100%; object-fit: cover;">
+                                        <img src="data:@product.Image.ContentType;base64,@product.Image.Base64Data"
+                                             alt="@(product.Image.AltText ?? product.Name)"
+                                             class="img-fluid rounded-top"
+                                             style="height: 100%; width: 100%; object-fit: cover;">
                                     }
                                     else
                                     {
@@ -198,6 +228,101 @@
         }
     </div>
 </section>
+
+<!-- Create/Edit Product Modal -->
+@if (isAdmin)
+{
+    <div class="modal fade" id="createProductModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">@Localizer["AddProduct"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="productForm" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="productId" name="productId" />
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">@Localizer["ProductName"] *</label>
+                            <input type="text" class="form-control" id="name" name="name" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">@Localizer["Description"]</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="basePrice" class="form-label">@Localizer["Price"] ($) *</label>
+                                <input type="number" step="0.01" class="form-control" id="basePrice" name="basePrice" required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="preparationTime" class="form-label">@Localizer["PrepTime"] (@Localizer["Minutes"])</label>
+                                <input type="number" class="form-control" id="preparationTime" name="preparationTime" />
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="imageFile" class="form-label">@Localizer["ProductImage"]</label>
+                            <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*" />
+                            <div id="currentImagePreview"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["Categories"] *</label>
+                            @foreach (var category in allCategories)
+                            {
+                                <div class="form-check">
+                                    <input class="form-check-input category-check" type="checkbox" name="selectedCategoryIds" value="@category.Id" id="cat@(category.Id)" />
+                                    <label class="form-check-label" for="cat@(category.Id)">@category.Name</label>
+                                </div>
+                            }
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["Allergens"]</label>
+                            @foreach (var allergen in allergens)
+                            {
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input allergen-check" type="checkbox" name="selectedAllergenIds" value="@allergen.Id" id="all@(allergen.Id)" />
+                                    <label class="form-check-label" for="all@(allergen.Id)">@allergen.Name</label>
+                                </div>
+                            }
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="isAvailable" name="isAvailable" checked />
+                            <label class="form-check-label" for="isAvailable">@Localizer["Available"]</label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="isActive" name="isActive" checked />
+                            <label class="form-check-label" for="isActive">@Localizer["Active"]</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
+                        <button type="submit" class="btn btn-primary">@Localizer["Save"]</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@Localizer["ConfirmDelete"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="deleteMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
+                    <button type="button" class="btn btn-danger" id="confirmDelete">@Localizer["Delete"]</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 <style>
     :root {
@@ -273,3 +398,93 @@
             background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
         }
 </style>
+
+@if (isAdmin)
+{
+    <script>
+        let currentProductId = null;
+
+        function editProduct(id) {
+            fetch(`/Home/GetProduct/${id}`)
+                .then(response => response.json())
+                .then(product => {
+                    document.getElementById('modalTitle').textContent = '@Localizer["EditProduct"]';
+                    document.getElementById('productId').value = product.id;
+                    document.getElementById('name').value = product.name;
+                    document.getElementById('description').value = product.description || '';
+                    document.getElementById('basePrice').value = product.basePrice;
+                    document.getElementById('preparationTime').value = product.preparationTime || '';
+                    document.getElementById('isAvailable').checked = product.isAvailable;
+                    document.getElementById('isActive').checked = product.isActive;
+
+                    document.querySelectorAll('.category-check').forEach(cb => cb.checked = false);
+                    product.categoryIds.forEach(id => {
+                        document.getElementById(`cat${id}`).checked = true;
+                    });
+
+                    document.querySelectorAll('.allergen-check').forEach(cb => cb.checked = false);
+                    product.allergenIds.forEach(id => {
+                        document.getElementById(`all${id}`).checked = true;
+                    });
+
+                    if (product.imageUrl) {
+                        document.getElementById('currentImagePreview').innerHTML =
+                            `<img src="${product.imageUrl}" class="img-thumbnail mt-2" style="max-width: 200px;">`;
+                    }
+
+                    new bootstrap.Modal(document.getElementById('createProductModal')).show();
+                });
+        }
+
+        function deleteProduct(id, name) {
+            currentProductId = id;
+            document.getElementById('deleteMessage').textContent = `@Localizer["DeleteConfirmMessage"]`.replace('{0}', name);
+            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        }
+
+        document.getElementById('confirmDelete').addEventListener('click', function() {
+            const formData = new FormData();
+            formData.append('__RequestVerificationToken', document.querySelector('[name="__RequestVerificationToken"]').value);
+
+            fetch(`/Home/DeleteProduct/${currentProductId}`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            });
+        });
+
+        document.getElementById('productForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const productId = document.getElementById('productId').value;
+            const url = productId ? `/Home/UpdateProduct/${productId}` : '/Home/CreateProduct';
+
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            });
+        });
+
+        document.getElementById('createProductModal').addEventListener('hidden.bs.modal', function() {
+            document.getElementById('productForm').reset();
+            document.getElementById('productId').value = '';
+            document.getElementById('modalTitle').textContent = '@Localizer["AddProduct"]';
+            document.getElementById('currentImagePreview').innerHTML = '';
+        });
+    </script>
+}

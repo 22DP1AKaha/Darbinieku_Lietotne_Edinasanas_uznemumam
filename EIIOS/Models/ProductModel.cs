@@ -19,8 +19,7 @@ namespace EIIOS.Models
         [Column(TypeName = "decimal(10,2)")]
         public decimal BasePrice { get; set; }
 
-        [StringLength(255)]
-        public string? ImageUrl { get; set; }
+        public int? ImageId { get; set; }
 
         public int? PreparationTime { get; set; } // in minutes
 
@@ -34,6 +33,8 @@ namespace EIIOS.Models
 
         [ForeignKey("CreatedBy")]
         public int? CreatedById { get; set; }
+        [ForeignKey("ImageId")]
+        public ImageModel? Image { get; set; }
 
         // Navigation Properties
         public virtual UserModel? CreatedBy { get; set; }

@@ -55,6 +55,7 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 });
 
 builder.Services.AddScoped<EIIOSDataQuery>();
+builder.Services.AddScoped<ImageService>();
 
 var app = builder.Build();
 
