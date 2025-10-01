@@ -46,10 +46,14 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
         new CultureInfo("lv-LV")
     };
 
-    options.DefaultRequestCulture = new RequestCulture("lv-LV");
+    // Use en-US for number formatting, lv-LV for UI text
+    options.DefaultRequestCulture = new RequestCulture(
+        culture: "en-US",      // Numbers use period as decimal separator
+        uiCulture: "lv-LV"     // UI text in Latvian
+    );
+
     options.SupportedCultures = supportedCultures;
     options.SupportedUICultures = supportedCultures;
-
     options.RequestCultureProviders.Insert(0, new QueryStringRequestCultureProvider());
     options.RequestCultureProviders.Insert(1, new CookieRequestCultureProvider());
 });
