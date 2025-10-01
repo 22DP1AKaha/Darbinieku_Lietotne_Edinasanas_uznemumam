@@ -138,8 +138,14 @@
   <data name="Categories" xml:space="preserve">
     <value>Categories</value>
   </data>
+  <data name="ConfirmDelete" xml:space="preserve">
+    <value>Confirm delete</value>
+  </data>
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
+  </data>
+  <data name="DeleteConfirmMessage" xml:space="preserve">
+    <value>By deleting the product it will forever be gone</value>
   </data>
   <data name="Description" xml:space="preserve">
     <value>Description</value>

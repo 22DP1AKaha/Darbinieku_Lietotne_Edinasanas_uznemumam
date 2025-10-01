@@ -138,8 +138,14 @@
   <data name="Categories" xml:space="preserve">
     <value>Kategorijas</value>
   </data>
+  <data name="ConfirmDelete" xml:space="preserve">
+    <value>Apstiprināt dzēšanu</value>
+  </data>
   <data name="Delete" xml:space="preserve">
     <value>Dzēst</value>
+  </data>
+  <data name="DeleteConfirmMessage" xml:space="preserve">
+    <value>Dzēšot produktu, tas pazudīs uz visiem laikiem.</value>
   </data>
   <data name="Description" xml:space="preserve">
     <value>Apraksts</value>
