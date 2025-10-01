@@ -75,10 +75,10 @@
                 {
                     <!-- Show Login/Register for non-authenticated users -->
                     <li class="nav-item me-3">
-                        <a class="nav-link btn btn-outline-dark px-3" href="@Url.Action("Register", "Account")">@Localizer["Register"]</a>
+                        <a class="nav-link" href="@Url.Action("Register", "Account")">@Localizer["Register"]</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link btn btn-dark px-3 text-white" href="@Url.Action("Login", "Account")">@Localizer["Login"]</a>
+                        <a class="nav-link" href="@Url.Action("Login", "Account")">@Localizer["Login"]</a>
                     </li>
                 }
                 else
