@@ -28,6 +28,7 @@ namespace EIIOS.Services
                 .ThenInclude(pc => pc.Category)
                 .Include(p => p.DiscountProducts)
                 .ThenInclude(dp => dp.Discount)
+                .Include(p => p.Image)
                 .Where(p => p.IsActive && p.IsAvailable);
 
             // Apply search filter
