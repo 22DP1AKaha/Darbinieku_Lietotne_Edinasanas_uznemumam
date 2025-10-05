@@ -19,6 +19,9 @@
             @if (isAdmin)
             {
                 <div class="col-md-6 text-end">
+                    <button class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#createDiscountModal">
+                        <i class="fas fa-tags me-1"></i>@Localizer["ManageDiscounts"]
+                    </button>
                     <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#createProductModal">
                         <i class="fas fa-plus me-1"></i>@Localizer["AddProduct"]
                     </button>
@@ -72,13 +75,13 @@
                                         {
                                             var discountedPrice = product.BasePrice * (1 - activeDiscount.DiscountValue / 100);
                                             <span class="text-decoration-line-through text-muted small">€@product.BasePrice.ToString("0.00")</span>
-                                            <span class="text-success fw-bold">$@discountedPrice.ToString("0.00")</span>
+                                            <span class="text-success fw-bold">€@discountedPrice.ToString("0.00")</span>
                                         }
                                         else
                                         {
                                             var discountedPrice = product.BasePrice - activeDiscount.DiscountValue;
                                             <span class="text-decoration-line-through text-muted small">€@product.BasePrice.ToString("0.00")</span>
-                                            <span class="text-success fw-bold">$@discountedPrice.ToString("0.00")</span>
+                                            <span class="text-success fw-bold">€@discountedPrice.ToString("0.00")</span>
                                         }
                                     </div>
                                 </div>
@@ -221,6 +224,7 @@
                 <div class="col-12 text-center py-5">
                     <i class="fas fa-search fa-3x text-muted mb-3"></i>
                     <h4 class="text-muted">@Localizer["NoMenuItems"]</h4>
+                    <p class="text-muted">@Localizer["NoMenuItemsDescription"]</p>
                     <a href="@Url.Action("Index", "Home")" class="btn btn-primary">@Localizer["ViewAllItems"]</a>
                 </div>
             </div>
@@ -321,6 +325,102 @@
             </div>
         </div>
     </div>
+
+    <!-- Discount Management Modal -->
+    <div class="modal fade" id="createDiscountModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@Localizer["ManageDiscounts"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Discount List -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6>@Localizer["ActiveDiscounts"]</h6>
+                            <button class="btn btn-sm btn-primary" onclick="showDiscountForm()">
+                                <i class="fas fa-plus me-1"></i>@Localizer["AddDiscount"]
+                            </button>
+                        </div>
+                        <div id="discountList" class="table-responsive">
+                            <!-- Discounts will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Discount Form (Hidden by default) -->
+                    <div id="discountFormContainer" style="display: none;">
+                        <hr />
+                        <h6 id="discountFormTitle">@Localizer["AddDiscount"]</h6>
+                        <form id="discountForm">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" id="discountId" name="discountId" />
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="discountName" class="form-label">@Localizer["DiscountName"] *</label>
+                                    <input type="text" class="form-control" id="discountName" name="name" required />
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="discountType" class="form-label">@Localizer["DiscountType"] *</label>
+                                    <select class="form-select" id="discountType" name="discountType" required>
+                                        <option value="Percentage">@Localizer["Percentage"]</option>
+                                        <option value="FixedAmount">@Localizer["FixedAmount"]</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="discountDescription" class="form-label">@Localizer["Description"]</label>
+                                <textarea class="form-control" id="discountDescription" name="description" rows="2"></textarea>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="discountValue" class="form-label">@Localizer["DiscountValue"] *</label>
+                                    <input type="number" step="0.01" class="form-control" id="discountValue" name="discountValue" required />
+                                    <small class="text-muted" id="discountValueHint">@Localizer["PercentageHint"]</small>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="startDate" class="form-label">@Localizer["StartDate"] *</label>
+                                    <input type="date" class="form-control" id="startDate" name="startDate" required />
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="endDate" class="form-label">@Localizer["EndDate"]</label>
+                                    <input type="date" class="form-control" id="endDate" name="endDate" />
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">@Localizer["ApplyToProducts"] *</label>
+                                <div style="max-height: 200px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem; padding: 0.5rem;">
+                                    @foreach (var product in Model.Products)
+                                    {
+                                        <div class="form-check">
+                                            <input class="form-check-input discount-product-check" type="checkbox" name="selectedProductIds" value="@product.Id" id="discProd@(product.Id)" />
+                                            <label class="form-check-label" for="discProd@(product.Id)">
+                                                @product.Name (€@product.BasePrice.ToString("0.00"))
+                                            </label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="discountIsActive" name="isActive" checked />
+                                <label class="form-check-label" for="discountIsActive">@Localizer["Active"]</label>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">@Localizer["Save"]</button>
+                                <button type="button" class="btn btn-secondary" onclick="hideDiscountForm()">@Localizer["Cancel"]</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
 <style>
@@ -402,6 +502,8 @@
 {
     <script>
         let currentProductId = null;
+        let currentDiscountId = null;
+        let deleteType = 'product';
 
         function editProduct(id) {
             fetch(`/Home/GetProduct/${id}`)
@@ -445,17 +547,35 @@
             const formData = new FormData();
             formData.append('__RequestVerificationToken', document.querySelector('[name="__RequestVerificationToken"]').value);
 
-            fetch(`/Home/DeleteProduct/${currentProductId}`, {
+            let url;
+            if (deleteType === 'discount') {
+                url = `/Home/DeleteDiscount/${currentDiscountId}`;
+            } else {
+                url = `/Home/DeleteProduct/${currentProductId}`;
+            }
+
+            fetch(url, {
                 method: 'POST',
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    location.reload();
+                    // Close the delete modal first
+                    bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+
+                    if (deleteType === 'discount') {
+                        location.reload();                   
+                    } else {
+                        location.reload();
+                    }
                 } else {
                     alert(data.message);
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deleting');
             });
         });
 
@@ -526,6 +646,151 @@
             document.getElementById('productId').value = '';
             document.getElementById('modalTitle').textContent = '@Localizer["AddProduct"]';
             document.getElementById('currentImagePreview').innerHTML = '';
+        });
+
+        // Discount management functions
+
+        function loadDiscounts() {
+            fetch('/Home/GetAllDiscounts')
+                .then(response => response.json())
+                .then(discounts => {
+                    const container = document.getElementById('discountList');
+                    if (discounts.length === 0) {
+                        container.innerHTML = '<p class="text-muted text-center">@Localizer["NoDiscountsYet"]</p>';
+                        return;
+                    }
+
+                    let html = '<table class="table table-sm"><thead><tr><th>@Localizer["Name"]</th><th>@Localizer["Type"]</th><th>@Localizer["Value"]</th><th>@Localizer["Period"]</th><th>@Localizer["Status"]</th><th>@Localizer["Actions"]</th></tr></thead><tbody>';
+
+                    discounts.forEach(discount => {
+                        const typeLabel = discount.discountType === 'Percentage' ? '%' : '€';
+                        const statusBadge = discount.isActive ? '<span class="badge bg-success">@Localizer["Active"]</span>' : '<span class="badge bg-secondary">@Localizer["Inactive"]</span>';
+                        const period = `${discount.startDate} - ${discount.endDate || '@Localizer["NoEndDate"]'}`;
+
+                        html += `<tr>
+                            <td>${discount.name}</td>
+                            <td>${discount.discountType}</td>
+                            <td>${discount.discountValue}${typeLabel}</td>
+                            <td><small>${period}</small></td>
+                            <td>${statusBadge}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" onclick="editDiscount(${discount.id})"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteDiscount(${discount.id}, '${discount.name}')"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>`;
+                    });
+
+                    html += '</tbody></table>';
+                    container.innerHTML = html;
+                });
+        }
+
+        function showDiscountForm() {
+            document.getElementById('discountFormContainer').style.display = 'block';
+            document.getElementById('discountFormTitle').textContent = '@Localizer["AddDiscount"]';
+            document.getElementById('discountForm').reset();
+            document.getElementById('discountId').value = '';
+        }
+
+        function hideDiscountForm() {
+            document.getElementById('discountFormContainer').style.display = 'none';
+            document.getElementById('discountForm').reset();
+        }
+
+        function editDiscount(id) {
+            fetch(`/Home/GetDiscount/${id}`)
+                .then(response => response.json())
+                .then(discount => {
+                    document.getElementById('discountFormTitle').textContent = '@Localizer["EditDiscount"]';
+                    document.getElementById('discountId').value = discount.id;
+                    document.getElementById('discountName').value = discount.name;
+                    document.getElementById('discountDescription').value = discount.description || '';
+                    document.getElementById('discountType').value = discount.discountType;
+                    document.getElementById('discountValue').value = discount.discountValue;
+                    document.getElementById('startDate').value = discount.startDate;
+                    document.getElementById('endDate').value = discount.endDate || '';
+                    document.getElementById('discountIsActive').checked = discount.isActive;
+
+                    document.querySelectorAll('.discount-product-check').forEach(cb => cb.checked = false);
+                    discount.productIds.forEach(id => {
+                        const checkbox = document.getElementById(`discProd${id}`);
+                        if (checkbox) checkbox.checked = true;
+                    });
+
+                    document.getElementById('discountFormContainer').style.display = 'block';
+                });
+        }
+
+        function deleteDiscount(id, name) {
+            currentDiscountId = id; // Use separate variable for discount
+            deleteType = 'discount'; // Mark this as a discount deletion
+
+            // Use the correct localized message for discount deletion
+            document.getElementById('deleteMessage').textContent =
+                `Are you sure you want to delete the discount "${name}"? This action cannot be undone.`;
+
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            const deleteModalEl = document.getElementById('deleteModal');
+
+            // Increase z-index to appear above discount modal
+            deleteModalEl.style.zIndex = '1060';
+            deleteModalEl.addEventListener('hidden.bs.modal', function() {
+                deleteModalEl.style.zIndex = '';
+                deleteType = 'product'; // Reset to default
+            }, { once: true });
+
+            deleteModal.show();
+        }
+
+        document.getElementById('discountForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData();
+
+            formData.append('__RequestVerificationToken', document.querySelector('[name="__RequestVerificationToken"]').value);
+            formData.append('Name', document.getElementById('discountName').value);
+            formData.append('Description', document.getElementById('discountDescription').value);
+            formData.append('DiscountType', document.getElementById('discountType').value);
+            formData.append('DiscountValue', parseFloat(document.getElementById('discountValue').value).toFixed(2));
+            formData.append('StartDate', document.getElementById('startDate').value);
+            formData.append('EndDate', document.getElementById('endDate').value);
+            formData.append('IsActive', document.getElementById('discountIsActive').checked);
+
+            document.querySelectorAll('.discount-product-check:checked').forEach(cb => {
+                formData.append('SelectedProductIds', cb.value);
+            });
+
+            const discountId = document.getElementById('discountId').value;
+            const url = discountId ? `/Home/UpdateDiscount/${discountId}` : '/Home/CreateDiscount';
+
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    hideDiscountForm();
+                    loadDiscounts();
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            });
+        });
+
+        // Update discount value hint based on type
+        document.getElementById('discountType')?.addEventListener('change', function() {
+            const hint = document.getElementById('discountValueHint');
+            if (this.value === 'Percentage') {
+                hint.textContent = '@Localizer["PercentageHint"]';
+            } else {
+                hint.textContent = '@Localizer["FixedAmountHint"]';
+            }
+        });
+
+        // Load discounts when modal opens
+        document.getElementById('createDiscountModal')?.addEventListener('shown.bs.modal', function() {
+            loadDiscounts();
         });
     </script>
 }
