@@ -184,7 +184,7 @@
             const errorSpan = document.getElementById('confirmPasswordError');
 
             if (password !== confirmPassword) {
-                errorSpan.textContent = 'Paroles nesakrīt';
+                errorSpan.textContent = '@Localizer["PasswordNoMatch"]';
                 this.classList.add('is-invalid');
             } else {
                 errorSpan.textContent = '';
@@ -201,14 +201,27 @@
 
             if (password !== confirmPassword) {
                 e.preventDefault();
-                document.getElementById('confirmPasswordError').textContent = 'Paroles nesakrīt';
+                document.getElementById('confirmPasswordError').textContent = '@Localizer["PasswordsNoMatch"]';
                 document.getElementById('confirmPassword').focus();
                 return;
             }
 
             if (!acceptTerms) {
                 e.preventDefault();
-                alert('Lūdzu apstipriniet lietošanas noteikumus');
+
+                // Create Bootstrap alert
+                const alertHtml = `
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>@Localizer["AcceptTermsRequired"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+
+                // Insert alert before the form
+                const form = document.getElementById('registerForm'); // or whatever your form ID is
+                form.insertAdjacentHTML('beforebegin', alertHtml);
+
+                // Scroll to and focus the checkbox
                 document.getElementById('AcceptTerms').focus();
                 return;
             }
