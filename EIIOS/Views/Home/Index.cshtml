@@ -727,7 +727,7 @@
 
             // Use the correct localized message for discount deletion
             document.getElementById('deleteMessage').textContent =
-                `Are you sure you want to delete the discount "${name}"? This action cannot be undone.`;
+                `@Localizer["DeleteDiscountMsg"]`;
 
             const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
             const deleteModalEl = document.getElementById('deleteModal');
