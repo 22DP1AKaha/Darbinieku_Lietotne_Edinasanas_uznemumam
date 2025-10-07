@@ -117,10 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="EIIOSName" xml:space="preserve">
-    <value>Internal organizational system catering establishments</value>
+  <data name="BackToLogin" xml:space="preserve">
+    <value>Atpakaļ uz pieslēgšanos</value>
   </data>
-  <data name="RightsReserved" xml:space="preserve">
-    <value>All rights reserved</value>
+  <data name="CheckInbox" xml:space="preserve">
+    <value>Pārbaudi savu iesūtni</value>
+  </data>
+  <data name="DidntReceiveEmail" xml:space="preserve">
+    <value>Nesaņēmi epastu?</value>
+  </data>
+  <data name="ResendEmail" xml:space="preserve">
+    <value>Sūtīt atkārtoti</value>
+  </data>
+  <data name="VerificationEmailSentTo" xml:space="preserve">
+    <value>Verifikācijas epasts aizsūtīts uz</value>
+  </data>
+  <data name="VerifyYourEmail" xml:space="preserve">
+    <value>Verificē savu epastu</value>
   </data>
 </root>

@@ -117,10 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="EIIOSName" xml:space="preserve">
-    <value>Internal organizational system catering establishments</value>
+  <data name="BackToLogin" xml:space="preserve">
+    <value>Back to login</value>
   </data>
-  <data name="RightsReserved" xml:space="preserve">
-    <value>All rights reserved</value>
+  <data name="CheckInbox" xml:space="preserve">
+    <value>Check your inbox</value>
+  </data>
+  <data name="DidntReceiveEmail" xml:space="preserve">
+    <value>Didn't receive an email?</value>
+  </data>
+  <data name="ResendEmail" xml:space="preserve">
+    <value>Resend email</value>
+  </data>
+  <data name="VerificationEmailSentTo" xml:space="preserve">
+    <value>Verification email sent to</value>
+  </data>
+  <data name="VerifyYourEmail" xml:space="preserve">
+    <value>Verify your email</value>
   </data>
 </root>
