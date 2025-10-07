@@ -120,6 +120,9 @@
   <data name="AcceptTerms" xml:space="preserve">
     <value>Es piekrītu lietošanas noteikumiem un privātuma politikai</value>
   </data>
+  <data name="AcceptTermsRequired" xml:space="preserve">
+    <value>Nepieciešams piekrist noteikumiem</value>
+  </data>
   <data name="AlreadyHaveAccount" xml:space="preserve">
     <value>Jau ir konts?</value>
   </data>

@@ -118,45 +118,45 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="FirstNameLength" xml:space="preserve">
-    <value>Name should be no longer than 50 symbols!</value>
+    <value />
   </data>
   <data name="EmailLength" xml:space="preserve">
-    <value>E-mail should be no longer than 100 symbols!</value>
+    <value />
   </data>
   <data name="PasswordLength" xml:space="preserve">
-    <value>Password should be no longer than 100 symbols!</value>
+    <value />
   </data>
   <data name="FirstNameRequired" xml:space="preserve">
-    <value>Name is required!</value>
+    <value />
   </data>
   <data name="LastNameLength" xml:space="preserve">
-    <value>Last name should be no longer than 50 symbols!</value>
+    <value />
   </data>
   <data name="UsernameLength" xml:space="preserve">
-    <value>Username should be no longer than 50 symbols!</value>
+    <value />
   </data>
   <data name="LastNameRequired" xml:space="preserve">
-    <value>Last name is required!</value>
+    <value />
   </data>
   <data name="UsernameRequired" xml:space="preserve">
-    <value>Username is required!</value>
+    <value />
   </data>
   <data name="EmailRequired" xml:space="preserve">
-    <value>E-mail is required!</value>
+    <value />
   </data>
   <data name="PasswordRequired" xml:space="preserve">
-    <value>Password is required!</value>
+    <value />
   </data>
   <data name="EmailInvalid" xml:space="preserve">
-    <value>Invalid E-mail</value>
+    <value />
   </data>
   <data name="ConfirmPasswordRequired" xml:space="preserve">
-    <value>Confirm password is required!</value>
+    <value />
   </data>
   <data name="PasswordsDoNotMatch" xml:space="preserve">
-    <value>Passwords do not match!</value>
+    <value />
   </data>
   <data name="AcceptTermsRequired" xml:space="preserve">
-    <value>Accept terms is required!</value>
+    <value />
   </data>
 </root>

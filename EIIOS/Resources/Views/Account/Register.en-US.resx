@@ -120,6 +120,9 @@
   <data name="AcceptTerms" xml:space="preserve">
     <value>I agree to the terms and privacy policy</value>
   </data>
+  <data name="AcceptTermsRequired" xml:space="preserve">
+    <value>Accept terms is required</value>
+  </data>
   <data name="AlreadyHaveAccount" xml:space="preserve">
     <value>Already have an account?</value>
   </data>
