@@ -120,6 +120,12 @@
   <data name="Active" xml:space="preserve">
     <value>Aktīvs</value>
   </data>
+  <data name="ActiveDiscounts" xml:space="preserve">
+    <value>Aktīvās atlaides</value>
+  </data>
+  <data name="AddDiscount" xml:space="preserve">
+    <value>Pievienot atlaidi</value>
+  </data>
   <data name="AddProduct" xml:space="preserve">
     <value>Pievienot produktu</value>
   </data>
@@ -128,6 +134,9 @@
   </data>
   <data name="Allergens" xml:space="preserve">
     <value>Allergēni</value>
+  </data>
+  <data name="ApplyToProducts" xml:space="preserve">
+    <value>Pievienot uz produktiem</value>
   </data>
   <data name="Available" xml:space="preserve">
     <value>Pieejams</value>
@@ -150,8 +159,17 @@
   <data name="Description" xml:space="preserve">
     <value>Apraksts</value>
   </data>
+  <data name="DiscountName" xml:space="preserve">
+    <value>Atlaides nosaukums</value>
+  </data>
   <data name="DiscountSystem" xml:space="preserve">
     <value>Atlaižu sistēma</value>
+  </data>
+  <data name="DiscountType" xml:space="preserve">
+    <value>Atlaides tips</value>
+  </data>
+  <data name="DiscountValue" xml:space="preserve">
+    <value>Atlaides vērtība</value>
   </data>
   <data name="EasyToUse" xml:space="preserve">
     <value>Viegli lietojams</value>
@@ -159,14 +177,23 @@
   <data name="Edit" xml:space="preserve">
     <value>Rediģēt</value>
   </data>
+  <data name="EndDate" xml:space="preserve">
+    <value>Beigu datums</value>
+  </data>
   <data name="Features" xml:space="preserve">
     <value>Sistēmas iespējas</value>
   </data>
   <data name="Filter" xml:space="preserve">
     <value>Filtrēt</value>
   </data>
+  <data name="FixedAmount" xml:space="preserve">
+    <value>Fiksēta summa</value>
+  </data>
   <data name="InventoryManagement" xml:space="preserve">
     <value>Noliktavas uzskaite</value>
+  </data>
+  <data name="ManageDiscounts" xml:space="preserve">
+    <value>Pārvaldīt atlaides</value>
   </data>
   <data name="MenuDescription" xml:space="preserve">
     <value>Apskataties mūsu ēdienkarti.</value>
@@ -185,6 +212,12 @@
   </data>
   <data name="OurMenu" xml:space="preserve">
     <value>Ēdienkarte</value>
+  </data>
+  <data name="PercentageHint" xml:space="preserve">
+    <value>Procentos</value>
+  </data>
+  <data name="Percentage" xml:space="preserve">
+    <value>Procenti</value>
   </data>
   <data name="PrepTime" xml:space="preserve">
     <value>Gatavošanas laiks</value>
@@ -222,6 +255,9 @@
   <data name="SortByPriceLow" xml:space="preserve">
     <value>Augoša cena</value>
   </data>
+  <data name="StartDate" xml:space="preserve">
+    <value>Sākuma datums</value>
+  </data>
   <data name="StartWorking" xml:space="preserve">
     <value>Sākt darbu ar EIIOS</value>
   </data>
@@ -236,5 +272,11 @@
   </data>
   <data name="WelcomeTitle" xml:space="preserve">
     <value>Laipni lūdzam</value>
+  </data>
+  <data name="NoDiscountsYet" xml:space="preserve">
+    <value>Nav aktīvu atlaižu</value>
+  </data>
+  <data name="DeleteDiscountMsg" xml:space="preserve">
+    <value>Vai tiešām vēlēties dzēst šo atlaidi? Šī darbība ir neatgriezeniska.</value>
   </data>
 </root>

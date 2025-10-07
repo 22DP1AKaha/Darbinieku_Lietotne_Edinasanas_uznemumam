@@ -120,6 +120,12 @@
   <data name="Active" xml:space="preserve">
     <value>Active</value>
   </data>
+  <data name="ActiveDiscounts" xml:space="preserve">
+    <value>Active discounts</value>
+  </data>
+  <data name="AddDiscount" xml:space="preserve">
+    <value>Add a discount</value>
+  </data>
   <data name="AddProduct" xml:space="preserve">
     <value>Add product</value>
   </data>
@@ -128,6 +134,9 @@
   </data>
   <data name="Allergens" xml:space="preserve">
     <value>Allergens</value>
+  </data>
+  <data name="ApplyToProducts" xml:space="preserve">
+    <value>Apply to products</value>
   </data>
   <data name="Available" xml:space="preserve">
     <value>Available</value>
@@ -150,8 +159,17 @@
   <data name="Description" xml:space="preserve">
     <value>Description</value>
   </data>
+  <data name="DiscountName" xml:space="preserve">
+    <value>Discount name</value>
+  </data>
   <data name="DiscountSystem" xml:space="preserve">
     <value>Discount System</value>
+  </data>
+  <data name="DiscountType" xml:space="preserve">
+    <value>Discount type</value>
+  </data>
+  <data name="DiscountValue" xml:space="preserve">
+    <value>Discount value</value>
   </data>
   <data name="EasyToUse" xml:space="preserve">
     <value>Easy to Use</value>
@@ -159,14 +177,23 @@
   <data name="Edit" xml:space="preserve">
     <value>Edit</value>
   </data>
+  <data name="EndDate" xml:space="preserve">
+    <value>End date</value>
+  </data>
   <data name="Features" xml:space="preserve">
     <value>System Features</value>
   </data>
   <data name="Filter" xml:space="preserve">
     <value>Filter</value>
   </data>
+  <data name="FixedAmount" xml:space="preserve">
+    <value>Fixed amount</value>
+  </data>
   <data name="InventoryManagement" xml:space="preserve">
     <value>Inventory Management</value>
+  </data>
+  <data name="ManageDiscounts" xml:space="preserve">
+    <value>Manage discount</value>
   </data>
   <data name="MenuDescription" xml:space="preserve">
     <value>Check out our menu</value>
@@ -185,6 +212,12 @@
   </data>
   <data name="OurMenu" xml:space="preserve">
     <value>Menu</value>
+  </data>
+  <data name="PercentageHint" xml:space="preserve">
+    <value>In procent</value>
+  </data>
+  <data name="Percentage" xml:space="preserve">
+    <value>Percentage</value>
   </data>
   <data name="PrepTime" xml:space="preserve">
     <value>Prep time</value>
@@ -222,6 +255,9 @@
   <data name="SortByPriceLow" xml:space="preserve">
     <value>Sort by price low-high</value>
   </data>
+  <data name="StartDate" xml:space="preserve">
+    <value>Start date</value>
+  </data>
   <data name="StartWorking" xml:space="preserve">
     <value>Start Working with EIIOS</value>
   </data>
@@ -236,5 +272,11 @@
   </data>
   <data name="WelcomeTitle" xml:space="preserve">
     <value>Welcome to</value>
+  </data>
+  <data name="NoDiscountsYet" xml:space="preserve">
+    <value>No active discounts</value>
+  </data>
+  <data name="DeleteDiscountMsg" xml:space="preserve">
+    <value>Are you sure you want to delete this discount? This action is irreversible.</value>
   </data>
 </root>
