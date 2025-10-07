@@ -4,8 +4,9 @@ using Microsoft.Extensions.Localization;
 using EIIOS.Data;
 using EIIOS.Models;
 using EIIOS.ViewModels;
+using EIIOS.Services;
 using BCrypt.Net;
-
+using System.Security.Cryptography;
 
 namespace EIIOS.Controllers
 {
@@ -14,15 +15,18 @@ namespace EIIOS.Controllers
         private readonly EIIOSDbContext _context;
         private readonly IStringLocalizer<AccountController> _localizer;
         private readonly ILogger<AccountController> _logger;
+        private readonly EmailService _emailService;
 
         public AccountController(
             EIIOSDbContext context,
             IStringLocalizer<AccountController> localizer,
-            ILogger<AccountController> logger)
+            ILogger<AccountController> logger,
+            EmailService emailService)
         {
             _context = context;
             _localizer = localizer;
             _logger = logger;
+            _emailService = emailService;
         }
 
         // GET: Account/Login
@@ -45,7 +49,6 @@ namespace EIIOS.Controllers
 
             try
             {
-                // Find user by username or email
                 var user = await _context.Users
                     .FirstOrDefaultAsync(u =>
                         (u.Username == model.Username || u.Email == model.Username)
@@ -57,16 +60,13 @@ namespace EIIOS.Controllers
                     return View(model);
                 }
 
-                // Verify password - Use BCrypt for production!
                 bool isPasswordValid;
                 if (user.PasswordHash.StartsWith("$2"))
                 {
-                    // BCrypt hash
                     isPasswordValid = BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash);
                 }
                 else
                 {
-                    // Plain text (for development/testing only)
                     isPasswordValid = user.PasswordHash == model.Password;
                 }
 
@@ -76,24 +76,24 @@ namespace EIIOS.Controllers
                     return View(model);
                 }
 
-                // Check if email is verified (if required)
+                // Check if email is verified
                 if (!user.IsEmailVerified)
                 {
                     TempData["WarningMessage"] = _localizer["EmailNotVerified"].Value;
+                    TempData["UnverifiedUserId"] = user.Id;
+                    return RedirectToAction("VerificationRequired", new { userId = user.Id });
                 }
 
-                // Store user info in session (simple approach)
+                // Store user info in session
                 HttpContext.Session.SetInt32("UserId", user.Id);
                 HttpContext.Session.SetString("UserName", user.FullName);
                 HttpContext.Session.SetString("UserRole", user.Role.ToString());
                 HttpContext.Session.SetString("Username", user.Username);
 
-                // Log successful login
                 _logger.LogInformation("User {Username} logged in successfully", user.Username);
 
                 TempData["SuccessMessage"] = _localizer["WelcomeBack", user.FirstName].Value;
 
-                // Redirect based on role or return URL
                 if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
                 {
                     return Redirect(model.ReturnUrl);
@@ -134,7 +134,6 @@ namespace EIIOS.Controllers
 
             try
             {
-                // Check if username already exists
                 var existingUsername = await _context.Users
                     .AnyAsync(u => u.Username.ToLower() == model.Username.ToLower());
 
@@ -144,7 +143,6 @@ namespace EIIOS.Controllers
                     return View(model);
                 }
 
-                // Check if email already exists
                 var existingEmail = await _context.Users
                     .AnyAsync(u => u.Email.ToLower() == model.Email.ToLower());
 
@@ -154,16 +152,21 @@ namespace EIIOS.Controllers
                     return View(model);
                 }
 
-                // Create new user
+                // Generate verification token
+                var verificationToken = GenerateVerificationToken();
+                var tokenExpiry = DateTime.UtcNow.AddHours(24);
+
                 var newUser = new UserModel
                 {
                     Username = model.Username.Trim(),
                     Email = model.Email.Trim().ToLower(),
                     FirstName = model.FirstName.Trim(),
                     LastName = model.LastName.Trim(),
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password), // Hash password
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
                     Role = UserRole.Client,
-                    IsEmailVerified = false, // Set to true for now, implement email verification later
+                    IsEmailVerified = false,
+                    EmailVerificationToken = verificationToken,
+                    EmailVerificationTokenExpiry = tokenExpiry,
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -172,10 +175,31 @@ namespace EIIOS.Controllers
                 _context.Users.Add(newUser);
                 await _context.SaveChangesAsync();
 
+                // Send verification email
+                var verificationLink = Url.Action(
+                    "VerifyEmail",
+                    "Account",
+                    new { userId = newUser.Id, token = verificationToken },
+                    Request.Scheme
+                );
+
+                var emailSent = await _emailService.SendVerificationEmailAsync(
+                    newUser.Email,
+                    newUser.FullName,
+                    verificationLink!
+                );
+
+                if (!emailSent)
+                {
+                    _logger.LogWarning("Failed to send verification email to {Email}", newUser.Email);
+                }
+
                 _logger.LogInformation("New user registered: {Username} ({Email})", newUser.Username, newUser.Email);
 
                 TempData["SuccessMessage"] = _localizer["RegistrationSuccess"].Value;
-                return RedirectToAction("Login");
+                TempData["InfoMessage"] = _localizer["VerificationEmailSent"].Value;
+
+                return RedirectToAction("VerificationRequired", new { userId = newUser.Id });
             }
             catch (Exception ex)
             {
@@ -185,17 +209,133 @@ namespace EIIOS.Controllers
             }
         }
 
+        // GET: Account/VerifyEmail
+        [HttpGet]
+        public async Task<IActionResult> VerifyEmail(int userId, string token)
+        {
+            if (string.IsNullOrEmpty(token))
+            {
+                TempData["ErrorMessage"] = _localizer["InvalidVerificationLink"].Value;
+                return RedirectToAction("Login");
+            }
+
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = _localizer["UserNotFound"].Value;
+                return RedirectToAction("Login");
+            }
+
+            if (user.IsEmailVerified)
+            {
+                TempData["InfoMessage"] = _localizer["EmailAlreadyVerified"].Value;
+                return RedirectToAction("Login");
+            }
+
+            if (user.EmailVerificationToken != token)
+            {
+                TempData["ErrorMessage"] = _localizer["InvalidVerificationToken"].Value;
+                return RedirectToAction("Login");
+            }
+
+            if (user.EmailVerificationTokenExpiry < DateTime.UtcNow)
+            {
+                TempData["ErrorMessage"] = _localizer["VerificationTokenExpired"].Value;
+                TempData["UnverifiedUserId"] = userId;
+                return RedirectToAction("VerificationRequired", new { userId });
+            }
+
+            user.IsEmailVerified = true;
+            user.EmailVerificationToken = null;
+            user.EmailVerificationTokenExpiry = null;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Email verified for user {Username}", user.Username);
+
+            TempData["SuccessMessage"] = _localizer["EmailVerifiedSuccess"].Value;
+            return RedirectToAction("Login");
+        }
+
+        // GET: Account/VerificationRequired
+        [HttpGet]
+        public async Task<IActionResult> VerificationRequired(int userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null || user.IsEmailVerified)
+            {
+                return RedirectToAction("Login");
+            }
+
+            ViewBag.Email = user.Email;
+            ViewBag.UserId = userId;
+            return View();
+        }
+
+        // POST: Account/ResendVerification
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResendVerification(int userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = _localizer["UserNotFound"].Value;
+                return RedirectToAction("Login");
+            }
+
+            if (user.IsEmailVerified)
+            {
+                TempData["InfoMessage"] = _localizer["EmailAlreadyVerified"].Value;
+                return RedirectToAction("Login");
+            }
+
+            // Generate new token
+            var verificationToken = GenerateVerificationToken();
+            var tokenExpiry = DateTime.UtcNow.AddHours(24);
+
+            user.EmailVerificationToken = verificationToken;
+            user.EmailVerificationTokenExpiry = tokenExpiry;
+            await _context.SaveChangesAsync();
+
+            // Send new verification email
+            var verificationLink = Url.Action(
+                "VerifyEmail",
+                "Account",
+                new { userId = user.Id, token = verificationToken },
+                Request.Scheme
+            );
+
+            var emailSent = await _emailService.SendVerificationEmailAsync(
+                user.Email,
+                user.FullName,
+                verificationLink!
+            );
+
+            if (emailSent)
+            {
+                TempData["SuccessMessage"] = _localizer["VerificationEmailResent"].Value;
+            }
+            else
+            {
+                TempData["ErrorMessage"] = _localizer["EmailSendFailed"].Value;
+            }
+
+            return RedirectToAction("VerificationRequired", new { userId });
+        }
+
         // GET: Account/Logout
         public IActionResult Logout()
         {
-            // Clear session
             HttpContext.Session.Clear();
-
             TempData["SuccessMessage"] = _localizer["LogoutSuccess"].Value;
             return RedirectToAction("Index", "Home");
         }
 
-        // GET: Account/Profile (for logged in users)
+        // GET: Account/Profile
         [HttpGet]
         public async Task<IActionResult> Profile()
         {
@@ -215,19 +355,18 @@ namespace EIIOS.Controllers
             return View(user);
         }
 
-        // Helper method to check if user is logged in
-        private bool IsUserLoggedIn()
+        // Helper method to generate secure verification token
+        private string GenerateVerificationToken()
         {
-            return HttpContext.Session.GetInt32("UserId") != null;
-        }
-
-        // Helper method to get current user
-        private async Task<UserModel?> GetCurrentUserAsync()
-        {
-            var userId = HttpContext.Session.GetInt32("UserId");
-            if (userId == null) return null;
-
-            return await _context.Users.FindAsync(userId.Value);
+            var randomBytes = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomBytes);
+            }
+            return Convert.ToBase64String(randomBytes)
+                .Replace("+", "-")
+                .Replace("/", "_")
+                .Replace("=", "");
         }
     }
 }

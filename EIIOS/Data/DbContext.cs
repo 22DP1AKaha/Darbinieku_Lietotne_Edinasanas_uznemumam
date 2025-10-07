@@ -72,6 +72,14 @@ namespace EIIOS.Data
                 .HasIndex(dm => dm.MenuDate)
                 .IsUnique();
 
+            modelBuilder.Entity<UserModel>()
+                .Property(u => u.EmailVerificationToken)
+                .HasMaxLength(255);
+
+            modelBuilder.Entity<UserModel>()
+                .HasIndex(u => u.EmailVerificationToken)
+                .IsUnique(false);
+
             // Configure enum conversions
             modelBuilder.Entity<UserModel>()
                 .Property(u => u.Role)

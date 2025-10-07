@@ -48,6 +48,9 @@ namespace EIIOS.Models
 
         public bool IsActive { get; set; } = true;
 
+        public string? EmailVerificationToken { get; set; }
+        public DateTime? EmailVerificationTokenExpiry { get; set; }
+
         // Navigation Properties
         public virtual ICollection<TimeEntryModel>? TimeEntries { get; set; }
         public virtual ICollection<TimeEntryModel>? ApprovedTimeEntries { get; set; }
