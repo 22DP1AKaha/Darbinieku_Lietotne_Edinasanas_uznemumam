@@ -124,7 +124,7 @@
     <value>Ē-pastam jābūt līdz 100 simboliem!</value>
   </data>
   <data name="PasswordLength" xml:space="preserve">
-    <value>Parolei jābūt līdz 100 simboliem!</value>
+    <value>Parolei jābūt no 6 līdz 100 simboliem!</value>
   </data>
   <data name="FirstNameRequired" xml:space="preserve">
     <value>Vārds ir obligāts!</value>

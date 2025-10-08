@@ -124,7 +124,7 @@
     <value>E-mail should be no longer than 100 symbols!</value>
   </data>
   <data name="PasswordLength" xml:space="preserve">
-    <value>Password should be no longer than 100 symbols!</value>
+    <value>Password should be 6-100 symbols!</value>
   </data>
   <data name="FirstNameRequired" xml:space="preserve">
     <value>Name is required!</value>
