@@ -9,7 +9,7 @@
 }
 
 <!-- Header Section -->
-<section class="menu-header bg-primary text-white py-4">
+<section class="menu-header text-white py-4">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-6">
@@ -437,15 +437,9 @@
 }
 
 <style>
-    :root {
-        --gradient-primary: linear-gradient(135deg, #fdfdb4 0%, #d9d7b6 100%);
-        --gradient-secondary: linear-gradient(135deg, #f7dc6f 0%, #e6b800 100%);
-        --shadow-soft: 0 10px 40px rgba(0,0,0,0.1);
-        --shadow-hover: 0 20px 60px rgba(0,0,0,0.15);
-    }
 
     .menu-header {
-        background: var(--gradient-primary);
+        background: #fdf6e3;
         color: #333 !important;
     }
 
@@ -537,61 +531,8 @@
         let currentDiscountId = null;
         let deleteType = 'product';
 
-        // Helper function to clear all validation errors
-        function clearValidationErrors(formId) {
-            const form = document.getElementById(formId);
-            if (!form) return;
-
-            // Clear all validation messages
-            form.querySelectorAll('[data-valmsg-for]').forEach(span => {
-                span.textContent = '';
-            });
-
-            // Remove invalid classes
-            form.querySelectorAll('.is-invalid').forEach(el => {
-                el.classList.remove('is-invalid');
-            });
-
-            // Remove input-validation-error classes
-            form.querySelectorAll('.input-validation-error').forEach(el => {
-                el.classList.remove('input-validation-error');
-            });
-        }
-
-        // Helper function to display validation errors
-        function displayValidationErrors(errors, formId) {
-            clearValidationErrors(formId);
-
-            // Handle general errors
-            if (errors.general) {
-                const form = document.getElementById(formId);
-                const alertHtml = `
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        ${errors.general}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                `;
-                form.insertAdjacentHTML('beforebegin', alertHtml);
-                return;
-            }
-
-            // Display field-specific errors
-            for (const [field, messages] of Object.entries(errors)) {
-                const errorSpan = document.querySelector(`[data-valmsg-for="${field}"]`);
-                const input = document.querySelector(`[name="${field}"]`);
-
-                if (errorSpan && input) {
-                    const errorMessage = Array.isArray(messages) ? messages[0] : messages;
-                    errorSpan.textContent = errorMessage;
-                    input.classList.add('is-invalid');
-                    input.classList.add('input-validation-error');
-                }
-            }
-        }
-
+        // Product functions
         function editProduct(id) {
-            clearValidationErrors('productForm');
-            
             fetch(`/Home/GetProduct/${id}`)
                 .then(response => response.json())
                 .then(product => {
@@ -606,14 +547,14 @@
 
                     document.querySelectorAll('.category-check').forEach(cb => cb.checked = false);
                     product.categoryIds.forEach(id => {
-                        const checkbox = document.getElementById(`cat${id}`);
-                        if (checkbox) checkbox.checked = true;
+                        const cb = document.getElementById(`cat${id}`);
+                        if (cb) cb.checked = true;
                     });
 
                     document.querySelectorAll('.allergen-check').forEach(cb => cb.checked = false);
                     product.allergenIds.forEach(id => {
-                        const checkbox = document.getElementById(`all${id}`);
-                        if (checkbox) checkbox.checked = true;
+                        const cb = document.getElementById(`all${id}`);
+                        if (cb) cb.checked = true;
                     });
 
                     if (product.imageUrl) {
@@ -622,17 +563,13 @@
                     }
 
                     new bootstrap.Modal(document.getElementById('createProductModal')).show();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('@Localizer["ErrorLoadingProduct"]');
                 });
         }
 
         function deleteProduct(id, name) {
             currentProductId = id;
-            deleteType = 'product';
-            document.getElementById('deleteMessage').textContent = `@Localizer["DeleteConfirmMessage"]`.replace('{0}', name);
+            document.getElementById('deleteMessage').textContent =
+                '@Localizer["DeleteConfirmMessage"]'.replace('{0}', name);
             new bootstrap.Modal(document.getElementById('deleteModal')).show();
         }
 
@@ -647,89 +584,50 @@
                 url = `/Home/DeleteProduct/${currentProductId}`;
             }
 
-            fetch(url, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
-                    location.reload();
-                } else {
-                    alert(data.message || '@Localizer["DeleteError"]');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('@Localizer["DeleteError"]');
-            });
+            fetch(url, { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Error deleting');
+                    }
+                });
         });
 
         document.getElementById('productForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            clearValidationErrors('productForm');
-
             const formData = new FormData();
+            formData.append('__RequestVerificationToken', document.querySelector('[name="__RequestVerificationToken"]').value);
 
-            // Add anti-forgery token
-            formData.append('__RequestVerificationToken', document.querySelector('#productForm [name="__RequestVerificationToken"]').value);
-
-            // Add basic fields
             formData.append('Name', document.getElementById('name').value);
             formData.append('Description', document.getElementById('description').value);
 
-            // Format decimal as invariant culture string
-            const basePriceInput = document.getElementById('basePrice').value;
-            const basePrice = parseFloat(basePriceInput.replace(',', '.'));
-            formData.append('BasePrice', basePrice);
+            const basePrice = parseFloat(document.getElementById('basePrice').value.replace(',', '.'));
+            formData.append('BasePrice', isNaN(basePrice) ? 0 : basePrice.toFixed(2));
 
             const prepTime = document.getElementById('preparationTime').value;
-            if (prepTime) {
-                formData.append('PreparationTime', parseInt(prepTime));
-            }
+            if (prepTime) formData.append('PreparationTime', parseInt(prepTime));
 
-            // Add boolean fields
-            formData.append('IsAvailable', document.getElementById('isAvailable').checked);
-            formData.append('IsActive', document.getElementById('isActive').checked);
+            formData.append('IsAvailable', document.getElementById('isAvailable').checked ? 'true' : 'false');
+            formData.append('IsActive', document.getElementById('isActive').checked ? 'true' : 'false');
 
-            // Add image file if selected
             const imageFile = document.getElementById('imageFile').files[0];
-            if (imageFile) {
-                formData.append('ImageFile', imageFile);
-            }
+            if (imageFile) formData.append('ImageFile', imageFile);
 
-            // Add selected categories
-            document.querySelectorAll('.category-check:checked').forEach(cb => {
-                formData.append('SelectedCategoryIds', cb.value);
-            });
-
-            // Add selected allergens
-            document.querySelectorAll('.allergen-check:checked').forEach(cb => {
-                formData.append('SelectedAllergenIds', cb.value);
-            });
+            document.querySelectorAll('.category-check:checked').forEach(cb => formData.append('SelectedCategoryIds', cb.value));
+            document.querySelectorAll('.allergen-check:checked').forEach(cb => formData.append('SelectedAllergenIds', cb.value));
 
             const productId = document.getElementById('productId').value;
             const url = productId ? `/Home/UpdateProduct/${productId}` : '/Home/CreateProduct';
 
-            fetch(url, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else if (data.errors) {
-                    displayValidationErrors(data.errors, 'productForm');
-                } else {
-                    alert(data.message || '@Localizer["SaveError"]');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('@Localizer["SaveError"]');
-            });
+            fetch(url, { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) location.reload();
+                    else alert(data.message || 'Error saving product');
+                });
         });
 
         document.getElementById('createProductModal').addEventListener('hidden.bs.modal', function() {
@@ -737,52 +635,42 @@
             document.getElementById('productId').value = '';
             document.getElementById('modalTitle').textContent = '@Localizer["AddProduct"]';
             document.getElementById('currentImagePreview').innerHTML = '';
-            clearValidationErrors('productForm');
         });
 
-        // Discount management functions
-
+        // Discount functions
         function loadDiscounts() {
             fetch('/Home/GetAllDiscounts')
-                .then(response => response.json())
+                .then(res => res.json())
                 .then(discounts => {
                     const container = document.getElementById('discountList');
-                    if (discounts.length === 0) {
+                    if (!discounts || discounts.length === 0) {
                         container.innerHTML = '<p class="text-muted text-center">@Localizer["NoDiscountsYet"]</p>';
                         return;
                     }
 
                     let html = '<table class="table table-sm"><thead><tr><th>@Localizer["Name"]</th><th>@Localizer["Type"]</th><th>@Localizer["Value"]</th><th>@Localizer["Period"]</th><th>@Localizer["Status"]</th><th>@Localizer["Actions"]</th></tr></thead><tbody>';
-
-                    discounts.forEach(discount => {
-                        const typeLabel = discount.discountType === 'Percentage' ? '%' : '€';
-                        const statusBadge = discount.isActive ? '<span class="badge bg-success">@Localizer["Active"]</span>' : '<span class="badge bg-secondary">@Localizer["Inactive"]</span>';
-                        const period = `${discount.startDate} - ${discount.endDate || '@Localizer["NoEndDate"]'}`;
-
+                    discounts.forEach(d => {
+                        const typeLabel = d.discountType === 'Percentage' ? '%' : '€';
+                        const statusBadge = d.isActive ? '<span class="badge bg-success">@Localizer["Active"]</span>' : '<span class="badge bg-secondary">@Localizer["Inactive"]</span>';
+                        const period = `${d.startDate} - ${d.endDate || '@Localizer["NoEndDate"]'}`;
                         html += `<tr>
-                            <td>${discount.name}</td>
-                            <td>${discount.discountType}</td>
-                            <td>${discount.discountValue}${typeLabel}</td>
+                            <td>${d.name}</td>
+                            <td>${d.discountType}</td>
+                            <td>${d.discountValue}${typeLabel}</td>
                             <td><small>${period}</small></td>
                             <td>${statusBadge}</td>
                             <td>
-                                <button class="btn btn-sm btn-outline-primary" onclick="editDiscount(${discount.id})"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteDiscount(${discount.id}, '${discount.name}')"><i class="fas fa-trash"></i></button>
+                                <button class="btn btn-sm btn-outline-primary" onclick="editDiscount(${d.id})"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteDiscount(${d.id}, '${d.name}')"><i class="fas fa-trash"></i></button>
                             </td>
                         </tr>`;
                     });
-
                     html += '</tbody></table>';
                     container.innerHTML = html;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('discountList').innerHTML = '<p class="text-danger">@Localizer["ErrorLoadingDiscounts"]</p>';
                 });
         }
 
         function showDiscountForm() {
-            clearValidationErrors('discountForm');
             document.getElementById('discountFormContainer').style.display = 'block';
             document.getElementById('discountFormTitle').textContent = '@Localizer["AddDiscount"]';
             document.getElementById('discountForm').reset();
@@ -792,75 +680,65 @@
         function hideDiscountForm() {
             document.getElementById('discountFormContainer').style.display = 'none';
             document.getElementById('discountForm').reset();
-            clearValidationErrors('discountForm');
         }
 
         function editDiscount(id) {
-            clearValidationErrors('discountForm');
-
             fetch(`/Home/GetDiscount/${id}`)
-                .then(response => response.json())
-                .then(discount => {
+                .then(res => res.json())
+                .then(d => {
                     document.getElementById('discountFormTitle').textContent = '@Localizer["EditDiscount"]';
-                    document.getElementById('discountId').value = discount.id;
-                    document.getElementById('discountName').value = discount.name;
-                    document.getElementById('discountDescription').value = discount.description || '';
-                    document.getElementById('discountType').value = discount.discountType;
-                    document.getElementById('discountValue').value = discount.discountValue;
-                    document.getElementById('startDate').value = discount.startDate;
-                    document.getElementById('endDate').value = discount.endDate || '';
-                    document.getElementById('discountIsActive').checked = discount.isActive;
+                    document.getElementById('discountId').value = d.id;
+                    document.getElementById('discountName').value = d.name;
+                    document.getElementById('discountDescription').value = d.description || '';
+                    document.getElementById('discountType').value = d.discountType;
+                    document.getElementById('discountValue').value = d.discountValue;
+                    document.getElementById('startDate').value = d.startDate;
+                    document.getElementById('endDate').value = d.endDate || '';
+                    document.getElementById('discountIsActive').checked = d.isActive;
 
                     document.querySelectorAll('.discount-product-check').forEach(cb => cb.checked = false);
-                    discount.productIds.forEach(id => {
-                        const checkbox = document.getElementById(`discProd${id}`);
-                        if (checkbox) checkbox.checked = true;
+                    d.productIds.forEach(pid => {
+                        const cb = document.getElementById(`discProd${pid}`);
+                        if (cb) cb.checked = true;
                     });
 
                     document.getElementById('discountFormContainer').style.display = 'block';
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('@Localizer["ErrorLoadingDiscount"]');
                 });
         }
 
         function deleteDiscount(id, name) {
             currentDiscountId = id;
             deleteType = 'discount';
-
-            document.getElementById('deleteMessage').textContent = `@Localizer["DeleteDiscountMsg"]`.replace('{0}', name);
-
-            const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-            const deleteModalEl = document.getElementById('deleteModal');
-
-            // Increase z-index to appear above discount modal
-            deleteModalEl.style.zIndex = '1060';
-            deleteModalEl.addEventListener('hidden.bs.modal', function() {
-                deleteModalEl.style.zIndex = '';
-                deleteType = 'product'; // Reset to default
+            document.getElementById('deleteMessage').textContent =
+                '@Localizer["DeleteDiscountMsg"]'.replace('{0}', name);
+            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            const el = document.getElementById('deleteModal');
+            el.style.zIndex = '1060';
+            el.addEventListener('hidden.bs.modal', function() {
+                el.style.zIndex = '';
+                deleteType = 'product';
             }, { once: true });
-
-            deleteModal.show();
+            modal.show();
         }
 
+        // FIXED discount form submit
         document.getElementById('discountForm')?.addEventListener('submit', function(e) {
             e.preventDefault();
-            clearValidationErrors('discountForm');
-
             const formData = new FormData();
 
-            formData.append('__RequestVerificationToken', document.querySelector('#discountForm [name="__RequestVerificationToken"]').value);
+            const tokenEl = document.querySelector('#discountForm [name="__RequestVerificationToken"]');
+            if (tokenEl) formData.append('__RequestVerificationToken', tokenEl.value);
+
             formData.append('Name', document.getElementById('discountName').value);
             formData.append('Description', document.getElementById('discountDescription').value);
             formData.append('DiscountType', document.getElementById('discountType').value);
-            formData.append('DiscountValue', parseFloat(document.getElementById('discountValue').value));
-            formData.append('StartDate', document.getElementById('startDate').value);
 
-            const endDateValue = document.getElementById('endDate').value;
-            if (endDateValue) {
-                formData.append('EndDate', endDateValue);
-            }
+            const val = parseFloat(document.getElementById('discountValue').value);
+            if (!isNaN(val)) formData.append('DiscountValue', val);
+
+            formData.append('StartDate', document.getElementById('startDate').value);
+            const endVal = document.getElementById('endDate').value;
+            if (endVal) formData.append('EndDate', endVal);
 
             formData.append('IsActive', document.getElementById('discountIsActive').checked);
 
@@ -871,65 +749,30 @@
             const discountId = document.getElementById('discountId').value;
             const url = discountId ? `/Home/UpdateDiscount/${discountId}` : '/Home/CreateDiscount';
 
-            fetch(url, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    hideDiscountForm();
-                    loadDiscounts();
-
-                    // Show success message
-                    const modalBody = document.querySelector('#createDiscountModal .modal-body');
-                    const alertHtml = `
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            @Localizer["DiscountSavedSuccess"]
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    `;
-                    modalBody.insertAdjacentHTML('afterbegin', alertHtml);
-
-                    // Remove alert after 3 seconds
-                    setTimeout(() => {
-                        const alert = modalBody.querySelector('.alert');
-                        if (alert) alert.remove();
-                    }, 3000);
-                } else if (data.errors) {
-                    displayValidationErrors(data.errors, 'discountForm');
-                } else {
-                    alert(data.message || '@Localizer["SaveError"]');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('@Localizer["SaveError"]');
-            });
+            fetch(url, { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        hideDiscountForm();
+                        loadDiscounts();
+                        location.reload();
+                    } else {
+                        alert(data.message || '@Localizer["SaveError"]');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('@Localizer["SaveError"]');
+                });
         });
 
-        // Update discount value hint based on type
+        // Discount value hint
         document.getElementById('discountType')?.addEventListener('change', function() {
             const hint = document.getElementById('discountValueHint');
-            if (this.value === 'Percentage') {
-                hint.textContent = '@Localizer["PercentageHint"]';
-            } else {
-                hint.textContent = '@Localizer["FixedAmountHint"]';
-            }
+            hint.textContent = this.value === 'Percentage' ? '@Localizer["PercentageHint"]' : '@Localizer["FixedAmountHint"]';
         });
 
-        // Load discounts when modal opens
-        document.getElementById('createDiscountModal')?.addEventListener('shown.bs.modal', function() {
-            loadDiscounts();
-        });
-
-        // Clear discount form when modal closes
-        document.getElementById('createDiscountModal')?.addEventListener('hidden.bs.modal', function() {
-            hideDiscountForm();
-            clearValidationErrors('discountForm');
-
-            // Remove any alerts
-            document.querySelectorAll('#createDiscountModal .alert').forEach(alert => alert.remove());
-        });
+        // Load discounts on modal open
+        document.getElementById('createDiscountModal')?.addEventListener('shown.bs.modal', loadDiscounts);
     </script>
 }
