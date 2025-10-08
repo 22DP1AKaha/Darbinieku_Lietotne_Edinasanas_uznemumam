@@ -248,25 +248,30 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="name" class="form-label">@Localizer["ProductName"] *</label>
-                            <input type="text" class="form-control" id="name" name="name" required />
+                            <input type="text" class="form-control" id="name" name="Name" required />
+                            <span class="text-danger small" data-valmsg-for="Name"></span>
                         </div>
                         <div class="mb-3">
                             <label for="description" class="form-label">@Localizer["Description"]</label>
-                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                            <textarea class="form-control" id="description" name="Description" rows="3"></textarea>
+                            <span class="text-danger small" data-valmsg-for="Description"></span>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="basePrice" class="form-label">@Localizer["Price"] (€) *</label>
-                                <input type="number" step="0.01" class="form-control" id="basePrice" name="basePrice" required />
+                                <input type="number" step="0.01" class="form-control" id="basePrice" name="BasePrice" required />
+                                <span class="text-danger small" data-valmsg-for="BasePrice"></span>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="preparationTime" class="form-label">@Localizer["PrepTime"] (@Localizer["Minutes"])</label>
-                                <input type="number" class="form-control" id="preparationTime" name="preparationTime" />
+                                <input type="number" class="form-control" id="preparationTime" name="PreparationTime" />
+                                <span class="text-danger small" data-valmsg-for="PreparationTime"></span>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="imageFile" class="form-label">@Localizer["ProductImage"]</label>
-                            <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*" />
+                            <input type="file" class="form-control" id="imageFile" name="ImageFile" accept="image/*" />
+                            <span class="text-danger small" data-valmsg-for="ImageFile"></span>
                             <div id="currentImagePreview"></div>
                         </div>
                         <div class="mb-3">
@@ -274,27 +279,28 @@
                             @foreach (var category in allCategories)
                             {
                                 <div class="form-check">
-                                    <input class="form-check-input category-check" type="checkbox" name="selectedCategoryIds" value="@category.Id" id="cat@(category.Id)" />
+                                    <input class="form-check-input category-check" type="checkbox" name="SelectedCategoryIds" value="@category.Id" id="cat@(category.Id)" />
                                     <label class="form-check-label" for="cat@(category.Id)">@category.Name</label>
                                 </div>
                             }
+                            <span class="text-danger small" data-valmsg-for="SelectedCategoryIds"></span>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">@Localizer["Allergens"]</label>
                             @foreach (var allergen in allergens)
                             {
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input allergen-check" type="checkbox" name="selectedAllergenIds" value="@allergen.Id" id="all@(allergen.Id)" />
+                                    <input class="form-check-input allergen-check" type="checkbox" name="SelectedAllergenIds" value="@allergen.Id" id="all@(allergen.Id)" />
                                     <label class="form-check-label" for="all@(allergen.Id)">@allergen.Name</label>
                                 </div>
                             }
                         </div>
                         <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="isAvailable" name="isAvailable" checked />
+                            <input class="form-check-input" type="checkbox" id="isAvailable" name="IsAvailable" checked />
                             <label class="form-check-label" for="isAvailable">@Localizer["Available"]</label>
                         </div>
                         <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="isActive" name="isActive" checked />
+                            <input class="form-check-input" type="checkbox" id="isActive" name="IsActive" checked />
                             <label class="form-check-label" for="isActive">@Localizer["Active"]</label>
                         </div>
                     </div>
@@ -359,35 +365,41 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="discountName" class="form-label">@Localizer["DiscountName"] *</label>
-                                    <input type="text" class="form-control" id="discountName" name="name" required />
+                                    <input type="text" class="form-control" id="discountName" name="Name" required />
+                                    <span class="text-danger small" data-valmsg-for="Name"></span>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="discountType" class="form-label">@Localizer["DiscountType"] *</label>
-                                    <select class="form-select" id="discountType" name="discountType" required>
+                                    <select class="form-select" id="discountType" name="DiscountType" required>
                                         <option value="Percentage">@Localizer["Percentage"]</option>
                                         <option value="FixedAmount">@Localizer["FixedAmount"]</option>
                                     </select>
+                                    <span class="text-danger small" data-valmsg-for="DiscountType"></span>
                                 </div>
                             </div>
 
                             <div class="mb-3">
                                 <label for="discountDescription" class="form-label">@Localizer["Description"]</label>
-                                <textarea class="form-control" id="discountDescription" name="description" rows="2"></textarea>
+                                <textarea class="form-control" id="discountDescription" name="Description" rows="2"></textarea>
+                                <span class="text-danger small" data-valmsg-for="Description"></span>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label for="discountValue" class="form-label">@Localizer["DiscountValue"] *</label>
-                                    <input type="number" step="0.01" class="form-control" id="discountValue" name="discountValue" required />
+                                    <input type="number" step="0.01" class="form-control" id="discountValue" name="DiscountValue" required />
+                                    <span class="text-danger small" data-valmsg-for="DiscountValue"></span>
                                     <small class="text-muted" id="discountValueHint">@Localizer["PercentageHint"]</small>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="startDate" class="form-label">@Localizer["StartDate"] *</label>
-                                    <input type="date" class="form-control" id="startDate" name="startDate" required />
+                                    <input type="date" class="form-control" id="startDate" name="StartDate" required />
+                                    <span class="text-danger small" data-valmsg-for="StartDate"></span>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="endDate" class="form-label">@Localizer["EndDate"]</label>
-                                    <input type="date" class="form-control" id="endDate" name="endDate" />
+                                    <input type="date" class="form-control" id="endDate" name="EndDate" />
+                                    <span class="text-danger small" data-valmsg-for="EndDate"></span>
                                 </div>
                             </div>
 
@@ -397,17 +409,18 @@
                                     @foreach (var product in Model.Products)
                                     {
                                         <div class="form-check">
-                                            <input class="form-check-input discount-product-check" type="checkbox" name="selectedProductIds" value="@product.Id" id="discProd@(product.Id)" />
+                                            <input class="form-check-input discount-product-check" type="checkbox" name="SelectedProductIds" value="@product.Id" id="discProd@(product.Id)" />
                                             <label class="form-check-label" for="discProd@(product.Id)">
                                                 @product.Name (€@product.BasePrice.ToString("0.00"))
                                             </label>
                                         </div>
                                     }
                                 </div>
+                                <span class="text-danger small" data-valmsg-for="SelectedProductIds"></span>
                             </div>
 
                             <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" id="discountIsActive" name="isActive" checked />
+                                <input class="form-check-input" type="checkbox" id="discountIsActive" name="IsActive" checked />
                                 <label class="form-check-label" for="discountIsActive">@Localizer["Active"]</label>
                             </div>
 
@@ -496,6 +509,25 @@
         .btn-primary:hover {
             background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
         }
+
+    /* Validation styles */
+    [data-valmsg-for] {
+        display: block;
+        margin-top: 0.25rem;
+    }
+
+    .input-validation-error {
+        border-color: #dc3545 !important;
+    }
+
+    .field-validation-error {
+        color: #dc3545;
+        font-size: 0.875rem;
+    }
+
+    .is-invalid {
+        border-color: #dc3545 !important;
+    }
 </style>
 
 @if (isAdmin)
@@ -505,7 +537,61 @@
         let currentDiscountId = null;
         let deleteType = 'product';
 
+        // Helper function to clear all validation errors
+        function clearValidationErrors(formId) {
+            const form = document.getElementById(formId);
+            if (!form) return;
+
+            // Clear all validation messages
+            form.querySelectorAll('[data-valmsg-for]').forEach(span => {
+                span.textContent = '';
+            });
+
+            // Remove invalid classes
+            form.querySelectorAll('.is-invalid').forEach(el => {
+                el.classList.remove('is-invalid');
+            });
+
+            // Remove input-validation-error classes
+            form.querySelectorAll('.input-validation-error').forEach(el => {
+                el.classList.remove('input-validation-error');
+            });
+        }
+
+        // Helper function to display validation errors
+        function displayValidationErrors(errors, formId) {
+            clearValidationErrors(formId);
+
+            // Handle general errors
+            if (errors.general) {
+                const form = document.getElementById(formId);
+                const alertHtml = `
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        ${errors.general}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+                form.insertAdjacentHTML('beforebegin', alertHtml);
+                return;
+            }
+
+            // Display field-specific errors
+            for (const [field, messages] of Object.entries(errors)) {
+                const errorSpan = document.querySelector(`[data-valmsg-for="${field}"]`);
+                const input = document.querySelector(`[name="${field}"]`);
+
+                if (errorSpan && input) {
+                    const errorMessage = Array.isArray(messages) ? messages[0] : messages;
+                    errorSpan.textContent = errorMessage;
+                    input.classList.add('is-invalid');
+                    input.classList.add('input-validation-error');
+                }
+            }
+        }
+
         function editProduct(id) {
+            clearValidationErrors('productForm');
+            
             fetch(`/Home/GetProduct/${id}`)
                 .then(response => response.json())
                 .then(product => {
@@ -520,12 +606,14 @@
 
                     document.querySelectorAll('.category-check').forEach(cb => cb.checked = false);
                     product.categoryIds.forEach(id => {
-                        document.getElementById(`cat${id}`).checked = true;
+                        const checkbox = document.getElementById(`cat${id}`);
+                        if (checkbox) checkbox.checked = true;
                     });
 
                     document.querySelectorAll('.allergen-check').forEach(cb => cb.checked = false);
                     product.allergenIds.forEach(id => {
-                        document.getElementById(`all${id}`).checked = true;
+                        const checkbox = document.getElementById(`all${id}`);
+                        if (checkbox) checkbox.checked = true;
                     });
 
                     if (product.imageUrl) {
@@ -534,11 +622,16 @@
                     }
 
                     new bootstrap.Modal(document.getElementById('createProductModal')).show();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('@Localizer["ErrorLoadingProduct"]');
                 });
         }
 
         function deleteProduct(id, name) {
             currentProductId = id;
+            deleteType = 'product';
             document.getElementById('deleteMessage').textContent = `@Localizer["DeleteConfirmMessage"]`.replace('{0}', name);
             new bootstrap.Modal(document.getElementById('deleteModal')).show();
         }
@@ -561,30 +654,26 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Close the delete modal first
                     bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
-
-                    if (deleteType === 'discount') {
-                        location.reload();                   
-                    } else {
-                        location.reload();
-                    }
+                    location.reload();
                 } else {
-                    alert(data.message);
+                    alert(data.message || '@Localizer["DeleteError"]');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred while deleting');
+                alert('@Localizer["DeleteError"]');
             });
         });
 
         document.getElementById('productForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            clearValidationErrors('productForm');
+
             const formData = new FormData();
 
             // Add anti-forgery token
-            formData.append('__RequestVerificationToken', document.querySelector('[name="__RequestVerificationToken"]').value);
+            formData.append('__RequestVerificationToken', document.querySelector('#productForm [name="__RequestVerificationToken"]').value);
 
             // Add basic fields
             formData.append('Name', document.getElementById('name').value);
@@ -593,16 +682,16 @@
             // Format decimal as invariant culture string
             const basePriceInput = document.getElementById('basePrice').value;
             const basePrice = parseFloat(basePriceInput.replace(',', '.'));
-            formData.append('BasePrice', basePrice.toFixed(2));
+            formData.append('BasePrice', basePrice);
 
             const prepTime = document.getElementById('preparationTime').value;
             if (prepTime) {
                 formData.append('PreparationTime', parseInt(prepTime));
             }
 
-            // Add boolean fields explicitly as true/false strings
-            formData.append('IsAvailable', document.getElementById('isAvailable').checked ? 'true' : 'false');
-            formData.append('IsActive', document.getElementById('isActive').checked ? 'true' : 'false');
+            // Add boolean fields
+            formData.append('IsAvailable', document.getElementById('isAvailable').checked);
+            formData.append('IsActive', document.getElementById('isActive').checked);
 
             // Add image file if selected
             const imageFile = document.getElementById('imageFile').files[0];
@@ -631,13 +720,15 @@
             .then(data => {
                 if (data.success) {
                     location.reload();
+                } else if (data.errors) {
+                    displayValidationErrors(data.errors, 'productForm');
                 } else {
-                    alert(data.message);
+                    alert(data.message || '@Localizer["SaveError"]');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred');
+                alert('@Localizer["SaveError"]');
             });
         });
 
@@ -646,6 +737,7 @@
             document.getElementById('productId').value = '';
             document.getElementById('modalTitle').textContent = '@Localizer["AddProduct"]';
             document.getElementById('currentImagePreview').innerHTML = '';
+            clearValidationErrors('productForm');
         });
 
         // Discount management functions
@@ -682,10 +774,15 @@
 
                     html += '</tbody></table>';
                     container.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('discountList').innerHTML = '<p class="text-danger">@Localizer["ErrorLoadingDiscounts"]</p>';
                 });
         }
 
         function showDiscountForm() {
+            clearValidationErrors('discountForm');
             document.getElementById('discountFormContainer').style.display = 'block';
             document.getElementById('discountFormTitle').textContent = '@Localizer["AddDiscount"]';
             document.getElementById('discountForm').reset();
@@ -695,9 +792,12 @@
         function hideDiscountForm() {
             document.getElementById('discountFormContainer').style.display = 'none';
             document.getElementById('discountForm').reset();
+            clearValidationErrors('discountForm');
         }
 
         function editDiscount(id) {
+            clearValidationErrors('discountForm');
+
             fetch(`/Home/GetDiscount/${id}`)
                 .then(response => response.json())
                 .then(discount => {
@@ -718,16 +818,18 @@
                     });
 
                     document.getElementById('discountFormContainer').style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('@Localizer["ErrorLoadingDiscount"]');
                 });
         }
 
         function deleteDiscount(id, name) {
-            currentDiscountId = id; // Use separate variable for discount
-            deleteType = 'discount'; // Mark this as a discount deletion
+            currentDiscountId = id;
+            deleteType = 'discount';
 
-            // Use the correct localized message for discount deletion
-            document.getElementById('deleteMessage').textContent =
-                `@Localizer["DeleteDiscountMsg"]`;
+            document.getElementById('deleteMessage').textContent = `@Localizer["DeleteDiscountMsg"]`.replace('{0}', name);
 
             const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
             const deleteModalEl = document.getElementById('deleteModal');
@@ -744,15 +846,22 @@
 
         document.getElementById('discountForm')?.addEventListener('submit', function(e) {
             e.preventDefault();
+            clearValidationErrors('discountForm');
+
             const formData = new FormData();
 
-            formData.append('__RequestVerificationToken', document.querySelector('[name="__RequestVerificationToken"]').value);
+            formData.append('__RequestVerificationToken', document.querySelector('#discountForm [name="__RequestVerificationToken"]').value);
             formData.append('Name', document.getElementById('discountName').value);
             formData.append('Description', document.getElementById('discountDescription').value);
             formData.append('DiscountType', document.getElementById('discountType').value);
-            formData.append('DiscountValue', parseFloat(document.getElementById('discountValue').value).toFixed(2));
+            formData.append('DiscountValue', parseFloat(document.getElementById('discountValue').value));
             formData.append('StartDate', document.getElementById('startDate').value);
-            formData.append('EndDate', document.getElementById('endDate').value);
+
+            const endDateValue = document.getElementById('endDate').value;
+            if (endDateValue) {
+                formData.append('EndDate', endDateValue);
+            }
+
             formData.append('IsActive', document.getElementById('discountIsActive').checked);
 
             document.querySelectorAll('.discount-product-check:checked').forEach(cb => {
@@ -771,10 +880,31 @@
                 if (data.success) {
                     hideDiscountForm();
                     loadDiscounts();
-                    location.reload();
+
+                    // Show success message
+                    const modalBody = document.querySelector('#createDiscountModal .modal-body');
+                    const alertHtml = `
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @Localizer["DiscountSavedSuccess"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    `;
+                    modalBody.insertAdjacentHTML('afterbegin', alertHtml);
+
+                    // Remove alert after 3 seconds
+                    setTimeout(() => {
+                        const alert = modalBody.querySelector('.alert');
+                        if (alert) alert.remove();
+                    }, 3000);
+                } else if (data.errors) {
+                    displayValidationErrors(data.errors, 'discountForm');
                 } else {
-                    alert(data.message);
+                    alert(data.message || '@Localizer["SaveError"]');
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('@Localizer["SaveError"]');
             });
         });
 
@@ -791,6 +921,15 @@
         // Load discounts when modal opens
         document.getElementById('createDiscountModal')?.addEventListener('shown.bs.modal', function() {
             loadDiscounts();
+        });
+
+        // Clear discount form when modal closes
+        document.getElementById('createDiscountModal')?.addEventListener('hidden.bs.modal', function() {
+            hideDiscountForm();
+            clearValidationErrors('discountForm');
+
+            // Remove any alerts
+            document.querySelectorAll('#createDiscountModal .alert').forEach(alert => alert.remove());
         });
     </script>
 }
