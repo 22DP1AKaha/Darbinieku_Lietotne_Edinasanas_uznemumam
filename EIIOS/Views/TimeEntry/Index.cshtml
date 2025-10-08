@@ -1,0 +1,323 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model EIIOS.ViewModels.TimeEntryViewModel
+@{
+    ViewData["Title"] = Localizer["TimeTracking"];
+}
+
+<!-- Time Tracking Section -->
+<section class="time-tracking-section py-5">
+    <div class="container">
+        <!-- Header -->
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="fw-bold mb-3">@Localizer["TimeTracking"]</h2>
+                <p class="lead text-muted">@Localizer["WelcomeBack"] @Model.User.FirstName!</p>
+            </div>
+        </div>
+
+        <!-- Current Status Card -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <h4 class="fw-bold mb-2">@Localizer["CurrentStatus"]</h4>
+                                @if (Model.IsClockedIn)
+                                {
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <div class="clocked-in-badge bg-success text-white px-3 py-2 rounded-pill">
+                                            <i class="fas fa-play-circle me-2"></i>
+                                            @Localizer["ClockedIn"]
+                                        </div>
+                                    </div>
+                                    <p class="text-muted mt-2 mb-0">
+                                        @Localizer["Since"]: @Model.ActiveTimeEntry?.ClockIn.ToLocalTime().ToString("hh:mm tt")
+                                    </p>
+                                }
+                                else
+                                {
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <div class="clocked-out-badge bg-secondary text-white px-3 py-2 rounded-pill">
+                                            <i class="fas fa-stop-circle me-2"></i>
+                                            @Localizer["ClockedOut"]
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <div class="col-md-6">
+                                @if (Model.IsClockedIn)
+                                {
+                                    <form asp-action="ClockOut" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-danger btn-lg px-4 py-2">
+                                            <i class="fas fa-sign-out-alt me-2"></i>
+                                            @Localizer["ClockOut"]
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-action="ClockIn" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-success btn-lg px-4 py-2">
+                                            <i class="fas fa-sign-in-alt me-2"></i>
+                                            @Localizer["ClockIn"]
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="row g-4 mb-5">
+            <!-- Today's Hours -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm summary-card">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-circle bg-primary">
+                            <i class="fas fa-sun fa-2x text-primary"></i>
+                        </div>
+                        <h4 class="fw-bold mb-2 text-dark">@Localizer["Today"]</h4>
+                        <h2 class="text-primary fw-bold">@Model.TodayTotalHours.ToString("0.00")</h2>
+                        <p class="text-muted mb-0">@Localizer["HoursWorked"]</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weekly Hours -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm summary-card">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-circle bg-warning">
+                            <i class="fas fa-calendar-week fa-2x text-warning"></i>
+                        </div>
+                        <h4 class="fw-bold mb-2 text-dark">@Localizer["ThisWeek"]</h4>
+                        <h2 class="text-warning fw-bold">@Model.WeeklyTotalHours.ToString("0.00")</h2>
+                        <p class="text-muted mb-0">@Localizer["HoursWorked"]</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monthly Hours -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm summary-card">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-circle bg-success">
+                            <i class="fas fa-calendar-alt fa-2x text-success"></i>
+                        </div>
+                        <h4 class="fw-bold mb-2 text-dark">@Localizer["ThisMonth"]</h4>
+                        <h2 class="text-success fw-bold">@Model.MonthlyTotalHours.ToString("0.00")</h2>
+                        <p class="text-muted mb-0">@Localizer["HoursWorked"]</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Today's Entries and Recent Activity -->
+        <div class="row g-4">
+            <!-- Today's Time Entries -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-light border-0 py-3">
+                        <h5 class="fw-bold mb-0">
+                            <i class="fas fa-list me-2"></i>
+                            @Localizer["TodaysEntries"]
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        @if (Model.TodaysEntries.Any())
+                        {
+                            <div class="list-group list-group-flush">
+                                @foreach (var entry in Model.TodaysEntries)
+                                {
+                                    <div class="list-group-item border-0 py-3">
+                                        <div class="row align-items-center">
+                                            <div class="col-8">
+                                                <h6 class="fw-bold mb-1">
+                                                    @entry.ClockIn.ToLocalTime().ToString("hh:mm tt") -
+                                                    @if (entry.ClockOut.HasValue)
+                                                    {
+                                                        @entry.ClockOut.Value.ToLocalTime().ToString("hh:mm tt")
+                                                    }
+                                                    else
+                                                    {
+                                                        @Localizer["InProgress"]
+                                                    }
+                                                </h6>
+                                                <p class="text-muted mb-0 small">
+                                                    @if (entry.TotalHours.HasValue)
+                                                    {
+                                                        <span>@entry.TotalHours.Value.ToString("0.00") @Localizer["Hours"]</span>
+                                                    }
+                                                    <span class="badge bg-@(entry.Status == TimeEntryStatus.Approved ? "success" : entry.Status == TimeEntryStatus.Rejected ? "danger" : "warning") ms-2">
+                                                        @entry.Status
+                                                    </span>
+                                                </p>
+                                            </div>
+                                            <div class="col-4 text-end">
+                                                @if (!entry.ClockOut.HasValue)
+                                                {
+                                                    <form asp-action="ClockOut" method="post" class="d-inline">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="id" value="@entry.Id" />
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                            @Localizer["ClockOut"]
+                                                        </button>
+                                                    </form>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i class="fas fa-clock fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">@Localizer["NoEntriesToday"]</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-light border-0 py-3">
+                        <h5 class="fw-bold mb-0">
+                            <i class="fas fa-history me-2"></i>
+                            @Localizer["RecentActivity"]
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        @if (Model.RecentEntries.Any())
+                        {
+                            <div class="list-group list-group-flush">
+                                @foreach (var entry in Model.RecentEntries)
+                                {
+                                    <div class="list-group-item border-0 py-3">
+                                        <div class="row align-items-center">
+                                            <div class="col-8">
+                                                <h6 class="fw-bold mb-1">@entry.Date.ToString("MMM dd, yyyy")</h6>
+                                                <p class="text-muted mb-0 small">
+                                                    @entry.ClockIn.ToLocalTime().ToString("hh:mm tt") -
+                                                    @if (entry.ClockOut.HasValue)
+                                                    {
+                                                        @entry.ClockOut.Value.ToLocalTime().ToString("hh:mm tt")
+                                                    }
+                                                    else
+                                                    {
+                                                        @Localizer["InProgress"]
+                                                    }
+                                                    @if (entry.TotalHours.HasValue)
+                                                    {
+                                                        <span class="ms-1">(@entry.TotalHours.Value.ToString("0.00") @Localizer["Hours"])</span>
+                                                    }
+                                                </p>
+                                            </div>
+                                            <div class="col-4 text-end">
+                                                <span class="badge bg-@(entry.Status == TimeEntryStatus.Approved ? "success" : entry.Status == TimeEntryStatus.Rejected ? "danger" : "warning")">
+                                                    @entry.Status
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">@Localizer["NoRecentActivity"]</p>
+                            </div>
+                        }
+                    </div>
+                    <div class="card-footer bg-light border-0 py-3">
+                        <a href="@Url.Action("History")" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-eye me-1"></i>
+                            @Localizer["ViewFullHistory"]
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    body {
+        background-color: #fdf6e3; /* Cream background */
+    }
+
+    .summary-card, .card {
+        background-color: #fffbea;
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+    }
+
+        .summary-card:hover, .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+        }
+
+    .icon-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem auto;
+    }
+
+    .clocked-in-badge, .clocked-out-badge {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .btn {
+        border-radius: 0.75rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .list-group-item {
+        background-color: transparent;
+        border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+    }
+
+        .list-group-item:last-child {
+            border-bottom: none !important;
+        }
+</style>
+
+@section Scripts {
+    <script>
+        // Auto-refresh the page every 60 seconds to update status
+        setInterval(function() {
+            location.reload();
+        }, 60000);
+
+        // Show confirmation for clock out
+        document.addEventListener('DOMContentLoaded', function() {
+            const clockOutForms = document.querySelectorAll('form[action*="ClockOut"]');
+            clockOutForms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    if (!confirm('Are you sure you want to clock out?')) {
+                        e.preventDefault();
+                    }
+                });
+            });
+        });
+    </script>
+}
