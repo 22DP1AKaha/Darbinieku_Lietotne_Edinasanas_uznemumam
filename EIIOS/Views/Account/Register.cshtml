@@ -201,7 +201,7 @@
 
             if (password !== confirmPassword) {
                 e.preventDefault();
-                document.getElementById('confirmPasswordError').textContent = '@Localizer["PasswordsNoMatch"]';
+                document.getElementById('confirmPasswordError').textContent = '@Localizer["PasswordNoMatch"]';
                 document.getElementById('confirmPassword').focus();
                 return;
             }
