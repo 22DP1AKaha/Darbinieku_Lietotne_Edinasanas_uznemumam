@@ -6,8 +6,12 @@ namespace EIIOS.ViewModels
     {
         [Required(ErrorMessageResourceType = typeof(Resources.ViewModels.DiscountViewModel),
                   ErrorMessageResourceName = "NameRequired")]
+        [StringLength(100, MinimumLength = 2, ErrorMessageResourceType = typeof(Resources.ViewModels.DiscountViewModel),
+                      ErrorMessageResourceName = "NameLength")]
         public string Name { get; set; } = string.Empty;
 
+        [StringLength(500, ErrorMessageResourceType = typeof(Resources.ViewModels.DiscountViewModel),
+                      ErrorMessageResourceName = "DescriptionLength")]
         public string? Description { get; set; }
 
         [Required(ErrorMessageResourceType = typeof(Resources.ViewModels.DiscountViewModel),
@@ -16,6 +20,8 @@ namespace EIIOS.ViewModels
 
         [Required(ErrorMessageResourceType = typeof(Resources.ViewModels.DiscountViewModel),
                   ErrorMessageResourceName = "ValueRequired")]
+        [Range(0.01, 100, ErrorMessageResourceType = typeof(Resources.ViewModels.DiscountViewModel),
+               ErrorMessageResourceName = "ValueRange")]
         public decimal DiscountValue { get; set; }
 
         [Required(ErrorMessageResourceType = typeof(Resources.ViewModels.DiscountViewModel),
@@ -28,6 +34,8 @@ namespace EIIOS.ViewModels
 
         [Required(ErrorMessageResourceType = typeof(Resources.ViewModels.DiscountViewModel),
                   ErrorMessageResourceName = "ProductRequired")]
+        [MinLength(1, ErrorMessageResourceType = typeof(Resources.ViewModels.DiscountViewModel),
+                   ErrorMessageResourceName = "ProductRequired")]
         public List<int> SelectedProductIds { get; set; } = new List<int>();
     }
 }

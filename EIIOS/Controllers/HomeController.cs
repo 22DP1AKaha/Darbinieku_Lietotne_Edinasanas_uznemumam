@@ -15,14 +15,24 @@ namespace EIIOS.Controllers
         private readonly EIIOSDbContext _context;
         private readonly IStringLocalizer<HomeController> _localizer;
         private readonly EIIOSDataQuery _dataQuery;
+        private readonly UserService _userService;
 
-        public HomeController(EIIOSDbContext context, IStringLocalizer<HomeController> localizer, EIIOSDataQuery dataQuery)
+        public HomeController(EIIOSDbContext context, IStringLocalizer<HomeController> localizer, EIIOSDataQuery dataQuery, UserService userService)
         {
             _context = context;
             _localizer = localizer;
             _dataQuery = dataQuery;
+            _userService = userService;
+        }
+        public async Task<bool> IsCurrentUserAdmin()
+        {
+            return await _userService.IsCurrentUserAdmin();
         }
 
+        public async Task<bool> IsCurrentUserEmployee()
+        {
+            return await _userService.IsCurrentUserEmployee();
+        }
         public async Task<IActionResult> Index(string searchTerm = "", string category = "", string sortBy = "name")
         {
             var viewModel = new MenuViewModel
@@ -80,59 +90,44 @@ namespace EIIOS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateProduct()
+        public async Task<IActionResult> CreateProduct(CreateProductViewModel model)
         {
             if (!await IsCurrentUserAdmin())
             {
-                TempData["ErrorMessage"] = _localizer["Unauthorized"].Value;
-                return RedirectToAction("Index");
+                return Json(new { success = false, errors = new { general = _localizer["Unauthorized"].Value } });
             }
 
-            var name = Request.Form["Name"].ToString();
-            var description = Request.Form["Description"].ToString();
-            var basePriceStr = Request.Form["BasePrice"].ToString();
-            var prepTimeStr = Request.Form["PreparationTime"].ToString();
-            var isAvailable = Request.Form["IsAvailable"].ToString() == "true";
-            var isActive = Request.Form["IsActive"].ToString() == "true";
-            var categoryIds = Request.Form["SelectedCategoryIds"].Select(int.Parse).ToList();
-            var allergenIds = Request.Form["SelectedAllergenIds"].Select(int.Parse).ToList();
-            var imageFile = Request.Form.Files.GetFile("ImageFile");
-
-            if (!decimal.TryParse(basePriceStr, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal basePrice) || basePrice < 0)
+            if (!ModelState.IsValid)
             {
-                return Json(new { success = false, message = _localizer["InvalidPriceFormat"].Value });
-            }
-
-            int? prepTime = null;
-            if (!string.IsNullOrEmpty(prepTimeStr))
-            {
-                if (!int.TryParse(prepTimeStr, out int parsedPrepTime) || parsedPrepTime < 0)
-                {
-                    return Json(new { success = false, message = _localizer["InvalidPrepTimeFormat"].Value });
-                }
-                prepTime = parsedPrepTime;
+                var errors = ModelState
+                    .Where(x => x.Value.Errors.Count > 0)
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                    );
+                return Json(new { success = false, errors });
             }
 
             var imageService = HttpContext.RequestServices.GetRequiredService<ImageService>();
 
             ImageModel? image = null;
-            if (imageFile != null)
+            if (model.ImageFile != null)
             {
-                image = await imageService.SaveImageAsync(imageFile, null);
+                image = await imageService.SaveImageAsync(model.ImageFile, model.ImageAltText);
                 if (image == null)
                 {
-                    return Json(new { success = false, message = _localizer["InvalidImageFile"].Value });
+                    return Json(new { success = false, errors = new { ImageFile = new[] { _localizer["InvalidImageFile"].Value } } });
                 }
             }
 
             var product = new ProductModel
             {
-                Name = name,
-                Description = description,
-                BasePrice = basePrice,
-                PreparationTime = prepTime,
-                IsAvailable = isAvailable,
-                IsActive = isActive,
+                Name = model.Name,
+                Description = model.Description,
+                BasePrice = model.BasePrice,
+                PreparationTime = model.PreparationTime,
+                IsAvailable = model.IsAvailable,
+                IsActive = model.IsActive,
                 ImageId = image?.Id,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
@@ -142,7 +137,7 @@ namespace EIIOS.Controllers
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
 
-            foreach (var categoryId in categoryIds)
+            foreach (var categoryId in model.SelectedCategoryIds)
             {
                 _context.ProductCategories.Add(new ProductCategoryModel
                 {
@@ -151,7 +146,7 @@ namespace EIIOS.Controllers
                 });
             }
 
-            foreach (var allergenId in allergenIds)
+            foreach (var allergenId in model.SelectedAllergenIds)
             {
                 _context.ProductAllergens.Add(new ProductAllergenModel
                 {
@@ -168,37 +163,22 @@ namespace EIIOS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateProduct(int id)
+        public async Task<IActionResult> UpdateProduct(int id, CreateProductViewModel model)
         {
             if (!await IsCurrentUserAdmin())
             {
-                TempData["ErrorMessage"] = _localizer["Unauthorized"].Value;
-                return RedirectToAction("Index");
+                return Json(new { success = false, errors = new { general = _localizer["Unauthorized"].Value } });
             }
 
-            var name = Request.Form["Name"].ToString();
-            var description = Request.Form["Description"].ToString();
-            var basePriceStr = Request.Form["BasePrice"].ToString();
-            var prepTimeStr = Request.Form["PreparationTime"].ToString();
-            var isAvailable = Request.Form["IsAvailable"].ToString() == "true";
-            var isActive = Request.Form["IsActive"].ToString() == "true";
-            var categoryIds = Request.Form["SelectedCategoryIds"].Select(int.Parse).ToList();
-            var allergenIds = Request.Form["SelectedAllergenIds"].Select(int.Parse).ToList();
-            var imageFile = Request.Form.Files.GetFile("ImageFile");
-
-            if (!decimal.TryParse(basePriceStr, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal basePrice) || basePrice < 0)
+            if (!ModelState.IsValid)
             {
-                return Json(new { success = false, message = _localizer["InvalidPriceFormat"].Value });
-            }
-
-            int? prepTime = null;
-            if (!string.IsNullOrEmpty(prepTimeStr))
-            {
-                if (!int.TryParse(prepTimeStr, out int parsedPrepTime) || parsedPrepTime < 0)
-                {
-                    return Json(new { success = false, message = _localizer["InvalidPrepTimeFormat"].Value });
-                }
-                prepTime = parsedPrepTime;
+                var errors = ModelState
+                    .Where(x => x.Value.Errors.Count > 0)
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                    );
+                return Json(new { success = false, errors });
             }
 
             var product = await _context.Products
@@ -208,37 +188,37 @@ namespace EIIOS.Controllers
 
             if (product == null)
             {
-                return Json(new { success = false, message = _localizer["ProductNotFound"].Value });
+                return Json(new { success = false, errors = new { general = _localizer["ProductNotFound"].Value } });
             }
 
             var imageService = HttpContext.RequestServices.GetRequiredService<ImageService>();
 
-            if (imageFile != null)
+            if (model.ImageFile != null)
             {
                 if (product.ImageId.HasValue)
                 {
                     await imageService.DeleteImageAsync(product.ImageId.Value);
                 }
 
-                var newImage = await imageService.SaveImageAsync(imageFile, null);
+                var newImage = await imageService.SaveImageAsync(model.ImageFile, model.ImageAltText);
                 if (newImage == null)
                 {
-                    return Json(new { success = false, message = _localizer["InvalidImageFile"].Value });
+                    return Json(new { success = false, errors = new { ImageFile = new[] { _localizer["InvalidImageFile"].Value } } });
                 }
 
                 product.ImageId = newImage?.Id;
             }
 
-            product.Name = name;
-            product.Description = description;
-            product.BasePrice = basePrice;
-            product.PreparationTime = prepTime;
-            product.IsAvailable = isAvailable;
-            product.IsActive = isActive;
+            product.Name = model.Name;
+            product.Description = model.Description;
+            product.BasePrice = model.BasePrice;
+            product.PreparationTime = model.PreparationTime;
+            product.IsAvailable = model.IsAvailable;
+            product.IsActive = model.IsActive;
             product.UpdatedAt = DateTime.UtcNow;
 
             _context.ProductCategories.RemoveRange(product.ProductCategories);
-            foreach (var categoryId in categoryIds)
+            foreach (var categoryId in model.SelectedCategoryIds)
             {
                 _context.ProductCategories.Add(new ProductCategoryModel
                 {
@@ -248,7 +228,7 @@ namespace EIIOS.Controllers
             }
 
             _context.ProductAllergens.RemoveRange(product.ProductAllergens);
-            foreach (var allergenId in allergenIds)
+            foreach (var allergenId in model.SelectedAllergenIds)
             {
                 _context.ProductAllergens.Add(new ProductAllergenModel
                 {
@@ -294,26 +274,6 @@ namespace EIIOS.Controllers
             return Json(new { success = true });
         }
 
-        public async Task<bool> IsCurrentUserAdmin()
-        {
-            var userId = HttpContext.Session.GetInt32("UserId");
-            if (userId == null || userId == 0)
-                return false;
-
-            var user = await _context.Users.FindAsync(userId.Value);
-            return user?.Role == UserRole.Administrator && user.IsActive;
-        }
-
-        public async Task<bool> IsCurrentUserEmployee()
-        {
-            var userId = HttpContext.Session.GetInt32("UserId");
-            if (userId == null || userId == 0)
-                return false;
-
-            var user = await _context.Users.FindAsync(userId.Value);
-            return user?.Role == UserRole.Employee && user.IsActive;
-        }
-
         [HttpGet]
         public async Task<IActionResult> GetDiscount(int id)
         {
@@ -343,53 +303,38 @@ namespace EIIOS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateDiscount()
+        public async Task<IActionResult> CreateDiscount(CreateDiscountViewModel model)
         {
             if (!await IsCurrentUserAdmin())
             {
-                TempData["ErrorMessage"] = _localizer["Unauthorized"].Value;
-                return RedirectToAction("Index");
+                return Json(new { success = false, errors = new { general = _localizer["Unauthorized"].Value } });
             }
 
-            var name = Request.Form["Name"].ToString();
-            var description = Request.Form["Description"].ToString();
-            var discountTypeStr = Request.Form["DiscountType"].ToString();
-            var discountValueStr = Request.Form["DiscountValue"].ToString();
-            var startDateStr = Request.Form["StartDate"].ToString();
-            var endDateStr = Request.Form["EndDate"].ToString();
-            var isActive = Request.Form["IsActive"].ToString() == "true";
-            var productIds = Request.Form["SelectedProductIds"].Select(int.Parse).ToList();
-
-            if (!decimal.TryParse(discountValueStr, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal discountValue) || discountValue < 0)
+            if (!ModelState.IsValid)
             {
-                return Json(new { success = false, message = _localizer["InvalidDiscountValue"].Value });
+                var errors = ModelState
+                    .Where(x => x.Value.Errors.Count > 0)
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                    );
+                return Json(new { success = false, errors });
             }
 
-            if (!DateTime.TryParse(startDateStr, out DateTime startDate))
+            if (!Enum.TryParse<DiscountType>(model.DiscountType, out var discountType))
             {
-                return Json(new { success = false, message = _localizer["InvalidStartDate"].Value });
-            }
-
-            DateTime? endDate = null;
-            if (!string.IsNullOrEmpty(endDateStr) && DateTime.TryParse(endDateStr, out DateTime parsedEndDate))
-            {
-                endDate = parsedEndDate;
-            }
-
-            if (!Enum.TryParse<DiscountType>(discountTypeStr, out var discountType))
-            {
-                return Json(new { success = false, message = _localizer["InvalidDiscountType"].Value });
+                return Json(new { success = false, errors = new { DiscountType = new[] { _localizer["InvalidDiscountType"].Value } } });
             }
 
             var discount = new DiscountModel
             {
-                Name = name,
-                Description = description,
+                Name = model.Name,
+                Description = model.Description,
                 DiscountType = discountType,
-                DiscountValue = discountValue,
-                StartDate = startDate,
-                EndDate = endDate,
-                IsActive = isActive,
+                DiscountValue = model.DiscountValue,
+                StartDate = model.StartDate,
+                EndDate = model.EndDate,
+                IsActive = model.IsActive,
                 CreatedAt = DateTime.UtcNow,
                 CreatedById = HttpContext.Session.GetInt32("UserId") ?? 1
             };
@@ -397,7 +342,7 @@ namespace EIIOS.Controllers
             _context.Discounts.Add(discount);
             await _context.SaveChangesAsync();
 
-            foreach (var productId in productIds)
+            foreach (var productId in model.SelectedProductIds)
             {
                 _context.DiscountProducts.Add(new DiscountProductModel
                 {
@@ -414,42 +359,27 @@ namespace EIIOS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateDiscount(int id)
+        public async Task<IActionResult> UpdateDiscount(int id, CreateDiscountViewModel model)
         {
             if (!await IsCurrentUserAdmin())
             {
-                TempData["ErrorMessage"] = _localizer["Unauthorized"].Value;
-                return RedirectToAction("Index");
+                return Json(new { success = false, errors = new { general = _localizer["Unauthorized"].Value } });
             }
 
-            var name = Request.Form["Name"].ToString();
-            var description = Request.Form["Description"].ToString();
-            var discountTypeStr = Request.Form["DiscountType"].ToString();
-            var discountValueStr = Request.Form["DiscountValue"].ToString();
-            var startDateStr = Request.Form["StartDate"].ToString();
-            var endDateStr = Request.Form["EndDate"].ToString();
-            var isActive = Request.Form["IsActive"].ToString() == "true";
-            var productIds = Request.Form["SelectedProductIds"].Select(int.Parse).ToList();
-
-            if (!decimal.TryParse(discountValueStr, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal discountValue) || discountValue < 0)
+            if (!ModelState.IsValid)
             {
-                return Json(new { success = false, message = _localizer["InvalidDiscountValue"].Value });
+                var errors = ModelState
+                    .Where(x => x.Value.Errors.Count > 0)
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                    );
+                return Json(new { success = false, errors });
             }
 
-            if (!DateTime.TryParse(startDateStr, out DateTime startDate))
+            if (!Enum.TryParse<DiscountType>(model.DiscountType, out var discountType))
             {
-                return Json(new { success = false, message = _localizer["InvalidStartDate"].Value });
-            }
-
-            DateTime? endDate = null;
-            if (!string.IsNullOrEmpty(endDateStr) && DateTime.TryParse(endDateStr, out DateTime parsedEndDate))
-            {
-                endDate = parsedEndDate;
-            }
-
-            if (!Enum.TryParse<DiscountType>(discountTypeStr, out var discountType))
-            {
-                return Json(new { success = false, message = _localizer["InvalidDiscountType"].Value });
+                return Json(new { success = false, errors = new { DiscountType = new[] { _localizer["InvalidDiscountType"].Value } } });
             }
 
             var discount = await _context.Discounts
@@ -458,19 +388,19 @@ namespace EIIOS.Controllers
 
             if (discount == null)
             {
-                return Json(new { success = false, message = _localizer["DiscountNotFound"].Value });
+                return Json(new { success = false, errors = new { general = _localizer["DiscountNotFound"].Value } });
             }
 
-            discount.Name = name;
-            discount.Description = description;
+            discount.Name = model.Name;
+            discount.Description = model.Description;
             discount.DiscountType = discountType;
-            discount.DiscountValue = discountValue;
-            discount.StartDate = startDate;
-            discount.EndDate = endDate;
-            discount.IsActive = isActive;
+            discount.DiscountValue = model.DiscountValue;
+            discount.StartDate = model.StartDate;
+            discount.EndDate = model.EndDate;
+            discount.IsActive = model.IsActive;
 
             _context.DiscountProducts.RemoveRange(discount.DiscountProducts);
-            foreach (var productId in productIds)
+            foreach (var productId in model.SelectedProductIds)
             {
                 _context.DiscountProducts.Add(new DiscountProductModel
                 {

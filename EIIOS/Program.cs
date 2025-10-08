@@ -61,6 +61,8 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 builder.Services.AddScoped<EIIOSDataQuery>();
 builder.Services.AddScoped<ImageService>();
 builder.Services.AddScoped<EmailService>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<UserService>();
 
 var app = builder.Build();
 
