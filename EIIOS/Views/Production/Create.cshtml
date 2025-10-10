@@ -9,7 +9,12 @@
 <div class="card p-4 shadow-sm">
     <h4>@Model.ProductName</h4>
     <hr />
-    <form asp-action="Create" method="post">
+
+    <!-- Explicitly set action and controller to avoid routing issues -->
+    <form action="@Url.Action("Create", "Production")" method="post">
+        @* Anti-forgery token *@
+        @Html.AntiForgeryToken()
+
         <input type="hidden" asp-for="ProductId" />
 
         <div class="mb-3">

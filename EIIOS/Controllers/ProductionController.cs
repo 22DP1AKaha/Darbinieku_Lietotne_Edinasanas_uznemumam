@@ -1,28 +1,40 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using EIIOS.Data;
+﻿using EIIOS.Data;
+using EIIOS.Models;
 using EIIOS.Services;
 using EIIOS.ViewModels;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Localization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace EIIOS.Controllers
 {
     public class ProductionController : Controller
     {
         private readonly EIIOSDbContext _context;
+        private readonly IViewLocalizer _localizer;
         private readonly InventoryConsumptionService _inventoryService;
-        private readonly UserService _userService;
 
-        public ProductionController(
-            EIIOSDbContext context,
-            InventoryConsumptionService inventoryService,
-            UserService userService)
+        public ProductionController(EIIOSDbContext context, IViewLocalizer localizer, InventoryConsumptionService inventoryService)
         {
             _context = context;
+            _localizer = localizer;
             _inventoryService = inventoryService;
-            _userService = userService;
         }
 
-        // GET: Production/Create/5
+        // GET: /Production/SelectProduct
+        public async Task<IActionResult> SelectProduct()
+        {
+            var products = await _context.Products
+                                         .OrderBy(p => p.Name)
+                                         .ToListAsync();
+            return View(products);
+        }
+
+        // GET: /Production/Create/{id}
+        [HttpGet]
         public async Task<IActionResult> Create(int id)
         {
             var product = await _context.Products
@@ -31,45 +43,47 @@ namespace EIIOS.Controllers
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null)
-                return NotFound();
+                return NotFound(); // ✅ return value here
 
             var vm = new ProduceProductViewModel
             {
                 ProductId = product.Id,
                 ProductName = product.Name,
-                Ingredients = product.ProductIngredients?.Select(pi => new ProduceProductViewModel.IngredientDisplay
+                Ingredients = product.ProductIngredients.Select(pi => new ProduceProductViewModel.IngredientDisplay
                 {
-                    Name = pi.InventoryItem.Name,
+                    Name = pi.InventoryItem?.Name ?? "Unknown",
                     QuantityNeeded = pi.QuantityNeeded,
                     Unit = pi.Unit
                 }).ToList()
+
+
             };
 
-            return View(vm);
+            return View(vm); // ✅ return value at the end
         }
-
-        // POST: Production/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProduceProductViewModel model)
         {
             if (!ModelState.IsValid)
+            {
                 return View(model);
-
-            if (!await _userService.IsCurrentUserEmployee() && !await _userService.IsCurrentUserAdmin())
-                return Forbid();
+            }
 
             try
             {
                 await _inventoryService.ConsumeIngredientsAsync(model.ProductId, model.QuantityProduced);
-                TempData["Success"] = $"Produced {model.QuantityProduced} {model.ProductName}. Inventory updated successfully.";
-                return RedirectToAction("Index", "InventoryItems");
             }
             catch (InvalidOperationException ex)
             {
-                TempData["Error"] = ex.Message;
-                return RedirectToAction("Create", new { id = model.ProductId });
+                ModelState.AddModelError("", ex.Message);
+                return View("Create", model);
             }
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("SelectProduct");
         }
+
     }
 }
