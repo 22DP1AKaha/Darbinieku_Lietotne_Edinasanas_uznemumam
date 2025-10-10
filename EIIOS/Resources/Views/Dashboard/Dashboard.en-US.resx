@@ -117,6 +117,15 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Administration" xml:space="preserve">
+    <value>Administration</value>
+  </data>
+  <data name="AdminOnly" xml:space="preserve">
+    <value>Admin Only</value>
+  </data>
+  <data name="AdminToolsDesc" xml:space="preserve">
+    <value>Admin Tool Description</value>
+  </data>
   <data name="ChooseAction" xml:space="preserve">
     <value>Choose Action</value>
   </data>
@@ -146,5 +155,23 @@
   </data>
   <data name="ProduceProductDesc" xml:space="preserve">
     <value>Produce product desc</value>
+  </data>
+  <data name="TimeApproval" xml:space="preserve">
+    <value>Time Approval</value>
+  </data>
+  <data name="TimeApprovalDesc" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="TimeReports" xml:space="preserve">
+    <value>Time Reports</value>
+  </data>
+  <data name="TimeReportsDesc" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="WorkerManagement" xml:space="preserve">
+    <value>Worker Management</value>
+  </data>
+  <data name="WorkerManagementDesc" xml:space="preserve">
+    <value>Description</value>
   </data>
 </root>
