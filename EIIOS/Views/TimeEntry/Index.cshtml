@@ -138,7 +138,7 @@
                                 {
                                     <div class="list-group-item border-0 py-3">
                                         <div class="row align-items-center">
-                                            <div class="col-8">
+                                            <div class="col-7">
                                                 <h6 class="fw-bold mb-1">
                                                     @entry.ClockIn.ToLocalTime().ToString("hh:mm tt") -
                                                     @if (entry.ClockOut.HasValue)
@@ -160,17 +160,25 @@
                                                     </span>
                                                 </p>
                                             </div>
-                                            <div class="col-4 text-end">
-                                                @if (!entry.ClockOut.HasValue)
-                                                {
-                                                    <form asp-action="ClockOut" method="post" class="d-inline">
-                                                        @Html.AntiForgeryToken()
-                                                        <input type="hidden" name="id" value="@entry.Id" />
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                            @Localizer["ClockOut"]
-                                                        </button>
-                                                    </form>
-                                                }
+                                            <div class="col-5 text-end">
+                                                <div class="btn-group btn-group-sm">
+                                                    @if (!entry.ClockOut.HasValue)
+                                                    {
+                                                        <form asp-action="ClockOut" method="post" class="d-inline">
+                                                            @Html.AntiForgeryToken()
+                                                            <input type="hidden" name="id" value="@entry.Id" />
+                                                            <button type="submit" class="btn btn-outline-danger">
+                                                                @Localizer["ClockOut"]
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                    <!-- Add View Details button -->
+                                                    <a href="@Url.Action("Details", new { id = entry.Id })"
+                                                       class="btn btn-outline-info"
+                                                       title="@Localizer["ViewDetails"]">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -205,7 +213,7 @@
                                 {
                                     <div class="list-group-item border-0 py-3">
                                         <div class="row align-items-center">
-                                            <div class="col-8">
+                                            <div class="col-7">
                                                 <h6 class="fw-bold mb-1">@entry.Date.ToString("MMM dd, yyyy")</h6>
                                                 <p class="text-muted mb-0 small">
                                                     @entry.ClockIn.ToLocalTime().ToString("hh:mm tt") -
@@ -223,10 +231,18 @@
                                                     }
                                                 </p>
                                             </div>
-                                            <div class="col-4 text-end">
-                                                <span class="badge bg-@(entry.Status == TimeEntryStatus.Approved ? "success" : entry.Status == TimeEntryStatus.Rejected ? "danger" : "warning")">
-                                                    @entry.Status
-                                                </span>
+                                            <div class="col-5 text-end">
+                                                <div class="btn-group btn-group-sm">
+                                                    <span class="badge bg-@(entry.Status == TimeEntryStatus.Approved ? "success" : entry.Status == TimeEntryStatus.Rejected ? "danger" : "warning") me-2">
+                                                        @entry.Status
+                                                    </span>
+                                                    <!-- Add View Details button -->
+                                                    <a href="@Url.Action("Details", new { id = entry.Id })"
+                                                       class="btn btn-outline-info btn-sm"
+                                                       title="@Localizer["ViewDetails"]">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -289,6 +305,11 @@
         border-radius: 0.75rem;
         font-weight: 600;
         transition: all 0.3s ease;
+    }
+
+    .btn-group-sm > .btn {
+        border-radius: 0.5rem;
+        padding: 0.25rem 0.5rem;
     }
 
     .list-group-item {

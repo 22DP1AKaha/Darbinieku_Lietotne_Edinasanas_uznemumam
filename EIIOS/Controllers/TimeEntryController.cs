@@ -501,7 +501,7 @@ namespace EIIOS.Controllers
 
         // GET: TimeEntry/Details/5
         [HttpGet]
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(int id, string? returnUrl = null)
         {
             try
             {
@@ -530,6 +530,26 @@ namespace EIIOS.Controllers
                 {
                     TempData["ErrorMessage"] = _localizer["AccessDenied"].Value;
                     return RedirectToAction(nameof(Index));
+                }
+
+                // Set return URL for back button - prioritize in this order:
+                // 1. Explicit returnUrl parameter
+                // 2. Referer header from request
+                // 3. Default based on user role
+                if (!string.IsNullOrEmpty(returnUrl))
+                {
+                    ViewBag.ReturnUrl = returnUrl;
+                }
+                else if (Request.Headers["Referer"].Any() && !string.IsNullOrEmpty(Request.Headers["Referer"].ToString()))
+                {
+                    ViewBag.ReturnUrl = Request.Headers["Referer"].ToString();
+                }
+                else
+                {
+                    // Default return URL based on user role
+                    ViewBag.ReturnUrl = currentUserRole == UserRole.Administrator.ToString()
+                        ? Url.Action("Admin")
+                        : Url.Action("Index");
                 }
 
                 return View(timeEntry);
@@ -786,18 +806,18 @@ namespace EIIOS.Controllers
 
                 // Group by employee and calculate totals
                 var summary = timeEntries
-     .GroupBy(te => te.Employee)
-     .Select(g => new EmployeeTimeSummary
-     {
-         Employee = g.Key,
-         TotalHours = g.Sum(te => te.TotalHours ?? 0),
-         EntryCount = g.Count(),
-         AverageHoursPerDay = g.GroupBy(te => te.Date)
-                             .Average(group => group.Sum(te => te.TotalHours ?? 0))
-     })
-     .OrderBy(s => s.Employee.FirstName)
-     .ThenBy(s => s.Employee.LastName)
-     .ToList();
+                    .GroupBy(te => te.Employee)
+                    .Select(g => new EmployeeTimeSummary
+                    {
+                        Employee = g.Key,
+                        TotalHours = g.Sum(te => te.TotalHours ?? 0),
+                        EntryCount = g.Count(),
+                        AverageHoursPerDay = g.GroupBy(te => te.Date)
+                                            .Average(group => (decimal)group.Sum(te => te.TotalHours ?? 0))
+                    })
+                    .OrderBy(s => s.Employee.FirstName)
+                    .ThenBy(s => s.Employee.LastName)
+                    .ToList();
 
                 var viewModel = new TimeEntrySummaryViewModel
                 {
