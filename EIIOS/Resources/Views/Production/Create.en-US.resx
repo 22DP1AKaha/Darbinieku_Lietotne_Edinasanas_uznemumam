@@ -117,34 +117,28 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ChooseAction" xml:space="preserve">
-    <value>Choose Action</value>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
   </data>
-  <data name="ClockInOut" xml:space="preserve">
-    <value>Clock in or out</value>
+  <data name="Ingredient" xml:space="preserve">
+    <value>Ingredient</value>
   </data>
-  <data name="ClockInOutDesc" xml:space="preserve">
-    <value>Clock in or out desc</value>
+  <data name="IngredientsRequiredPerUnit" xml:space="preserve">
+    <value>Ingredients required (per unit)</value>
   </data>
-  <data name="Dashboard" xml:space="preserve">
-    <value>Dashboard</value>
-  </data>
-  <data name="InventoryManagement" xml:space="preserve">
-    <value>Inventory management</value>
-  </data>
-  <data name="InventoryManagementDesc" xml:space="preserve">
-    <value>Inventory management desc</value>
-  </data>
-  <data name="MenuManagement" xml:space="preserve">
-    <value>Menu management</value>
-  </data>
-  <data name="MenuManagementDesc" xml:space="preserve">
-    <value>Menu management desc</value>
+  <data name="Produce" xml:space="preserve">
+    <value>Produce</value>
   </data>
   <data name="ProduceProduct" xml:space="preserve">
     <value>Produce product</value>
   </data>
-  <data name="ProduceProductDesc" xml:space="preserve">
-    <value>Produce product desc</value>
+  <data name="QuantityNeeded" xml:space="preserve">
+    <value>Quantity needed</value>
+  </data>
+  <data name="QuantityProduced" xml:space="preserve">
+    <value>Quantity produced</value>
+  </data>
+  <data name="Unit" xml:space="preserve">
+    <value>Unit</value>
   </data>
 </root>

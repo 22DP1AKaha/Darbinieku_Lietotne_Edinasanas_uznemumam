@@ -1,7 +1,9 @@
 ﻿@model EIIOS.ViewModels.ProduceProductViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 
 @{
-    ViewData["Title"] = "Produce Product";
+    ViewData["Title"] = Localizer["ProduceProduct"];
 }
 
 <h2>@ViewData["Title"]</h2>
@@ -9,22 +11,27 @@
 <div class="card p-4 shadow-sm">
     <h4>@Model.ProductName</h4>
     <hr />
-    <form asp-action="Create" method="post">
+
+    <!-- Explicitly set action and controller to avoid routing issues -->
+    <form action="@Url.Action("Create", "Production")" method="post">
+        @* Anti-forgery token *@
+        @Html.AntiForgeryToken()
+
         <input type="hidden" asp-for="ProductId" />
 
         <div class="mb-3">
-            <label asp-for="QuantityProduced" class="form-label"></label>
+            <label asp-for="QuantityProduced" class="form-label">@Localizer["QuantityProduced"]</label>
             <input asp-for="QuantityProduced" class="form-control" />
             <span asp-validation-for="QuantityProduced" class="text-danger"></span>
         </div>
 
-        <h5>Ingredients Required (per unit)</h5>
+        <h5>@Localizer["IngredientsRequiredPerUnit"]</h5>
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>Ingredient</th>
-                    <th>Quantity Needed</th>
-                    <th>Unit</th>
+                    <th>@Localizer["Ingredient"]</th>
+                    <th>@Localizer["QuantityNeeded"]</th>
+                    <th>@Localizer["Unit"]</th>
                 </tr>
             </thead>
             <tbody>
@@ -39,8 +46,8 @@
             </tbody>
         </table>
 
-        <button type="submit" class="btn btn-primary">Produce</button>
-        <a asp-controller="Products" asp-action="Index" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">@Localizer["Produce"]</button>
+        <a asp-controller="Products" asp-action="Index" class="btn btn-secondary">@Localizer["Cancel"]</a>
     </form>
 </div>
 
