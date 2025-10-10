@@ -45,6 +45,7 @@ namespace EIIOS.Controllers
             {
                 ViewBag.AllCategories = await _context.Categories.Where(c => c.IsActive).ToListAsync();
                 ViewBag.Allergens = await _context.Allergens.OrderBy(a => a.Name).ToListAsync();
+                ViewBag.InventoryItems = await _context.InventoryItems.OrderBy(i => i.Name).ToListAsync();
             }
 
             return View(viewModel);
@@ -56,6 +57,8 @@ namespace EIIOS.Controllers
             var product = await _context.Products
                 .Include(p => p.ProductCategories)
                 .Include(p => p.ProductAllergens)
+                .Include(p => p.ProductIngredients)
+                .ThenInclude(pi => pi.InventoryItem)
                 .Include(p => p.Image)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
@@ -73,6 +76,12 @@ namespace EIIOS.Controllers
                 isActive = product.IsActive,
                 categoryIds = product.ProductCategories.Select(pc => pc.CategoryId).ToList(),
                 allergenIds = product.ProductAllergens.Select(pa => pa.AllergenId).ToList(),
+                ingredients = product.ProductIngredients?.Select(pi => new
+                {
+                    inventoryItemId = pi.InventoryItemId,
+                    quantityNeeded = pi.QuantityNeeded,
+                    unit = pi.Unit
+                }).ToList(),
                 imageUrl = product.Image != null ? $"data:{product.Image.ContentType};base64,{product.Image.Base64Data}" : null
             });
         }
@@ -144,6 +153,18 @@ namespace EIIOS.Controllers
                 });
             }
 
+            // NEW: Add ingredients
+            foreach (var ingredient in model.Ingredients.Where(i => i.InventoryItemId > 0 && i.QuantityNeeded > 0))
+            {
+                _context.ProductIngredients.Add(new ProductIngredientModel
+                {
+                    ProductId = product.Id,
+                    InventoryItemId = ingredient.InventoryItemId,
+                    QuantityNeeded = ingredient.QuantityNeeded,
+                    Unit = ingredient.Unit
+                });
+            }
+
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = _localizer["ProductCreatedSuccess"].Value;
@@ -173,6 +194,7 @@ namespace EIIOS.Controllers
             var product = await _context.Products
                 .Include(p => p.ProductCategories)
                 .Include(p => p.ProductAllergens)
+                .Include(p => p.ProductIngredients)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null)
@@ -223,6 +245,19 @@ namespace EIIOS.Controllers
                 {
                     ProductId = product.Id,
                     AllergenId = allergenId
+                });
+            }
+
+            // NEW: Update ingredients
+            _context.ProductIngredients.RemoveRange(product.ProductIngredients);
+            foreach (var ingredient in model.Ingredients.Where(i => i.InventoryItemId > 0 && i.QuantityNeeded > 0))
+            {
+                _context.ProductIngredients.Add(new ProductIngredientModel
+                {
+                    ProductId = product.Id,
+                    InventoryItemId = ingredient.InventoryItemId,
+                    QuantityNeeded = ingredient.QuantityNeeded,
+                    Unit = ingredient.Unit
                 });
             }
 

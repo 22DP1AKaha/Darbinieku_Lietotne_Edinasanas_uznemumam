@@ -5,9 +5,6 @@ using EIIOS.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
-using System.Globalization;
-using System.Security.Claims;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace EIIOS.Controllers
 {
@@ -38,10 +35,8 @@ namespace EIIOS.Controllers
 
         public async Task<IActionResult> Index(string searchTerm = "", string category = "", string sortBy = "name")
         {
-            // Get today's date (date only, no time)
             var today = DateTime.Today;
 
-            // Fetch today's daily menu if it exists
             var todayMenu = await _context.DailyMenus
                 .Include(dm => dm.DailyMenuItems)
                     .ThenInclude(dmi => dmi.Product)
@@ -54,6 +49,10 @@ namespace EIIOS.Controllers
                     .ThenInclude(dmi => dmi.Product)
                         .ThenInclude(p => p.ProductAllergens)
                             .ThenInclude(pa => pa.Allergen)
+                .Include(dm => dm.DailyMenuItems)
+                    .ThenInclude(dmi => dmi.Product)
+                        .ThenInclude(p => p.DiscountProducts)
+                            .ThenInclude(dp => dp.Discount)
                 .FirstOrDefaultAsync(dm => dm.MenuDate.Date == today && dm.IsActive);
 
             var viewModel = new MenuViewModel
@@ -70,10 +69,20 @@ namespace EIIOS.Controllers
                     .ToList() ?? new List<DailyMenuItemModel>()
             };
 
-            // Get current logged-in user and check role
             ViewBag.IsAdmin = await IsCurrentUserAdmin();
+            ViewBag.IsEmployee = await IsCurrentUserEmployee();
 
-            if (ViewBag.IsAdmin)
+            // Always load products for today's menu (for all users to see)
+            if (todayMenu != null)
+            {
+                ViewBag.TodayMenuProducts = todayMenu.DailyMenuItems
+                    .Where(dmi => dmi.IsAvailable)
+                    .Select(dmi => dmi.Product)
+                    .ToList();
+            }
+
+            // Load all products only for admin/employee (for management purposes)
+            if (ViewBag.IsAdmin || ViewBag.IsEmployee)
             {
                 ViewBag.AllCategories = await _context.Categories.Where(c => c.IsActive).ToListAsync();
                 ViewBag.Allergens = await _context.Allergens.OrderBy(a => a.Name).ToListAsync();
@@ -91,41 +100,80 @@ namespace EIIOS.Controllers
             return View();
         }
 
-        #region Product Management
+        #region Daily Menu Management
 
         [HttpGet]
-        public async Task<IActionResult> GetProduct(int id)
+        public async Task<IActionResult> GetDailyMenu(int id)
         {
-            var product = await _context.Products
-                .Include(p => p.ProductCategories)
-                .Include(p => p.ProductAllergens)
-                .Include(p => p.Image)
-                .FirstOrDefaultAsync(p => p.Id == id);
+            if (!await IsCurrentUserAdmin() && !await IsCurrentUserEmployee())
+                return Unauthorized();
 
-            if (product == null) return NotFound();
+            var menu = await _context.DailyMenus
+                .Include(dm => dm.DailyMenuItems)
+                    .ThenInclude(dmi => dmi.Product)
+                .FirstOrDefaultAsync(dm => dm.Id == id);
+
+            if (menu == null) return NotFound();
 
             return Json(new
             {
-                id = product.Id,
-                name = product.Name,
-                description = product.Description,
-                basePrice = product.BasePrice,
-                preparationTime = product.PreparationTime,
-                isAvailable = product.IsAvailable,
-                isActive = product.IsActive,
-                categoryIds = product.ProductCategories.Select(pc => pc.CategoryId).ToList(),
-                allergenIds = product.ProductAllergens.Select(pa => pa.AllergenId).ToList(),
-                imageUrl = product.Image != null ? $"data:{product.Image.ContentType};base64,{product.Image.Base64Data}" : null
+                id = menu.Id,
+                menuDate = menu.MenuDate.ToString("yyyy-MM-dd"),
+                isActive = menu.IsActive,
+                items = menu.DailyMenuItems.OrderBy(dmi => dmi.DisplayOrder).Select(dmi => new
+                {
+                    id = dmi.Id,
+                    productId = dmi.ProductId,
+                    productName = dmi.Product.Name,
+                    displayOrder = dmi.DisplayOrder,
+                    specialPrice = dmi.SpecialPrice,
+                    isAvailable = dmi.IsAvailable
+                }).ToList()
+            });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDailyMenuByDate(string date)
+        {
+            if (!await IsCurrentUserAdmin() && !await IsCurrentUserEmployee())
+                return Unauthorized();
+
+            if (!DateTime.TryParse(date, out var menuDate))
+                return BadRequest(new { message = "Invalid date format" });
+
+            var menu = await _context.DailyMenus
+                .Include(dm => dm.DailyMenuItems)
+                    .ThenInclude(dmi => dmi.Product)
+                .FirstOrDefaultAsync(dm => dm.MenuDate.Date == menuDate.Date);
+
+            if (menu == null)
+                return Json(new { exists = false });
+
+            return Json(new
+            {
+                exists = true,
+                id = menu.Id,
+                menuDate = menu.MenuDate.ToString("yyyy-MM-dd"),
+                isActive = menu.IsActive,
+                items = menu.DailyMenuItems.OrderBy(dmi => dmi.DisplayOrder).Select(dmi => new
+                {
+                    id = dmi.Id,
+                    productId = dmi.ProductId,
+                    productName = dmi.Product.Name,
+                    displayOrder = dmi.DisplayOrder,
+                    specialPrice = dmi.SpecialPrice,
+                    isAvailable = dmi.IsAvailable
+                }).ToList()
             });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateProduct(CreateProductViewModel model)
+        public async Task<IActionResult> CreateDailyMenu(CreateDailyMenuViewModel model)
         {
-            if (!await IsCurrentUserAdmin())
+            if (!await IsCurrentUserAdmin() && !await IsCurrentUserEmployee())
             {
-                return Json(new { success = false, errors = new { general = _localizer["Unauthorized"].Value } });
+                return Json(new { success = false, message = _localizer["Unauthorized"].Value });
             }
 
             if (!ModelState.IsValid)
@@ -139,66 +187,61 @@ namespace EIIOS.Controllers
                 return Json(new { success = false, errors });
             }
 
-            var imageService = HttpContext.RequestServices.GetRequiredService<ImageService>();
-            ImageModel? image = null;
-
-            if (model.ImageFile != null)
+            if (model.ProductIds == null || !model.ProductIds.Any())
             {
-                image = await imageService.SaveImageAsync(model.ImageFile, model.ImageAltText);
-                if (image == null)
-                {
-                    return Json(new { success = false, errors = new { ImageFile = new[] { _localizer["InvalidImageFile"].Value } } });
-                }
+                return Json(new { success = false, message = _localizer["SelectAtLeastOneProduct"].Value });
             }
 
-            var product = new ProductModel
+            // Check if menu already exists for this date
+            var existingMenu = await _context.DailyMenus
+                .FirstOrDefaultAsync(dm => dm.MenuDate.Date == model.MenuDate.Date);
+
+            if (existingMenu != null)
             {
-                Name = model.Name,
-                Description = model.Description,
-                BasePrice = model.BasePrice,
-                PreparationTime = model.PreparationTime,
-                IsAvailable = model.IsAvailable,
+                return Json(new { success = false, message = _localizer["MenuExistsForDate"].Value });
+            }
+
+            var dailyMenu = new DailyMenuModel
+            {
+                MenuDate = model.MenuDate.Date,
                 IsActive = model.IsActive,
-                ImageId = image?.Id,
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                CreatedById = HttpContext.Session.GetInt32("UserId") ?? 1
+                CreatedById = HttpContext.Session.GetInt32("UserId")
             };
 
-            _context.Products.Add(product);
+            _context.DailyMenus.Add(dailyMenu);
             await _context.SaveChangesAsync();
 
-            foreach (var categoryId in model.SelectedCategoryIds)
+            // Add menu items
+            for (int i = 0; i < model.ProductIds.Count; i++)
             {
-                _context.ProductCategories.Add(new ProductCategoryModel
+                var menuItem = new DailyMenuItemModel
                 {
-                    ProductId = product.Id,
-                    CategoryId = categoryId
-                });
-            }
+                    DailyMenuId = dailyMenu.Id,
+                    ProductId = model.ProductIds[i],
+                    DisplayOrder = i + 1,
+                    SpecialPrice = (model.SpecialPrices != null && i < model.SpecialPrices.Count)
+                        ? model.SpecialPrices[i]
+                        : null,
+                    IsAvailable = true
+                };
 
-            foreach (var allergenId in model.SelectedAllergenIds)
-            {
-                _context.ProductAllergens.Add(new ProductAllergenModel
-                {
-                    ProductId = product.Id,
-                    AllergenId = allergenId
-                });
+                _context.DailyMenuItems.Add(menuItem);
             }
 
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = _localizer["ProductCreatedSuccess"].Value;
+            TempData["SuccessMessage"] = _localizer["DailyMenuCreatedSuccess"].Value;
             return Json(new { success = true });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateProduct(int id, CreateProductViewModel model)
+        public async Task<IActionResult> UpdateDailyMenu(int id, CreateDailyMenuViewModel model)
         {
-            if (!await IsCurrentUserAdmin())
+            if (!await IsCurrentUserAdmin() && !await IsCurrentUserEmployee())
             {
-                return Json(new { success = false, errors = new { general = _localizer["Unauthorized"].Value } });
+                return Json(new { success = false, message = _localizer["Unauthorized"].Value });
             }
 
             if (!ModelState.IsValid)
@@ -212,95 +255,98 @@ namespace EIIOS.Controllers
                 return Json(new { success = false, errors });
             }
 
-            var product = await _context.Products
-                .Include(p => p.ProductCategories)
-                .Include(p => p.ProductAllergens)
-                .FirstOrDefaultAsync(p => p.Id == id);
-
-            if (product == null)
+            if (model.ProductIds == null || !model.ProductIds.Any())
             {
-                return Json(new { success = false, errors = new { general = _localizer["ProductNotFound"].Value } });
+                return Json(new { success = false, message = _localizer["SelectAtLeastOneProduct"].Value });
             }
 
-            var imageService = HttpContext.RequestServices.GetRequiredService<ImageService>();
+            var menu = await _context.DailyMenus
+                .Include(dm => dm.DailyMenuItems)
+                .FirstOrDefaultAsync(dm => dm.Id == id);
 
-            if (model.ImageFile != null)
+            if (menu == null)
             {
-                if (product.ImageId.HasValue)
-                {
-                    await imageService.DeleteImageAsync(product.ImageId.Value);
-                }
-
-                var newImage = await imageService.SaveImageAsync(model.ImageFile, model.ImageAltText);
-                if (newImage == null)
-                {
-                    return Json(new { success = false, errors = new { ImageFile = new[] { _localizer["InvalidImageFile"].Value } } });
-                }
-
-                product.ImageId = newImage?.Id;
+                return Json(new { success = false, message = _localizer["MenuNotFound"].Value });
             }
 
-            product.Name = model.Name;
-            product.Description = model.Description;
-            product.BasePrice = model.BasePrice;
-            product.PreparationTime = model.PreparationTime;
-            product.IsAvailable = model.IsAvailable;
-            product.IsActive = model.IsActive;
-            product.UpdatedAt = DateTime.UtcNow;
+            menu.MenuDate = model.MenuDate.Date;
+            menu.IsActive = model.IsActive;
 
-            _context.ProductCategories.RemoveRange(product.ProductCategories);
-            foreach (var categoryId in model.SelectedCategoryIds)
-            {
-                _context.ProductCategories.Add(new ProductCategoryModel
-                {
-                    ProductId = product.Id,
-                    CategoryId = categoryId
-                });
-            }
+            // Remove old items
+            _context.DailyMenuItems.RemoveRange(menu.DailyMenuItems);
 
-            _context.ProductAllergens.RemoveRange(product.ProductAllergens);
-            foreach (var allergenId in model.SelectedAllergenIds)
+            // Add new items
+            for (int i = 0; i < model.ProductIds.Count; i++)
             {
-                _context.ProductAllergens.Add(new ProductAllergenModel
+                var menuItem = new DailyMenuItemModel
                 {
-                    ProductId = product.Id,
-                    AllergenId = allergenId
-                });
+                    DailyMenuId = menu.Id,
+                    ProductId = model.ProductIds[i],
+                    DisplayOrder = i + 1,
+                    SpecialPrice = (model.SpecialPrices != null && i < model.SpecialPrices.Count)
+                        ? model.SpecialPrices[i]
+                        : null,
+                    IsAvailable = true
+                };
+
+                _context.DailyMenuItems.Add(menuItem);
             }
 
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = _localizer["ProductUpdatedSuccess"].Value;
+            TempData["SuccessMessage"] = _localizer["DailyMenuUpdatedSuccess"].Value;
             return Json(new { success = true });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteProduct(int id)
+        public async Task<IActionResult> DeleteDailyMenu(int id)
         {
-            if (!await IsCurrentUserAdmin())
+            if (!await IsCurrentUserAdmin() && !await IsCurrentUserEmployee())
             {
                 TempData["ErrorMessage"] = _localizer["Unauthorized"].Value;
                 return RedirectToAction("Index");
             }
 
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
+            var menu = await _context.DailyMenus.FindAsync(id);
+            if (menu == null)
             {
-                return Json(new { success = false, message = _localizer["ProductNotFound"].Value });
+                return Json(new { success = false, message = _localizer["MenuNotFound"].Value });
             }
 
-            var imageService = HttpContext.RequestServices.GetRequiredService<ImageService>();
-            if (product.ImageId.HasValue)
-            {
-                await imageService.DeleteImageAsync(product.ImageId.Value);
-            }
-
-            _context.Products.Remove(product);
+            _context.DailyMenus.Remove(menu);
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = _localizer["ProductDeletedSuccess"].Value;
+            TempData["SuccessMessage"] = _localizer["DailyMenuDeletedSuccess"].Value;
             return Json(new { success = true });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllDailyMenus()
+        {
+            if (!await IsCurrentUserAdmin() && !await IsCurrentUserEmployee())
+                return Unauthorized();
+
+            var menus = await _context.DailyMenus
+                .Include(dm => dm.DailyMenuItems)
+                    .ThenInclude(dmi => dmi.Product)
+                .OrderByDescending(dm => dm.MenuDate)
+                .Take(30) // Limit to last 30 menus
+                .ToListAsync();
+
+            return Json(menus.Select(dm => new
+            {
+                id = dm.Id,
+                menuDate = dm.MenuDate.ToString("yyyy-MM-dd"),
+                isActive = dm.IsActive,
+                itemCount = dm.DailyMenuItems.Count,
+                items = dm.DailyMenuItems.OrderBy(dmi => dmi.DisplayOrder).Select(dmi => new
+                {
+                    productId = dmi.ProductId,
+                    productName = dmi.Product.Name,
+                    specialPrice = dmi.SpecialPrice
+                }).ToList()
+            }));
         }
 
         #endregion
@@ -490,243 +536,6 @@ namespace EIIOS.Controllers
                 endDate = d.EndDate?.ToString("yyyy-MM-dd"),
                 isActive = d.IsActive,
                 productIds = d.DiscountProducts.Select(dp => dp.ProductId).ToList()
-            }));
-        }
-
-        #endregion
-
-        #region Daily Menu Management
-
-        [HttpGet]
-        public async Task<IActionResult> GetDailyMenu(int id)
-        {
-            if (!await IsCurrentUserAdmin()) return Unauthorized();
-
-            var menu = await _context.DailyMenus
-                .Include(dm => dm.DailyMenuItems)
-                    .ThenInclude(dmi => dmi.Product)
-                .FirstOrDefaultAsync(dm => dm.Id == id);
-
-            if (menu == null) return NotFound();
-
-            return Json(new
-            {
-                id = menu.Id,
-                menuDate = menu.MenuDate.ToString("yyyy-MM-dd"),
-                isActive = menu.IsActive,
-                items = menu.DailyMenuItems.OrderBy(dmi => dmi.DisplayOrder).Select(dmi => new
-                {
-                    id = dmi.Id,
-                    productId = dmi.ProductId,
-                    productName = dmi.Product.Name,
-                    displayOrder = dmi.DisplayOrder,
-                    specialPrice = dmi.SpecialPrice,
-                    isAvailable = dmi.IsAvailable
-                }).ToList()
-            });
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetDailyMenuByDate(string date)
-        {
-            if (!await IsCurrentUserAdmin()) return Unauthorized();
-
-            if (!DateTime.TryParse(date, out var menuDate))
-                return BadRequest("Invalid date format");
-
-            var menu = await _context.DailyMenus
-                .Include(dm => dm.DailyMenuItems)
-                    .ThenInclude(dmi => dmi.Product)
-                .FirstOrDefaultAsync(dm => dm.MenuDate.Date == menuDate.Date);
-
-            if (menu == null)
-                return Json(new { exists = false });
-
-            return Json(new
-            {
-                exists = true,
-                id = menu.Id,
-                menuDate = menu.MenuDate.ToString("yyyy-MM-dd"),
-                isActive = menu.IsActive,
-                items = menu.DailyMenuItems.OrderBy(dmi => dmi.DisplayOrder).Select(dmi => new
-                {
-                    id = dmi.Id,
-                    productId = dmi.ProductId,
-                    productName = dmi.Product.Name,
-                    displayOrder = dmi.DisplayOrder,
-                    specialPrice = dmi.SpecialPrice,
-                    isAvailable = dmi.IsAvailable
-                }).ToList()
-            });
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateDailyMenu(CreateDailyMenuViewModel model)
-        {
-            if (!await IsCurrentUserAdmin())
-            {
-                return Json(new { success = false, message = _localizer["Unauthorized"].Value });
-            }
-
-            if (!ModelState.IsValid)
-            {
-                var errors = ModelState
-                    .Where(x => x.Value.Errors.Count > 0)
-                    .ToDictionary(
-                        kvp => kvp.Key,
-                        kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
-                    );
-                return Json(new { success = false, errors });
-            }
-
-            // Check if menu already exists for this date
-            var existingMenu = await _context.DailyMenus
-                .FirstOrDefaultAsync(dm => dm.MenuDate.Date == model.MenuDate.Date);
-
-            if (existingMenu != null)
-            {
-                return Json(new { success = false, message = "A menu already exists for this date" });
-            }
-
-            var dailyMenu = new DailyMenuModel
-            {
-                MenuDate = model.MenuDate.Date,
-                IsActive = model.IsActive,
-                CreatedAt = DateTime.UtcNow,
-                CreatedById = HttpContext.Session.GetInt32("UserId")
-            };
-
-            _context.DailyMenus.Add(dailyMenu);
-            await _context.SaveChangesAsync();
-
-            // Add menu items
-            for (int i = 0; i < model.ProductIds.Count; i++)
-            {
-                var menuItem = new DailyMenuItemModel
-                {
-                    DailyMenuId = dailyMenu.Id,
-                    ProductId = model.ProductIds[i],
-                    DisplayOrder = i + 1,
-                    SpecialPrice = (model.SpecialPrices != null && i < model.SpecialPrices.Count)
-                        ? model.SpecialPrices[i]
-                        : null,
-                    IsAvailable = true
-                };
-
-                _context.DailyMenuItems.Add(menuItem);
-            }
-
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = "Daily menu created successfully";
-            return Json(new { success = true });
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateDailyMenu(int id, CreateDailyMenuViewModel model)
-        {
-            if (!await IsCurrentUserAdmin())
-            {
-                return Json(new { success = false, message = _localizer["Unauthorized"].Value });
-            }
-
-            if (!ModelState.IsValid)
-            {
-                var errors = ModelState
-                    .Where(x => x.Value.Errors.Count > 0)
-                    .ToDictionary(
-                        kvp => kvp.Key,
-                        kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
-                    );
-                return Json(new { success = false, errors });
-            }
-
-            var menu = await _context.DailyMenus
-                .Include(dm => dm.DailyMenuItems)
-                .FirstOrDefaultAsync(dm => dm.Id == id);
-
-            if (menu == null)
-            {
-                return Json(new { success = false, message = "Menu not found" });
-            }
-
-            menu.MenuDate = model.MenuDate.Date;
-            menu.IsActive = model.IsActive;
-
-            // Remove old items
-            _context.DailyMenuItems.RemoveRange(menu.DailyMenuItems);
-
-            // Add new items
-            for (int i = 0; i < model.ProductIds.Count; i++)
-            {
-                var menuItem = new DailyMenuItemModel
-                {
-                    DailyMenuId = menu.Id,
-                    ProductId = model.ProductIds[i],
-                    DisplayOrder = i + 1,
-                    SpecialPrice = (model.SpecialPrices != null && i < model.SpecialPrices.Count)
-                        ? model.SpecialPrices[i]
-                        : null,
-                    IsAvailable = true
-                };
-
-                _context.DailyMenuItems.Add(menuItem);
-            }
-
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = "Daily menu updated successfully";
-            return Json(new { success = true });
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteDailyMenu(int id)
-        {
-            if (!await IsCurrentUserAdmin())
-            {
-                TempData["ErrorMessage"] = _localizer["Unauthorized"].Value;
-                return RedirectToAction("Index");
-            }
-
-            var menu = await _context.DailyMenus.FindAsync(id);
-            if (menu == null)
-            {
-                return Json(new { success = false, message = "Menu not found" });
-            }
-
-            _context.DailyMenus.Remove(menu);
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = "Daily menu deleted successfully";
-            return Json(new { success = true });
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetAllDailyMenus()
-        {
-            if (!await IsCurrentUserAdmin()) return Unauthorized();
-
-            var menus = await _context.DailyMenus
-                .Include(dm => dm.DailyMenuItems)
-                    .ThenInclude(dmi => dmi.Product)
-                .OrderByDescending(dm => dm.MenuDate)
-                .ToListAsync();
-
-            return Json(menus.Select(dm => new
-            {
-                id = dm.Id,
-                menuDate = dm.MenuDate.ToString("yyyy-MM-dd"),
-                isActive = dm.IsActive,
-                itemCount = dm.DailyMenuItems.Count,
-                items = dm.DailyMenuItems.OrderBy(dmi => dmi.DisplayOrder).Select(dmi => new
-                {
-                    productId = dmi.ProductId,
-                    productName = dmi.Product.Name,
-                    specialPrice = dmi.SpecialPrice
-                }).ToList()
             }));
         }
 

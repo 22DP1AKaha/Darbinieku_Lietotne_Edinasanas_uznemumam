@@ -27,21 +27,26 @@ namespace EIIOS.ViewModels
 
         public bool IsAvailable { get; set; } = true;
         public bool IsActive { get; set; } = true;
+
         public IFormFile? ImageFile { get; set; }
         public string? ImageAltText { get; set; }
 
         [Required(ErrorMessageResourceType = typeof(Resources.ViewModels.ProductViewModel),
                   ErrorMessageResourceName = "CategoryRequired")]
         [MinLength(1, ErrorMessageResourceType = typeof(Resources.ViewModels.ProductViewModel),
-                   ErrorMessageResourceName = "CategoryLength")]
+                   ErrorMessageResourceName = "CategoryRequired")]
         public List<int> SelectedCategoryIds { get; set; } = new List<int>();
 
         public List<int> SelectedAllergenIds { get; set; } = new List<int>();
 
-        [Required(ErrorMessageResourceType = typeof(Resources.ViewModels.ProductViewModel),
-          ErrorMessageResourceName = "QuantityRequired")]
-        [Range(0.01, 10000, ErrorMessageResourceType = typeof(Resources.ViewModels.ProductViewModel),
-       ErrorMessageResourceName = "QuantityRange")]
-        public decimal QuantityProduced { get; set; }
+        // NEW: Ingredients
+        public List<ProductIngredientViewModel> Ingredients { get; set; } = new List<ProductIngredientViewModel>();
+    }
+
+    public class ProductIngredientViewModel
+    {
+        public int InventoryItemId { get; set; }
+        public decimal QuantityNeeded { get; set; }
+        public string Unit { get; set; } = string.Empty;
     }
 }

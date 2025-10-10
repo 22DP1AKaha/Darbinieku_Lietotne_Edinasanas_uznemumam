@@ -282,4 +282,19 @@
   <data name="Products" xml:space="preserve">
     <value>Produkti</value>
   </data>
+  <data name="Ingredients" xml:space="preserve">
+    <value>Sastāvdaļas</value>
+  </data>
+  <data name="SelectIngredient" xml:space="preserve">
+    <value>Izvēleties sastāvdaļu</value>
+  </data>
+  <data name="Quantity" xml:space="preserve">
+    <value>Daudzums</value>
+  </data>
+  <data name="Unit" xml:space="preserve">
+    <value>Mērvienība</value>
+  </data>
+  <data name="AddIngredient" xml:space="preserve">
+    <value>Pievienot sastāvdaļu</value>
+  </data>
 </root>
