@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = Localizer["Dashboard"];
     var isAdmin = ViewBag.IsAdmin ?? false;
+    var userRole = Context.Session.GetString("UserRole");
 }
 
 <!-- Dashboard Section -->
@@ -17,7 +18,7 @@
         <div class="row g-4">
             <!-- Time Tracking -->
             <div class="col-md-4">
-                <a href="/clock-in-out" class="text-decoration-none">
+                <a href="/TimeEntry" class="text-decoration-none">
                     <div class="card h-100 border-0 shadow-sm hover-scale dashboard-card">
                         <div class="card-body text-center p-4">
                             <div class="icon-circle bg-warning">
@@ -59,11 +60,53 @@
                     </div>
                 </a>
             </div>
+        </div>
 
-            <!-- Worker Management (Admin Only) - Centered in Bottom Row -->
-            @if (isAdmin)
-            {
-                <div class="col-md-4 offset-md-4">
+        <!-- Admin Only Section -->
+        @if (userRole == "Administrator")
+        {
+            <div class="row mt-5">
+                <div class="col-12 text-center mb-4">
+                    <h3 class="fw-bold text-muted">@Localizer["Administration"]</h3>
+                    <p class="text-muted">@Localizer["AdminToolsDesc"]</p>
+                </div>
+            </div>
+
+            <div class="row g-4 justify-content-center">
+                <!-- Time Entry Admin -->
+                <div class="col-md-4">
+                    <a href="/TimeEntry/Admin" class="text-decoration-none">
+                        <div class="card h-100 border-0 shadow-sm hover-scale dashboard-card admin-only-card">
+                            <div class="card-body text-center p-4">
+                                <div class="icon-circle bg-info">
+                                    <i class="fas fa-check-circle fa-2x text-info"></i>
+                                </div>
+                                <h4 class="fw-bold mb-3 text-dark">@Localizer["TimeApproval"]</h4>
+                                <p class="text-muted">@Localizer["TimeApprovalDesc"]</p>
+                                <span class="badge bg-info mt-2">@Localizer["AdminOnly"]</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Time Reports -->
+                <div class="col-md-4">
+                    <a href="/TimeEntry/Summary" class="text-decoration-none">
+                        <div class="card h-100 border-0 shadow-sm hover-scale dashboard-card admin-only-card">
+                            <div class="card-body text-center p-4">
+                                <div class="icon-circle bg-purple">
+                                    <i class="fas fa-chart-bar fa-2x text-purple"></i>
+                                </div>
+                                <h4 class="fw-bold mb-3 text-dark">@Localizer["TimeReports"]</h4>
+                                <p class="text-muted">@Localizer["TimeReportsDesc"]</p>
+                                <span class="badge bg-purple mt-2">@Localizer["AdminOnly"]</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Worker Management -->
+                <div class="col-md-4">
                     <a asp-controller="Admin" asp-action="Employees" class="text-decoration-none">
                         <div class="card h-100 border-0 shadow-sm hover-scale dashboard-card admin-only-card">
                             <div class="card-body text-center p-4">
@@ -77,8 +120,8 @@
                         </div>
                     </a>
                 </div>
-            }
-        </div>
+            </div>
+        }
     </div>
 </section>
 
@@ -99,7 +142,8 @@
         }
 
     .admin-only-card {
-        border: 2px solid rgba(220, 53, 69, 0.2);
+        border: 2px solid rgba(0,0,0,0.1);
+        background-color: #fff;
     }
 
     .icon-circle {
@@ -111,5 +155,13 @@
         align-items: center;
         justify-content: center;
         margin: 0 auto 1rem auto;
+    }
+
+    .bg-purple {
+        background-color: #6f42c1 !important;
+    }
+
+    .text-purple {
+        color: #6f42c1 !important;
     }
 </style>

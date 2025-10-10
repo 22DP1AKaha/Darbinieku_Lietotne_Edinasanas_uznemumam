@@ -11,6 +11,8 @@ namespace EIIOS.ViewModels
         [DataType(DataType.Date)]
         public DateTime? EndDate { get; set; }
 
+        public int? EmployeeId { get; set; }
+
         public TimeEntryStatus? Status { get; set; }
     }
-}   
+}
