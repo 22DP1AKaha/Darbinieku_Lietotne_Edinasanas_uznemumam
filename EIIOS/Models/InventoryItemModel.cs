@@ -16,11 +16,12 @@ namespace EIIOS.Models
         [StringLength(20)]
         public string Unit { get; set; } // kg, l, pieces, etc.
 
-        [Column(TypeName = "decimal(10,3)")]
-        public decimal CurrentQuantity { get; set; } = 0;
+        [DisplayFormat(DataFormatString = "{0:0.##}", ApplyFormatInEditMode = true)]
+        public decimal CurrentQuantity { get; set; }
 
-        [Column(TypeName = "decimal(10,3)")]
-        public decimal MinimumQuantity { get; set; } = 0;
+        [DisplayFormat(DataFormatString = "{0:0.##}", ApplyFormatInEditMode = true)]
+        public decimal MinimumQuantity { get; set; }
+
 
         [Column(TypeName = "decimal(10,2)")]
         public decimal? UnitCost { get; set; }

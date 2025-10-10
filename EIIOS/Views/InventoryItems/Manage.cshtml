@@ -76,11 +76,12 @@
                             <strong>@Localizer["Unit"]:</strong> @item.Unit
                         </p>
                         <p class="text-muted mb-1">
-                            <strong>@Localizer["CurrentQuantity"]:</strong> @item.CurrentQuantity
+                            <strong>@Localizer["CurrentQuantity"]:</strong> @String.Format("{0:0.##}", item.CurrentQuantity)
                         </p>
                         <p class="text-muted mb-3">
-                            <strong>@Localizer["MinimumQuantity"]:</strong> @item.MinimumQuantity
+                            <strong>@Localizer["MinimumQuantity"]:</strong> @String.Format("{0:0.##}", item.MinimumQuantity)
                         </p>
+
 
                         <div class="d-flex justify-content-between">
                             <button class="btn btn-outline-primary btn-sm edit-btn"
