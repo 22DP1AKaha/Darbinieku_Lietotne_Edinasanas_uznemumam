@@ -117,31 +117,58 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Dashboard" xml:space="preserve">
-    <value>Dashboard</value>
+  <data name="AddIngredientButton" xml:space="preserve">
+    <value>Pievieno sastāvdaļu</value>
   </data>
-  <data name="Language" xml:space="preserve">
-    <value>Language</value>
+  <data name="AddNewIngredient" xml:space="preserve">
+    <value>Pievieno jaunu sastāvdaļu</value>
   </data>
-  <data name="Login" xml:space="preserve">
-    <value>Login</value>
+  <data name="Cancel" xml:space="preserve">
+    <value>Atcelt</value>
   </data>
-  <data name="Products" xml:space="preserve">
-    <value>Products</value>
+  <data name="CurrentIngredientsTitle" xml:space="preserve">
+    <value>Pašreizējās sastāvdaļas</value>
   </data>
-  <data name="Profile" xml:space="preserve">
-    <value>Profile</value>
+  <data name="CurrentQuantity" xml:space="preserve">
+    <value>Pašreizējais daudzums</value>
   </data>
-  <data name="Register" xml:space="preserve">
-    <value>Register</value>
+  <data name="Delete" xml:space="preserve">
+    <value>Dzēst</value>
   </data>
-  <data name="Signout" xml:space="preserve">
-    <value>Sign out</value>
+  <data name="Edit" xml:space="preserve">
+    <value>Rediģēt</value>
   </data>
-  <data name="About" xml:space="preserve">
-    <value>About us</value>
+  <data name="EditIngredient" xml:space="preserve">
+    <value>Rediģē sastāvdaļu</value>
   </data>
-  <data name="Menu" xml:space="preserve">
-    <value>Menu</value>
+  <data name="IngredientsSubtitle" xml:space="preserve">
+    <value>Apskati savas sastāvdaļas šeit</value>
+  </data>
+  <data name="IngredientsTitle" xml:space="preserve">
+    <value>Sastāvdaļas</value>
+  </data>
+  <data name="InStock" xml:space="preserve">
+    <value>Ir noliktavā</value>
+  </data>
+  <data name="LowStock" xml:space="preserve">
+    <value>Zems krājums</value>
+  </data>
+  <data name="MinimumQuantity" xml:space="preserve">
+    <value>Minimālais daudzums</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Nosaukums</value>
+  </data>
+  <data name="NamePlaceholder" xml:space="preserve">
+    <value>Olas</value>
+  </data>
+  <data name="Unit" xml:space="preserve">
+    <value>Mērvienība</value>
+  </data>
+  <data name="UnitPlaceholder" xml:space="preserve">
+    <value>kg</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Atjaunināt</value>
   </data>
 </root>

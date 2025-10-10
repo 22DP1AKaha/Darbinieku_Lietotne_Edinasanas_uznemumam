@@ -117,31 +117,34 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Dashboard" xml:space="preserve">
-    <value>Dashboard</value>
+  <data name="CategoryLength" xml:space="preserve">
+    <value />
   </data>
-  <data name="Language" xml:space="preserve">
-    <value>Language</value>
+  <data name="CategoryRequired" xml:space="preserve">
+    <value />
   </data>
-  <data name="Login" xml:space="preserve">
-    <value>Login</value>
+  <data name="DescriptionLength" xml:space="preserve">
+    <value />
   </data>
-  <data name="Products" xml:space="preserve">
-    <value>Products</value>
+  <data name="NameLength" xml:space="preserve">
+    <value>Length should be at least 2 characters</value>
   </data>
-  <data name="Profile" xml:space="preserve">
-    <value>Profile</value>
+  <data name="NameRequired" xml:space="preserve">
+    <value>Name is required</value>
   </data>
-  <data name="Register" xml:space="preserve">
-    <value>Register</value>
+  <data name="PrepTimeRange" xml:space="preserve">
+    <value />
   </data>
-  <data name="Signout" xml:space="preserve">
-    <value>Sign out</value>
+  <data name="PriceRange" xml:space="preserve">
+    <value />
   </data>
-  <data name="About" xml:space="preserve">
-    <value>About us</value>
+  <data name="PriceRequired" xml:space="preserve">
+    <value />
   </data>
-  <data name="Menu" xml:space="preserve">
-    <value>Menu</value>
+  <data name="QuantityRange" xml:space="preserve">
+    <value />
+  </data>
+  <data name="QuantityRequired" xml:space="preserve">
+    <value />
   </data>
 </root>

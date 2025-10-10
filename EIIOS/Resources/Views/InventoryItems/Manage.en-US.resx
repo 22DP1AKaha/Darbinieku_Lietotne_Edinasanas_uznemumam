@@ -117,31 +117,58 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Dashboard" xml:space="preserve">
-    <value>Dashboard</value>
+  <data name="AddIngredientButton" xml:space="preserve">
+    <value>Add ingredient</value>
   </data>
-  <data name="Language" xml:space="preserve">
-    <value>Language</value>
+  <data name="AddNewIngredient" xml:space="preserve">
+    <value>Add new ingredient</value>
   </data>
-  <data name="Login" xml:space="preserve">
-    <value>Login</value>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
   </data>
-  <data name="Products" xml:space="preserve">
-    <value>Products</value>
+  <data name="CurrentIngredientsTitle" xml:space="preserve">
+    <value>Current ingredients</value>
   </data>
-  <data name="Profile" xml:space="preserve">
-    <value>Profile</value>
+  <data name="CurrentQuantity" xml:space="preserve">
+    <value>Current quantity</value>
   </data>
-  <data name="Register" xml:space="preserve">
-    <value>Register</value>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
   </data>
-  <data name="Signout" xml:space="preserve">
-    <value>Sign out</value>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
   </data>
-  <data name="About" xml:space="preserve">
-    <value>About us</value>
+  <data name="EditIngredient" xml:space="preserve">
+    <value>Edit ingredient</value>
   </data>
-  <data name="Menu" xml:space="preserve">
-    <value>Menu</value>
+  <data name="IngredientsSubtitle" xml:space="preserve">
+    <value>View your ingredients here</value>
+  </data>
+  <data name="IngredientsTitle" xml:space="preserve">
+    <value>Ingredients</value>
+  </data>
+  <data name="InStock" xml:space="preserve">
+    <value>In stock</value>
+  </data>
+  <data name="LowStock" xml:space="preserve">
+    <value>Low stock</value>
+  </data>
+  <data name="MinimumQuantity" xml:space="preserve">
+    <value>Minimum quantity</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="NamePlaceholder" xml:space="preserve">
+    <value>Eggs</value>
+  </data>
+  <data name="Unit" xml:space="preserve">
+    <value>Unit</value>
+  </data>
+  <data name="UnitPlaceholder" xml:space="preserve">
+    <value>kg</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Update</value>
   </data>
 </root>

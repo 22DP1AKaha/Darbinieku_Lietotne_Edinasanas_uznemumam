@@ -141,4 +141,10 @@
   <data name="MenuManagementDesc" xml:space="preserve">
     <value>Menu management desc</value>
   </data>
+  <data name="ProduceProduct" xml:space="preserve">
+    <value>Produce product</value>
+  </data>
+  <data name="ProduceProductDesc" xml:space="preserve">
+    <value>Produce product desc</value>
+  </data>
 </root>

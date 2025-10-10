@@ -33,7 +33,7 @@
 
             <!-- Inventory Management -->
             <div class="col-md-4">
-                <a href="/inventory" class="text-decoration-none">
+                <a asp-controller="inventoryItems" asp-action="Manage" class="text-decoration-none">
                     <div class="card h-100 border-0 shadow-sm hover-scale dashboard-card">
                         <div class="card-body text-center p-4">
                             <div class="icon-circle bg-success">
@@ -60,6 +60,21 @@
                     </div>
                 </a>
             </div>
+            <!-- Produce Product -->
+            <div class="col-md-4">
+                <a asp-controller="Production" asp-action="SelectProduct" class="text-decoration-none">
+                    <div class="card h-100 border-0 shadow-sm hover-scale dashboard-card">
+                        <div class="card-body text-center p-4">
+                            <div class="icon-circle bg-success">
+                                <i class="fas fa-cogs fa-2x text-success"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3 text-dark">@Localizer["ProduceProduct"]</h4>
+                            <p class="text-muted">@Localizer["ProduceProductDesc"]</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
         </div>
 
         <!-- Admin Only Section -->
@@ -120,6 +135,7 @@
                         </div>
                     </a>
                 </div>
+
             </div>
         }
     </div>

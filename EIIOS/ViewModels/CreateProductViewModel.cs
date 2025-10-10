@@ -33,9 +33,15 @@ namespace EIIOS.ViewModels
         [Required(ErrorMessageResourceType = typeof(Resources.ViewModels.ProductViewModel),
                   ErrorMessageResourceName = "CategoryRequired")]
         [MinLength(1, ErrorMessageResourceType = typeof(Resources.ViewModels.ProductViewModel),
-                   ErrorMessageResourceName = "CategoryRequired")]
+                   ErrorMessageResourceName = "CategoryLength")]
         public List<int> SelectedCategoryIds { get; set; } = new List<int>();
 
         public List<int> SelectedAllergenIds { get; set; } = new List<int>();
+
+        [Required(ErrorMessageResourceType = typeof(Resources.ViewModels.ProductViewModel),
+          ErrorMessageResourceName = "QuantityRequired")]
+        [Range(0.01, 10000, ErrorMessageResourceType = typeof(Resources.ViewModels.ProductViewModel),
+       ErrorMessageResourceName = "QuantityRange")]
+        public decimal QuantityProduced { get; set; }
     }
 }

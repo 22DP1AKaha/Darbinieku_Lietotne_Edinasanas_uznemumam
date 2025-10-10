@@ -63,6 +63,7 @@ builder.Services.AddScoped<ImageService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<InventoryConsumptionService>();
 
 var app = builder.Build();
 

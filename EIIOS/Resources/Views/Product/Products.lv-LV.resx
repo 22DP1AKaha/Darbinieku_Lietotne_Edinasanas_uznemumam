@@ -117,31 +117,169 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Dashboard" xml:space="preserve">
-    <value>Dashboard</value>
+  <data name="Active" xml:space="preserve">
+    <value>Aktīvs</value>
   </data>
-  <data name="Language" xml:space="preserve">
-    <value>Language</value>
+  <data name="ActiveDiscounts" xml:space="preserve">
+    <value>Aktīvās atlaides</value>
   </data>
-  <data name="Login" xml:space="preserve">
-    <value>Login</value>
+  <data name="AddDiscount" xml:space="preserve">
+    <value>Pievienot atlaidi</value>
+  </data>
+  <data name="AddProduct" xml:space="preserve">
+    <value>Pievienot produktu</value>
+  </data>
+  <data name="AllCategories" xml:space="preserve">
+    <value>Visas kategorijas</value>
+  </data>
+  <data name="Allergens" xml:space="preserve">
+    <value>Allergēni</value>
+  </data>
+  <data name="ApplyToProducts" xml:space="preserve">
+    <value>Pievienot uz produktiem</value>
+  </data>
+  <data name="Available" xml:space="preserve">
+    <value>Pieejams</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Atcelt</value>
+  </data>
+  <data name="Categories" xml:space="preserve">
+    <value>Kategorijas</value>
+  </data>
+  <data name="ConfirmDelete" xml:space="preserve">
+    <value>Apstiprināt dzēšanu</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Dzēst</value>
+  </data>
+  <data name="DeleteConfirmMessage" xml:space="preserve">
+    <value>Dzēšot produktu, tas pazudīs uz visiem laikiem.</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Apraksts</value>
+  </data>
+  <data name="DiscountName" xml:space="preserve">
+    <value>Atlaides nosaukums</value>
+  </data>
+  <data name="DiscountSystem" xml:space="preserve">
+    <value>Atlaižu sistēma</value>
+  </data>
+  <data name="DiscountType" xml:space="preserve">
+    <value>Atlaides tips</value>
+  </data>
+  <data name="DiscountValue" xml:space="preserve">
+    <value>Atlaides vērtība</value>
+  </data>
+  <data name="EasyToUse" xml:space="preserve">
+    <value>Viegli lietojams</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Rediģēt</value>
+  </data>
+  <data name="EndDate" xml:space="preserve">
+    <value>Beigu datums</value>
+  </data>
+  <data name="Features" xml:space="preserve">
+    <value>Sistēmas iespējas</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filtrēt</value>
+  </data>
+  <data name="FixedAmount" xml:space="preserve">
+    <value>Fiksēta summa</value>
+  </data>
+  <data name="InventoryManagement" xml:space="preserve">
+    <value>Noliktavas uzskaite</value>
+  </data>
+  <data name="ManageDiscounts" xml:space="preserve">
+    <value>Pārvaldīt atlaides</value>
+  </data>
+  <data name="ProductDescription" xml:space="preserve">
+    <value>Apskatieties visus produktus, kas mums ir!</value>
+  </data>
+  <data name="MenuManagement" xml:space="preserve">
+    <value>Ēdienkartes pārvaldība</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>Minūtes</value>
+  </data>
+  <data name="NoDiscounts" xml:space="preserve">
+    <value>Nav atlaides</value>
+  </data>
+  <data name="NoMenuItems" xml:space="preserve">
+    <value>Nav neviens produkts kas atbilst kritērijiem</value>
+  </data>
+  <data name="OurMenu" xml:space="preserve">
+    <value>Ēdienkarte</value>
+  </data>
+  <data name="PercentageHint" xml:space="preserve">
+    <value>Procentos</value>
+  </data>
+  <data name="Percentage" xml:space="preserve">
+    <value>Procenti</value>
+  </data>
+  <data name="PrepTime" xml:space="preserve">
+    <value>Gatavošanas laiks</value>
+  </data>
+  <data name="Price" xml:space="preserve">
+    <value>Cena</value>
+  </data>
+  <data name="ProductImage" xml:space="preserve">
+    <value>Produktu bilde</value>
+  </data>
+  <data name="ProductName" xml:space="preserve">
+    <value>Produktu vārds</value>
+  </data>
+  <data name="ReadyToStart" xml:space="preserve">
+    <value>Gatavs sākt?</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Saglabāt</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Meklēt</value>
+  </data>
+  <data name="SortByCategory" xml:space="preserve">
+    <value>Kārtot pēc kategorijas</value>
+  </data>
+  <data name="SortByDiscount" xml:space="preserve">
+    <value>Kārtot pēc akcijas</value>
+  </data>
+  <data name="SortByName" xml:space="preserve">
+    <value>Kārtot pēc nosaukuma</value>
+  </data>
+  <data name="SortByPriceHigh" xml:space="preserve">
+    <value>Dilstoša cena</value>
+  </data>
+  <data name="SortByPriceLow" xml:space="preserve">
+    <value>Augoša cena</value>
+  </data>
+  <data name="StartDate" xml:space="preserve">
+    <value>Sākuma datums</value>
+  </data>
+  <data name="StartWorking" xml:space="preserve">
+    <value>Sākt darbu ar EIIOS</value>
+  </data>
+  <data name="TimeTracking" xml:space="preserve">
+    <value>Darba laika uzskaite</value>
+  </data>
+  <data name="UserRoles" xml:space="preserve">
+    <value>Lietotāju lomas</value>
+  </data>
+  <data name="ViewAllItems" xml:space="preserve">
+    <value>Skatīt visu produktus</value>
+  </data>
+  <data name="WelcomeTitle" xml:space="preserve">
+    <value>Laipni lūdzam</value>
+  </data>
+  <data name="NoDiscountsYet" xml:space="preserve">
+    <value>Nav aktīvu atlaižu</value>
+  </data>
+  <data name="DeleteDiscountMsg" xml:space="preserve">
+    <value>Vai tiešām vēlēties dzēst šo atlaidi? Šī darbība ir neatgriezeniska.</value>
   </data>
   <data name="Products" xml:space="preserve">
-    <value>Products</value>
-  </data>
-  <data name="Profile" xml:space="preserve">
-    <value>Profile</value>
-  </data>
-  <data name="Register" xml:space="preserve">
-    <value>Register</value>
-  </data>
-  <data name="Signout" xml:space="preserve">
-    <value>Sign out</value>
-  </data>
-  <data name="About" xml:space="preserve">
-    <value>About us</value>
-  </data>
-  <data name="Menu" xml:space="preserve">
-    <value>Menu</value>
+    <value>Produkti</value>
   </data>
 </root>

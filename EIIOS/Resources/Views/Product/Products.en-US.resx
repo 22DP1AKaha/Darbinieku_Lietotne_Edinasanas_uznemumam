@@ -117,31 +117,169 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Dashboard" xml:space="preserve">
-    <value>Dashboard</value>
+  <data name="Active" xml:space="preserve">
+    <value>Active</value>
   </data>
-  <data name="Language" xml:space="preserve">
-    <value>Language</value>
+  <data name="ActiveDiscounts" xml:space="preserve">
+    <value>Active discounts</value>
   </data>
-  <data name="Login" xml:space="preserve">
-    <value>Login</value>
+  <data name="AddDiscount" xml:space="preserve">
+    <value>Add a discount</value>
+  </data>
+  <data name="AddProduct" xml:space="preserve">
+    <value>Add product</value>
+  </data>
+  <data name="AllCategories" xml:space="preserve">
+    <value>All categories</value>
+  </data>
+  <data name="Allergens" xml:space="preserve">
+    <value>Allergens</value>
+  </data>
+  <data name="ApplyToProducts" xml:space="preserve">
+    <value>Apply to products</value>
+  </data>
+  <data name="Available" xml:space="preserve">
+    <value>Available</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Categories" xml:space="preserve">
+    <value>Categories</value>
+  </data>
+  <data name="ConfirmDelete" xml:space="preserve">
+    <value>Confirm delete</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="DeleteConfirmMessage" xml:space="preserve">
+    <value>By deleting the product it will forever be gone</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="DiscountName" xml:space="preserve">
+    <value>Discount name</value>
+  </data>
+  <data name="DiscountSystem" xml:space="preserve">
+    <value>Discount System</value>
+  </data>
+  <data name="DiscountType" xml:space="preserve">
+    <value>Discount type</value>
+  </data>
+  <data name="DiscountValue" xml:space="preserve">
+    <value>Discount value</value>
+  </data>
+  <data name="EasyToUse" xml:space="preserve">
+    <value>Easy to Use</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="EndDate" xml:space="preserve">
+    <value>End date</value>
+  </data>
+  <data name="Features" xml:space="preserve">
+    <value>System Features</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="FixedAmount" xml:space="preserve">
+    <value>Fixed amount</value>
+  </data>
+  <data name="InventoryManagement" xml:space="preserve">
+    <value>Inventory Management</value>
+  </data>
+  <data name="ManageDiscounts" xml:space="preserve">
+    <value>Manage discount</value>
+  </data>
+  <data name="ProductDescription" xml:space="preserve">
+    <value>Check out all the products that we have!</value>
+  </data>
+  <data name="MenuManagement" xml:space="preserve">
+    <value>Menu Management</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>Minutes</value>
+  </data>
+  <data name="NoDiscounts" xml:space="preserve">
+    <value>No Discounts</value>
+  </data>
+  <data name="NoMenuItems" xml:space="preserve">
+    <value>No menu items fit your description</value>
+  </data>
+  <data name="OurMenu" xml:space="preserve">
+    <value>Menu</value>
+  </data>
+  <data name="PercentageHint" xml:space="preserve">
+    <value>In procent</value>
+  </data>
+  <data name="Percentage" xml:space="preserve">
+    <value>Percentage</value>
+  </data>
+  <data name="PrepTime" xml:space="preserve">
+    <value>Prep time</value>
+  </data>
+  <data name="Price" xml:space="preserve">
+    <value>Price</value>
+  </data>
+  <data name="ProductImage" xml:space="preserve">
+    <value>Product image</value>
+  </data>
+  <data name="ProductName" xml:space="preserve">
+    <value>Product name</value>
+  </data>
+  <data name="ReadyToStart" xml:space="preserve">
+    <value>Ready to Start?</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="SortByCategory" xml:space="preserve">
+    <value>Sort by category</value>
+  </data>
+  <data name="SortByDiscount" xml:space="preserve">
+    <value>Sort by discount</value>
+  </data>
+  <data name="SortByName" xml:space="preserve">
+    <value>Sort by name</value>
+  </data>
+  <data name="SortByPriceHigh" xml:space="preserve">
+    <value>Sort by price high-low</value>
+  </data>
+  <data name="SortByPriceLow" xml:space="preserve">
+    <value>Sort by price low-high</value>
+  </data>
+  <data name="StartDate" xml:space="preserve">
+    <value>Start date</value>
+  </data>
+  <data name="StartWorking" xml:space="preserve">
+    <value>Start Working with EIIOS</value>
+  </data>
+  <data name="TimeTracking" xml:space="preserve">
+    <value>Time Tracking</value>
+  </data>
+  <data name="UserRoles" xml:space="preserve">
+    <value>User Roles</value>
+  </data>
+  <data name="ViewAllItems" xml:space="preserve">
+    <value>View all items</value>
+  </data>
+  <data name="WelcomeTitle" xml:space="preserve">
+    <value>Welcome to</value>
+  </data>
+  <data name="NoDiscountsYet" xml:space="preserve">
+    <value>No active discounts</value>
+  </data>
+  <data name="DeleteDiscountMsg" xml:space="preserve">
+    <value>Are you sure you want to delete this discount? This action is irreversible.</value>
   </data>
   <data name="Products" xml:space="preserve">
     <value>Products</value>
-  </data>
-  <data name="Profile" xml:space="preserve">
-    <value>Profile</value>
-  </data>
-  <data name="Register" xml:space="preserve">
-    <value>Register</value>
-  </data>
-  <data name="Signout" xml:space="preserve">
-    <value>Sign out</value>
-  </data>
-  <data name="About" xml:space="preserve">
-    <value>About us</value>
-  </data>
-  <data name="Menu" xml:space="preserve">
-    <value>Menu</value>
   </data>
 </root>
