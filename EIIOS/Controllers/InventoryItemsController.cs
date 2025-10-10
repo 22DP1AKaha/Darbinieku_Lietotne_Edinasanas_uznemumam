@@ -101,6 +101,29 @@ namespace EIIOS.Controllers
             return RedirectToAction(nameof(Manage));
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Add(InventoryManagementViewModel vm)
+        {
+            if (!ModelState.IsValid)
+            {
+                vm.InventoryItems = await _context.InventoryItems.OrderBy(i => i.Name).ToListAsync();
+                return View("Manage", vm);
+            }
+
+            var newItem = new InventoryItemModel
+            {
+                Name = vm.NewItem.Name,
+                Unit = vm.NewItem.Unit,
+                CurrentQuantity = vm.NewItem.CurrentQuantity,
+                MinimumQuantity = vm.NewItem.MinimumQuantity
+            };
+
+            _context.InventoryItems.Add(newItem);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Manage));
+        }
 
     }
 }
