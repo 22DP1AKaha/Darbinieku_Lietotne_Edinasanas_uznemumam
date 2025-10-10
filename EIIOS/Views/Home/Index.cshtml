@@ -1,778 +1,327 @@
 ﻿@model EIIOS.ViewModels.MenuViewModel
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
+
 @{
     ViewData["Title"] = Localizer["MenuTitle"];
     var isAdmin = ViewBag.IsAdmin ?? false;
-    var allCategories = ViewBag.AllCategories as List<CategoryModel> ?? new List<CategoryModel>();
-    var allergens = ViewBag.Allergens as List<AllergenModel> ?? new List<AllergenModel>();
+    var allProducts = ViewBag.AllProducts as List<ProductModel> ?? new List<ProductModel>();
+    var today = DateTime.UtcNow.Date;
+
+    // Filter only today's daily menu
+    var dailyProducts = allProducts
+        .Where(p => p.DailyMenuItems != null && p.DailyMenuItems.Any(d => d.DailyMenu.MenuDate.Date == today))
+        .ToList();
+
+    // Extract active discounts related to today's products
+    var activeDiscounts = dailyProducts
+        .SelectMany(p => p.DiscountProducts?.Select(dp => dp.Discount) ?? Enumerable.Empty<DiscountModel>())
+        .Where(d => d != null && d.IsCurrentlyActive)
+        .Distinct()
+        .ToList();
 }
 
-<!-- Header Section -->
-<section class="menu-header text-white py-4">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <h1 class="fw-bold mb-2">@Localizer["OurMenu"]</h1>
-                <p class="mb-0">@Localizer["MenuDescription"]</p>
+<div class="container my-4">
+    <h1 class="mb-4">@Localizer["DailyMenu"]</h1>
+
+    @if (isAdmin)
+    {
+        <!-- Admin toolbar -->
+        <div class="admin-toolbar mb-4 p-3 bg-light rounded-3 shadow-sm d-flex justify-content-between align-items-center">
+            <div>
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createProductModal">
+                    <i class="fas fa-plus"></i> @Localizer["AddProduct"]
+                </button>
+                <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createDiscountModal">
+                    <i class="fas fa-percent"></i> @Localizer["AddDiscount"]
+                </button>
             </div>
-            @if (isAdmin)
+        </div>
+    }
+
+    @if (activeDiscounts.Any())
+    {
+        <!-- Horizontal discounts section -->
+        <div class="discount-section mb-4">
+            <h4 class="mb-3">@Localizer["ActiveDiscounts"]</h4>
+            <div class="discount-scroll d-flex flex-row overflow-auto pb-2">
+                @foreach (var discount in activeDiscounts)
+                {
+                    <div class="discount-card border rounded-3 p-3 me-3 bg-danger text-light flex-shrink-0" style="min-width: 250px;">
+                        <h5 class="fw-bold">@discount.Name</h5>
+                        <p class="mb-1">@discount.Description</p>
+                        <p class="mb-0">
+                            @if (discount.DiscountType == DiscountType.Percentage)
+                            {
+                                <span>-@discount.DiscountValue% @Localizer["Off"]</span>
+                            }
+                            else
+                            {
+                                <span>-@discount.DiscountValue.ToString("C") @Localizer["Off"]</span>
+                            }
+                        </p>
+                        <small>@Localizer["ValidUntil"]: @(discount.EndDate?.ToString("d") ?? Localizer["NoEndDate"].Value)</small>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    @if (dailyProducts.Any())
+    {
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            @foreach (var product in dailyProducts)
             {
-                <div class="col-md-6 text-end">
-                    <button class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#createDiscountModal">
-                        <i class="fas fa-tags me-1"></i>@Localizer["ManageDiscounts"]
-                    </button>
-                    <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#createProductModal">
-                        <i class="fas fa-plus me-1"></i>@Localizer["AddProduct"]
-                    </button>
+                var imageUrl = product.Image != null ? Url.Content($"~/images/{product.Image.FileName}") : "";
+                var activeDiscount = product.DiscountProducts?
+                .Select(dp => dp.Discount)
+                .FirstOrDefault(d => d != null && d.IsCurrentlyActive);
+
+                decimal discountedPrice = product.BasePrice;
+                if (activeDiscount != null)
+                {
+                    if (activeDiscount.DiscountType == DiscountType.Percentage)
+                        discountedPrice = product.BasePrice * (1 - activeDiscount.DiscountValue / 100);
+                    else if (activeDiscount.DiscountType == DiscountType.FixedAmount)
+                        discountedPrice = product.BasePrice - activeDiscount.DiscountValue;
+                }
+
+                <div class="col">
+                    <div class="card daily-menu-card h-100 position-relative">
+                        @if (activeDiscount != null)
+                        {
+                            <div class="discount-badge position-absolute top-0 start-0 m-2">
+                                @if (activeDiscount.DiscountType == DiscountType.Percentage)
+                                {
+                                    <span class="badge bg-danger">-@activeDiscount.DiscountValue%</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">-@activeDiscount.DiscountValue.ToString("C")</span>
+                                }
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(imageUrl))
+                        {
+                            <img src="@imageUrl" class="card-img-top" alt="@product.Name" />
+                        }
+
+                        <div class="card-body">
+                            <h5 class="card-title">@product.Name</h5>
+                            <p class="card-text">@product.Description</p>
+
+                            @if (activeDiscount != null)
+                            {
+                                <p class="card-text mb-0">
+                                    <span class="text-muted text-decoration-line-through">@product.BasePrice.ToString("C")</span>
+                                </p>
+                                <p class="card-text text-danger fw-bold">@discountedPrice.ToString("C")</p>
+                            }
+                            else
+                            {
+                                <p class="card-text fw-bold">@product.BasePrice.ToString("C")</p>
+                            }
+                        </div>
+
+                        @if (isAdmin)
+                        {
+                            <div class="card-footer d-flex justify-content-between">
+                                <button class="btn btn-sm btn-outline-primary" onclick="editProduct(@product.Id)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteProduct(@product.Id, '@product.Name')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        }
+                    </div>
                 </div>
             }
         </div>
-    </div>
-</section>
+    }
+    else
+    {
+        <p class="text-center text-muted">@Localizer["NoDailyMenuYet"]</p>
+    }
+</div>
 
-<!-- Featured Discounts Section -->
-<section class="featured-discounts py-4 bg-light">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                @if (Model != null && Model.Products.Any(p => p.DiscountProducts?.Any(dp => dp.Discount.IsCurrentlyActive) == true))
-                {
-                    <div class="discount-carousel d-flex gap-3 overflow-auto pb-3">
-                        @foreach (var product in Model.Products
-                                            .Where(p => p.DiscountProducts?.Any(dp => dp.Discount.IsCurrentlyActive) == true)
-                                            .Take(6))
-                        {
-                            var activeDiscount = product.DiscountProducts?.FirstOrDefault(dp => dp.Discount.IsCurrentlyActive)?.Discount;
-                            if (activeDiscount != null)
-                            {
-                                <div class="discount-card bg-white rounded shadow-sm p-3 flex-shrink-0" style="min-width: 200px;">
-                                    <div class="position-relative">
-                                        <div class="product-image bg-light rounded mb-2" style="height: 120px;">
-                                            @if (product.Image != null && !string.IsNullOrEmpty(product.Image.Base64Data))
-                                            {
-                                                <img src="data:@product.Image.ContentType;base64,@product.Image.Base64Data"
-                                                     alt="@(product.Image.AltText ?? product.Name)"
-                                                     class="img-fluid rounded"
-                                                     style="height: 100%; width: 100%; object-fit: cover;">
-                                            }
-                                            else
-                                            {
-                                                <div class="d-flex align-items-center justify-content-center h-100">
-                                                    <i class="fas fa-utensils fa-2x text-muted"></i>
-                                                </div>
-                                            }
-                                        </div>
-                                        <div class="discount-badge position-absolute top-0 end-0">
-                                            <span class="badge bg-danger rounded-circle">
-                                                -@(activeDiscount.DiscountType == DiscountType.Percentage ? $"{activeDiscount.DiscountValue:0}%" : $"€{activeDiscount.DiscountValue:0.00}")
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <h6 class="mb-1">@product.Name</h6>
-                                    <div class="price-info">
-                                        @if (activeDiscount.DiscountType == DiscountType.Percentage)
-                                        {
-                                            var discountedPrice = product.BasePrice * (1 - activeDiscount.DiscountValue / 100);
-                                            <span class="text-decoration-line-through text-muted small">€@product.BasePrice.ToString("0.00")</span>
-                                            <span class="text-success fw-bold">€@discountedPrice.ToString("0.00")</span>
-                                        }
-                                        else
-                                        {
-                                            var discountedPrice = product.BasePrice - activeDiscount.DiscountValue;
-                                            <span class="text-decoration-line-through text-muted small">€@product.BasePrice.ToString("0.00")</span>
-                                            <span class="text-success fw-bold">€@discountedPrice.ToString("0.00")</span>
-                                        }
-                                    </div>
-                                </div>
-                            }
-                        }
-                    </div>
-                }
-                else
-                {
-                    <p class="text-center text-muted">@Localizer["NoDiscounts"]</p>
-                }
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Search and Filter Section -->
-<section class="search-filters py-4">
-    <div class="container">
-        <form method="get" asp-action="Index" asp-controller="Home" class="row g-3">
-            <div class="col-md-4">
-                <div class="input-group">
-                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
-                    <input type="text" name="searchTerm" value="@Model.SearchTerm" class="form-control border-start-0" placeholder="@Localizer["SearchPlaceholder"]">
-                </div>
-            </div>
-            <div class="col-md-3">
-                <select name="category" class="form-select">
-                    <option value="">@Localizer["AllCategories"]</option>
-                    @foreach (var category in Model.Categories)
-                    {
-                        <option value="@category.Name" selected="@(Model.Category == category.Name)">@category.Name</option>
-                    }
-                </select>
-            </div>
-            <div class="col-md-3">
-                <select name="sortBy" class="form-select">
-                    <option value="name" selected="@(Model.SortBy == "name")">@Localizer["SortByName"]</option>
-                    <option value="price" selected="@(Model.SortBy == "price")">@Localizer["SortByPriceLow"]</option>
-                    <option value="pricedesc" selected="@(Model.SortBy == "pricedesc")">@Localizer["SortByPriceHigh"]</option>
-                    <option value="category" selected="@(Model.SortBy == "category")">@Localizer["SortByCategory"]</option>
-                    <option value="discount" selected="@(Model.SortBy == "discount")">@Localizer["SortByDiscount"]</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter me-1"></i>@Localizer["Filter"]</button>
-            </div>
-        </form>
-    </div>
-</section>
-
-<!-- Menu Items Section -->
-<section class="menu-items py-4">
-    <div class="container">
-        @if (Model != null && Model.Products.Any())
-        {
-            <div class="row g-4">
-                @foreach (var product in Model.Products)
-                {
-                    var activeDiscount = product.DiscountProducts?.FirstOrDefault(dp => dp.Discount.IsCurrentlyActive)?.Discount;
-                    <div class="col-lg-3 col-md-4 col-sm-6">
-                        <div class="card menu-item-card h-100 border-0 shadow-sm hover-scale">
-                            @if (isAdmin)
-                            {
-                                <div class="position-absolute top-0 start-0 m-2" style="z-index: 10;">
-                                    <div class="btn-group">
-                                        <button class="btn btn-sm btn-light" onclick="editProduct(@product.Id)" title="@Localizer["Edit"]">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-light text-danger" onclick="deleteProduct(@product.Id, '@product.Name')" title="@Localizer["Delete"]">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            }
-                            <div class="position-relative">
-                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                                    @if (product.Image != null && !string.IsNullOrEmpty(product.Image.Base64Data))
-                                    {
-                                        <img src="data:@product.Image.ContentType;base64,@product.Image.Base64Data"
-                                             alt="@(product.Image.AltText ?? product.Name)"
-                                             class="img-fluid rounded-top"
-                                             style="height: 100%; width: 100%; object-fit: cover;">
-                                    }
-                                    else
-                                    {
-                                        <i class="fas fa-utensils fa-3x text-muted"></i>
-                                    }
-                                </div>
-                                @if (activeDiscount != null)
-                                {
-                                    <div class="discount-badge position-absolute top-0 end-0 m-2">
-                                        <span class="badge bg-danger fs-6">
-                                            -@(activeDiscount.DiscountType == DiscountType.Percentage ? $"{activeDiscount.DiscountValue:0}%" : $"${activeDiscount.DiscountValue:0.00}")
-                                        </span>
-                                    </div>
-                                }
-                            </div>
-                            <div class="card-body d-flex flex-column">
-                                @if (product.ProductCategories?.Any() == true)
-                                {
-                                    <span class="badge bg-light text-dark small">@product.ProductCategories.First().Category?.Name</span>
-                                }
-                                <h5 class="card-title mb-2">@product.Name</h5>
-                                <p class="card-text text-muted small flex-grow-1">
-                                    @(product.Description?.Length > 80 ? product.Description.Substring(0, 80) + "..." : product.Description)
-                                </p>
-                                @if (product.PreparationTime.HasValue)
-                                {
-                                    <div class="mb-2">
-                                        <small class="text-muted"><i class="fas fa-clock me-1"></i>@product.PreparationTime @Localizer["Minutes"]</small>
-                                    </div>
-                                }
-                                <div class="price-info mt-auto">
-                                    @if (activeDiscount != null)
-                                    {
-                                        var discountedPrice = activeDiscount.DiscountType == DiscountType.Percentage
-                                        ? product.BasePrice * (1 - activeDiscount.DiscountValue / 100)
-                                        : product.BasePrice - activeDiscount.DiscountValue;
-
-                                        <div>
-                                            <span class="text-decoration-line-through text-muted small">€@product.BasePrice.ToString("0.00")</span>
-                                            <span class="text-success fw-bold fs-5">€@discountedPrice.ToString("0.00")</span>
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-primary fw-bold fs-5">€@product.BasePrice.ToString("0.00")</span>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-        }
-        else
-        {
-            <div class="row">
-                <div class="col-12 text-center py-5">
-                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                    <h4 class="text-muted">@Localizer["NoMenuItems"]</h4>
-                    <p class="text-muted">@Localizer["NoMenuItemsDescription"]</p>
-                    <a href="@Url.Action("Index", "Home")" class="btn btn-primary">@Localizer["ViewAllItems"]</a>
-                </div>
-            </div>
-        }
-    </div>
-</section>
-
-<!-- Create/Edit Product Modal -->
 @if (isAdmin)
 {
-    <div class="modal fade" id="createProductModal" tabindex="-1">
+    <!-- Product Modal -->
+    <div class="modal fade" id="createProductModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitle">@Localizer["AddProduct"]</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <form id="productForm" enctype="multipart/form-data">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" id="productId" name="productId" />
+                <form id="productForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalTitle">@Localizer["AddProduct"]</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
                     <div class="modal-body">
+                        <input type="hidden" id="productId" name="Id" />
                         <div class="mb-3">
-                            <label for="name" class="form-label">@Localizer["ProductName"] *</label>
-                            <input type="text" class="form-control" id="name" name="Name" required />
-                            <span class="text-danger small" data-valmsg-for="Name"></span>
+                            <label class="form-label">@Localizer["Name"]</label>
+                            <input type="text" class="form-control" id="name" required />
                         </div>
                         <div class="mb-3">
-                            <label for="description" class="form-label">@Localizer["Description"]</label>
-                            <textarea class="form-control" id="description" name="Description" rows="3"></textarea>
-                            <span class="text-danger small" data-valmsg-for="Description"></span>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="basePrice" class="form-label">@Localizer["Price"] (€) *</label>
-                                <input type="number" step="0.01" class="form-control" id="basePrice" name="BasePrice" required />
-                                <span class="text-danger small" data-valmsg-for="BasePrice"></span>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="preparationTime" class="form-label">@Localizer["PrepTime"] (@Localizer["Minutes"])</label>
-                                <input type="number" class="form-control" id="preparationTime" name="PreparationTime" />
-                                <span class="text-danger small" data-valmsg-for="PreparationTime"></span>
-                            </div>
+                            <label class="form-label">@Localizer["Description"]</label>
+                            <textarea class="form-control" id="description"></textarea>
                         </div>
                         <div class="mb-3">
-                            <label for="imageFile" class="form-label">@Localizer["ProductImage"]</label>
-                            <input type="file" class="form-control" id="imageFile" name="ImageFile" accept="image/*" />
-                            <span class="text-danger small" data-valmsg-for="ImageFile"></span>
+                            <label class="form-label">@Localizer["BasePrice"]</label>
+                            <input type="number" class="form-control" id="basePrice" step="0.01" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["Image"]</label>
+                            <input type="file" class="form-control" id="imageFile" />
                             <div id="currentImagePreview"></div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">@Localizer["Categories"] *</label>
-                            @foreach (var category in allCategories)
-                            {
-                                <div class="form-check">
-                                    <input class="form-check-input category-check" type="checkbox" name="SelectedCategoryIds" value="@category.Id" id="cat@(category.Id)" />
-                                    <label class="form-check-label" for="cat@(category.Id)">@category.Name</label>
-                                </div>
-                            }
-                            <span class="text-danger small" data-valmsg-for="SelectedCategoryIds"></span>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">@Localizer["Allergens"]</label>
-                            @foreach (var allergen in allergens)
-                            {
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input allergen-check" type="checkbox" name="SelectedAllergenIds" value="@allergen.Id" id="all@(allergen.Id)" />
-                                    <label class="form-check-label" for="all@(allergen.Id)">@allergen.Name</label>
-                                </div>
-                            }
-                        </div>
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="isAvailable" name="IsAvailable" checked />
-                            <label class="form-check-label" for="isAvailable">@Localizer["Available"]</label>
-                        </div>
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="isActive" name="IsActive" checked />
-                            <label class="form-check-label" for="isActive">@Localizer["Active"]</label>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
-                        <button type="submit" class="btn btn-primary">@Localizer["Save"]</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Close"]</button>
+                        <button type="submit" class="btn btn-primary">@Localizer["SaveProduct"]</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div class="modal fade" id="deleteModal" tabindex="-1">
-        <div class="modal-dialog">
+    <!-- Discount Modal -->
+    <div class="modal fade" id="createDiscountModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">@Localizer["ConfirmDelete"]</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p id="deleteMessage"></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
-                    <button type="button" class="btn btn-danger" id="confirmDelete">@Localizer["Delete"]</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Discount Management Modal -->
-    <div class="modal fade" id="createDiscountModal" tabindex="-1">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">@Localizer["ManageDiscounts"]</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Discount List -->
-                    <div class="mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6>@Localizer["ActiveDiscounts"]</h6>
-                            <button class="btn btn-sm btn-primary" onclick="showDiscountForm()">
-                                <i class="fas fa-plus me-1"></i>@Localizer["AddDiscount"]
-                            </button>
+                <form id="discountForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title">@Localizer["AddDiscount"]</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["Name"]</label>
+                            <input type="text" class="form-control" id="discountName" required />
                         </div>
-                        <div id="discountList" class="table-responsive">
-                            <!-- Discounts will be loaded here -->
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["DiscountType"]</label>
+                            <select class="form-select" id="discountType">
+                                <option value="Percentage">@Localizer["Percentage"]</option>
+                                <option value="FixedAmount">@Localizer["FixedAmount"]</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["DiscountValue"]</label>
+                            <input type="number" class="form-control" id="discountValue" step="0.01" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["StartDate"]</label>
+                            <input type="date" class="form-control" id="discountStart" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["EndDate"]</label>
+                            <input type="date" class="form-control" id="discountEnd" />
                         </div>
                     </div>
-
-                    <!-- Discount Form (Hidden by default) -->
-                    <div id="discountFormContainer" style="display: none;">
-                        <hr />
-                        <h6 id="discountFormTitle">@Localizer["AddDiscount"]</h6>
-                        <form id="discountForm">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" id="discountId" name="discountId" />
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="discountName" class="form-label">@Localizer["DiscountName"] *</label>
-                                    <input type="text" class="form-control" id="discountName" name="Name" required />
-                                    <span class="text-danger small" data-valmsg-for="Name"></span>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="discountType" class="form-label">@Localizer["DiscountType"] *</label>
-                                    <select class="form-select" id="discountType" name="DiscountType" required>
-                                        <option value="Percentage">@Localizer["Percentage"]</option>
-                                        <option value="FixedAmount">@Localizer["FixedAmount"]</option>
-                                    </select>
-                                    <span class="text-danger small" data-valmsg-for="DiscountType"></span>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="discountDescription" class="form-label">@Localizer["Description"]</label>
-                                <textarea class="form-control" id="discountDescription" name="Description" rows="2"></textarea>
-                                <span class="text-danger small" data-valmsg-for="Description"></span>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <label for="discountValue" class="form-label">@Localizer["DiscountValue"] *</label>
-                                    <input type="number" step="0.01" class="form-control" id="discountValue" name="DiscountValue" required />
-                                    <span class="text-danger small" data-valmsg-for="DiscountValue"></span>
-                                    <small class="text-muted" id="discountValueHint">@Localizer["PercentageHint"]</small>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="startDate" class="form-label">@Localizer["StartDate"] *</label>
-                                    <input type="date" class="form-control" id="startDate" name="StartDate" required />
-                                    <span class="text-danger small" data-valmsg-for="StartDate"></span>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="endDate" class="form-label">@Localizer["EndDate"]</label>
-                                    <input type="date" class="form-control" id="endDate" name="EndDate" />
-                                    <span class="text-danger small" data-valmsg-for="EndDate"></span>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">@Localizer["ApplyToProducts"] *</label>
-                                <div style="max-height: 200px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem; padding: 0.5rem;">
-                                    @foreach (var product in Model.Products)
-                                    {
-                                        <div class="form-check">
-                                            <input class="form-check-input discount-product-check" type="checkbox" name="SelectedProductIds" value="@product.Id" id="discProd@(product.Id)" />
-                                            <label class="form-check-label" for="discProd@(product.Id)">
-                                                @product.Name (€@product.BasePrice.ToString("0.00"))
-                                            </label>
-                                        </div>
-                                    }
-                                </div>
-                                <span class="text-danger small" data-valmsg-for="SelectedProductIds"></span>
-                            </div>
-
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" id="discountIsActive" name="IsActive" checked />
-                                <label class="form-check-label" for="discountIsActive">@Localizer["Active"]</label>
-                            </div>
-
-                            <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary">@Localizer["Save"]</button>
-                                <button type="button" class="btn btn-secondary" onclick="hideDiscountForm()">@Localizer["Cancel"]</button>
-                            </div>
-                        </form>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Close"]</button>
+                        <button type="submit" class="btn btn-primary">@Localizer["SaveDiscount"]</button>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
 }
 
 <style>
-
-    .menu-header {
-        background: #fdf6e3;
-        color: #333 !important;
-    }
-
-        .menu-header h1,
-        .menu-header p {
-            color: #333 !important;
-        }
-
-    .discount-carousel {
-        scrollbar-width: thin;
-        scrollbar-color: #ffc107 transparent;
-    }
-
-        .discount-carousel::-webkit-scrollbar {
-            height: 6px;
-        }
-
-        .discount-carousel::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .discount-carousel::-webkit-scrollbar-thumb {
-            background: #ffc107;
-            border-radius: 3px;
-        }
-
-    .menu-item-card {
+    .daily-menu-card {
         transition: all 0.3s ease;
         border: 1px solid #e9ecef;
+        overflow: hidden;
     }
 
-        .menu-item-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-hover) !important;
+        .daily-menu-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
         }
 
-    .discount-badge .badge {
-        font-size: 0.8rem;
-        padding: 5px 8px;
-    }
-
-    .hover-scale {
-        transition: all 0.3s ease;
-    }
-
-    .search-filters {
-        background: #f8f9fa;
-    }
-
-    .form-control:focus,
-    .form-select:focus {
-        border-color: #ffc107;
-        box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-        border: none;
-    }
-
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+        .daily-menu-card img {
+            transition: transform 0.3s ease;
         }
 
-    /* Validation styles */
-    [data-valmsg-for] {
-        display: block;
-        margin-top: 0.25rem;
+        .daily-menu-card:hover img {
+            transform: scale(1.05);
+        }
+
+    .discount-badge {
+        z-index: 10;
     }
 
-    .input-validation-error {
-        border-color: #dc3545 !important;
+    .discount-section {
+        background-color: #fff;
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        padding: 1rem;
     }
 
-    .field-validation-error {
-        color: #dc3545;
-        font-size: 0.875rem;
+    .discount-scroll::-webkit-scrollbar {
+        height: 8px;
     }
 
-    .is-invalid {
-        border-color: #dc3545 !important;
+    .discount-scroll::-webkit-scrollbar-thumb {
+        background-color: #bbb;
+        border-radius: 4px;
     }
 </style>
 
-@if (isAdmin)
-{
-    <script>
-        let currentProductId = null;
-        let currentDiscountId = null;
-        let deleteType = 'product';
+<script>
+    let currentProductId = null;
 
-        // Product functions
-        function editProduct(id) {
-            fetch(`/Home/GetProduct/${id}`)
-                .then(response => response.json())
-                .then(product => {
-                    document.getElementById('modalTitle').textContent = '@Localizer["EditProduct"]';
-                    document.getElementById('productId').value = product.id;
-                    document.getElementById('name').value = product.name;
-                    document.getElementById('description').value = product.description || '';
-                    document.getElementById('basePrice').value = product.basePrice;
-                    document.getElementById('preparationTime').value = product.preparationTime || '';
-                    document.getElementById('isAvailable').checked = product.isAvailable;
-                    document.getElementById('isActive').checked = product.isActive;
+    function editProduct(id) {
+        fetch(`/Home/GetProduct/${id}`)
+            .then(res => res.json())
+            .then(product => {
+                document.getElementById('modalTitle').textContent = '@Localizer["EditProduct"]';
+                document.getElementById('productId').value = product.id;
+                document.getElementById('name').value = product.name;
+                document.getElementById('description').value = product.description || '';
+                document.getElementById('basePrice').value = product.basePrice;
+                document.getElementById('currentImagePreview').innerHTML =
+                    product.imageUrl ? `<img src="${product.imageUrl}" class="img-thumbnail mt-2" style="max-width: 200px;">` : '';
+                new bootstrap.Modal(document.getElementById('createProductModal')).show();
+            });
+    }
 
-                    document.querySelectorAll('.category-check').forEach(cb => cb.checked = false);
-                    product.categoryIds.forEach(id => {
-                        const cb = document.getElementById(`cat${id}`);
-                        if (cb) cb.checked = true;
-                    });
-
-                    document.querySelectorAll('.allergen-check').forEach(cb => cb.checked = false);
-                    product.allergenIds.forEach(id => {
-                        const cb = document.getElementById(`all${id}`);
-                        if (cb) cb.checked = true;
-                    });
-
-                    if (product.imageUrl) {
-                        document.getElementById('currentImagePreview').innerHTML =
-                            `<img src="${product.imageUrl}" class="img-thumbnail mt-2" style="max-width: 200px;">`;
-                    }
-
-                    new bootstrap.Modal(document.getElementById('createProductModal')).show();
-                });
-        }
-
-        function deleteProduct(id, name) {
-            currentProductId = id;
-            document.getElementById('deleteMessage').textContent =
-                '@Localizer["DeleteConfirmMessage"]'.replace('{0}', name);
-            new bootstrap.Modal(document.getElementById('deleteModal')).show();
-        }
-
-        document.getElementById('confirmDelete').addEventListener('click', function() {
-            const formData = new FormData();
-            formData.append('__RequestVerificationToken', document.querySelector('[name="__RequestVerificationToken"]').value);
-
-            let url;
-            if (deleteType === 'discount') {
-                url = `/Home/DeleteDiscount/${currentDiscountId}`;
-            } else {
-                url = `/Home/DeleteProduct/${currentProductId}`;
-            }
-
-            fetch(url, { method: 'POST', body: formData })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
-                        location.reload();
-                    } else {
-                        alert(data.message || 'Error deleting');
-                    }
-                });
-        });
-
-        document.getElementById('productForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData();
-            formData.append('__RequestVerificationToken', document.querySelector('[name="__RequestVerificationToken"]').value);
-
-            formData.append('Name', document.getElementById('name').value);
-            formData.append('Description', document.getElementById('description').value);
-
-            const basePrice = parseFloat(document.getElementById('basePrice').value.replace(',', '.'));
-            formData.append('BasePrice', isNaN(basePrice) ? 0 : basePrice.toFixed(2));
-
-            const prepTime = document.getElementById('preparationTime').value;
-            if (prepTime) formData.append('PreparationTime', parseInt(prepTime));
-
-            formData.append('IsAvailable', document.getElementById('isAvailable').checked ? 'true' : 'false');
-            formData.append('IsActive', document.getElementById('isActive').checked ? 'true' : 'false');
-
-            const imageFile = document.getElementById('imageFile').files[0];
-            if (imageFile) formData.append('ImageFile', imageFile);
-
-            document.querySelectorAll('.category-check:checked').forEach(cb => formData.append('SelectedCategoryIds', cb.value));
-            document.querySelectorAll('.allergen-check:checked').forEach(cb => formData.append('SelectedAllergenIds', cb.value));
-
-            const productId = document.getElementById('productId').value;
-            const url = productId ? `/Home/UpdateProduct/${productId}` : '/Home/CreateProduct';
-
-            fetch(url, { method: 'POST', body: formData })
+    function deleteProduct(id, name) {
+        if (confirm(`@Localizer["ConfirmDelete"] "${name}"?`)) {
+            fetch(`/Home/DeleteProduct/${id}`, { method: 'POST' })
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) location.reload();
-                    else alert(data.message || 'Error saving product');
-                });
-        });
-
-        document.getElementById('createProductModal').addEventListener('hidden.bs.modal', function() {
-            document.getElementById('productForm').reset();
-            document.getElementById('productId').value = '';
-            document.getElementById('modalTitle').textContent = '@Localizer["AddProduct"]';
-            document.getElementById('currentImagePreview').innerHTML = '';
-        });
-
-        // Discount functions
-        function loadDiscounts() {
-            fetch('/Home/GetAllDiscounts')
-                .then(res => res.json())
-                .then(discounts => {
-                    const container = document.getElementById('discountList');
-                    if (!discounts || discounts.length === 0) {
-                        container.innerHTML = '<p class="text-muted text-center">@Localizer["NoDiscountsYet"]</p>';
-                        return;
-                    }
-
-                    let html = '<table class="table table-sm"><thead><tr><th>@Localizer["Name"]</th><th>@Localizer["Type"]</th><th>@Localizer["Value"]</th><th>@Localizer["Period"]</th><th>@Localizer["Status"]</th><th>@Localizer["Actions"]</th></tr></thead><tbody>';
-                    discounts.forEach(d => {
-                        const typeLabel = d.discountType === 'Percentage' ? '%' : '€';
-                        const statusBadge = d.isActive ? '<span class="badge bg-success">@Localizer["Active"]</span>' : '<span class="badge bg-secondary">@Localizer["Inactive"]</span>';
-                        const period = `${d.startDate} - ${d.endDate || '@Localizer["NoEndDate"]'}`;
-                        html += `<tr>
-                            <td>${d.name}</td>
-                            <td>${d.discountType}</td>
-                            <td>${d.discountValue}${typeLabel}</td>
-                            <td><small>${period}</small></td>
-                            <td>${statusBadge}</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary" onclick="editDiscount(${d.id})"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteDiscount(${d.id}, '${d.name}')"><i class="fas fa-trash"></i></button>
-                            </td>
-                        </tr>`;
-                    });
-                    html += '</tbody></table>';
-                    container.innerHTML = html;
+                    else alert(data.message || '@Localizer["ErrorDeleting"]');
                 });
         }
+    }
 
-        function showDiscountForm() {
-            document.getElementById('discountFormContainer').style.display = 'block';
-            document.getElementById('discountFormTitle').textContent = '@Localizer["AddDiscount"]';
-            document.getElementById('discountForm').reset();
-            document.getElementById('discountId').value = '';
-        }
+    document.getElementById('productForm')?.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const productId = document.getElementById('productId').value;
+        const url = productId ? `/Home/UpdateProduct/${productId}` : '/Home/CreateProduct`;
 
-        function hideDiscountForm() {
-            document.getElementById('discountFormContainer').style.display = 'none';
-            document.getElementById('discountForm').reset();
-        }
-
-        function editDiscount(id) {
-            fetch(`/Home/GetDiscount/${id}`)
-                .then(res => res.json())
-                .then(d => {
-                    document.getElementById('discountFormTitle').textContent = '@Localizer["EditDiscount"]';
-                    document.getElementById('discountId').value = d.id;
-                    document.getElementById('discountName').value = d.name;
-                    document.getElementById('discountDescription').value = d.description || '';
-                    document.getElementById('discountType').value = d.discountType;
-                    document.getElementById('discountValue').value = d.discountValue;
-                    document.getElementById('startDate').value = d.startDate;
-                    document.getElementById('endDate').value = d.endDate || '';
-                    document.getElementById('discountIsActive').checked = d.isActive;
-
-                    document.querySelectorAll('.discount-product-check').forEach(cb => cb.checked = false);
-                    d.productIds.forEach(pid => {
-                        const cb = document.getElementById(`discProd${pid}`);
-                        if (cb) cb.checked = true;
-                    });
-
-                    document.getElementById('discountFormContainer').style.display = 'block';
-                });
-        }
-
-        function deleteDiscount(id, name) {
-            currentDiscountId = id;
-            deleteType = 'discount';
-            document.getElementById('deleteMessage').textContent =
-                '@Localizer["DeleteDiscountMsg"]'.replace('{0}', name);
-            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
-            const el = document.getElementById('deleteModal');
-            el.style.zIndex = '1060';
-            el.addEventListener('hidden.bs.modal', function() {
-                el.style.zIndex = '';
-                deleteType = 'product';
-            }, { once: true });
-            modal.show();
-        }
-
-        // FIXED discount form submit
-        document.getElementById('discountForm')?.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData();
-
-            const tokenEl = document.querySelector('#discountForm [name="__RequestVerificationToken"]');
-            if (tokenEl) formData.append('__RequestVerificationToken', tokenEl.value);
-
-            formData.append('Name', document.getElementById('discountName').value);
-            formData.append('Description', document.getElementById('discountDescription').value);
-            formData.append('DiscountType', document.getElementById('discountType').value);
-
-            const val = parseFloat(document.getElementById('discountValue').value);
-            if (!isNaN(val)) formData.append('DiscountValue', val);
-
-            formData.append('StartDate', document.getElementById('startDate').value);
-            const endVal = document.getElementById('endDate').value;
-            if (endVal) formData.append('EndDate', endVal);
-
-            formData.append('IsActive', document.getElementById('discountIsActive').checked);
-
-            document.querySelectorAll('.discount-product-check:checked').forEach(cb => {
-                formData.append('SelectedProductIds', cb.value);
+        fetch(url, { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) location.reload();
+                else alert(data.message || '@Localizer["ErrorSavingProduct"]');
             });
+    });
 
-            const discountId = document.getElementById('discountId').value;
-            const url = discountId ? `/Home/UpdateDiscount/${discountId}` : '/Home/CreateDiscount';
-
-            fetch(url, { method: 'POST', body: formData })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        hideDiscountForm();
-                        loadDiscounts();
-                        location.reload();
-                    } else {
-                        alert(data.message || '@Localizer["SaveError"]');
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert('@Localizer["SaveError"]');
-                });
-        });
-
-        // Discount value hint
-        document.getElementById('discountType')?.addEventListener('change', function() {
-            const hint = document.getElementById('discountValueHint');
-            hint.textContent = this.value === 'Percentage' ? '@Localizer["PercentageHint"]' : '@Localizer["FixedAmountHint"]';
-        });
-
-        // Load discounts on modal open
-        document.getElementById('createDiscountModal')?.addEventListener('shown.bs.modal', loadDiscounts);
-    </script>
-}
+    document.getElementById('discountForm')?.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        fetch('/Home/CreateDiscount', { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) location.reload();
+                else alert(data.message || '@Localizer["ErrorSavingDiscount"]');
+            });
+    });
+</script>
