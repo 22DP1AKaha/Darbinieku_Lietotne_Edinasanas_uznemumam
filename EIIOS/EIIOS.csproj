@@ -28,6 +28,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>AccountViewModel.resx</DependentUpon>
     </Compile>
+    <Compile Update="Resources\ViewModels\ProductViewModel.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ProductViewModel.resx</DependentUpon>
+    </Compile>
     <Compile Update="Resources\ViewModels\EmployeeViewModel.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -39,6 +44,10 @@
     <EmbeddedResource Update="Resources\ViewModels\AccountViewModel.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>AccountViewModel.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\ViewModels\ProductViewModel.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>ProductViewModel.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="Resources\ViewModels\EmployeeViewModel.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>

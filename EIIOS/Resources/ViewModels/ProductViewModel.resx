@@ -118,33 +118,33 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="CategoryLength" xml:space="preserve">
-    <value>Kategorijas garums</value>
+    <value />
   </data>
   <data name="CategoryRequired" xml:space="preserve">
-    <value>Kategorija ir obligāta</value>
+    <value />
   </data>
   <data name="DescriptionLength" xml:space="preserve">
-    <value>Apraksta maksimālais garums ir 500 simboli</value>
+    <value />
   </data>
   <data name="NameLength" xml:space="preserve">
-    <value>Garumam jābūt 2-100 simboliem</value>
+    <value>Length should be at least 2 characters</value>
   </data>
   <data name="NameRequired" xml:space="preserve">
-    <value>Nosaukums ir obligāts</value>
+    <value>Name is required</value>
   </data>
   <data name="PrepTimeRange" xml:space="preserve">
-    <value>Gatavošanas laikam jābūt 1-300</value>
+    <value />
   </data>
   <data name="PriceRange" xml:space="preserve">
-    <value>Cenai jābūt 0.01-10000</value>
+    <value />
   </data>
   <data name="PriceRequired" xml:space="preserve">
-    <value>Cena ir obligāta</value>
+    <value />
   </data>
   <data name="QuantityRange" xml:space="preserve">
-    <value>Daudzumam jābūt 0.01-10000</value>
+    <value />
   </data>
   <data name="QuantityRequired" xml:space="preserve">
-    <value>Daudzums ir obligāts</value>
+    <value />
   </data>
 </root>
