@@ -102,7 +102,7 @@ namespace EIIOS.Controllers
                 return user.Role switch
                 {
                     UserRole.Administrator => RedirectToAction("Index", "Home"),
-                    UserRole.Employee => RedirectToAction("Dashboard", "Employee"),
+                    UserRole.Employee => RedirectToAction("Dashboard", "Dashboard"),
                     UserRole.Client => RedirectToAction("Index", "Home"),
                     _ => RedirectToAction("Index", "Home")
                 };

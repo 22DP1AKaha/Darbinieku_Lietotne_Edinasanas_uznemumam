@@ -1,0 +1,488 @@
+﻿@model EIIOS.ViewModels.EmployeeListViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["EmployeeManagement"];
+}
+
+<!-- Header Section -->
+<section class="employees-header bg-primary text-white py-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="fw-bold mb-2">@Localizer["EmployeeManagement"]</h1>
+                <p class="mb-0">@Localizer["ManageSystemUsers"]</p>
+            </div>
+            <div class="col-md-6 text-end">
+                <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#createEmployeeModal">
+                    <i class="fas fa-user-plus me-1"></i>@Localizer["AddEmployee"]
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Search and Filter Section -->
+<section class="search-filters py-4 bg-light">
+    <div class="container">
+        <form method="get" asp-action="Employees" class="row g-3">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="fas fa-search text-muted"></i>
+                    </span>
+                    <input type="text" name="searchTerm" value="@Model.SearchTerm"
+                           class="form-control border-start-0"
+                           placeholder="@Localizer["SearchEmployees"]">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select name="roleFilter" class="form-select">
+                    <option value="">@Localizer["AllRoles"]</option>
+                    <option value="Administrator" selected="@(Model.RoleFilter == "Administrator")">@Localizer["Administrator"]</option>
+                    <option value="Employee" selected="@(Model.RoleFilter == "Employee")">@Localizer["Employee"]</option>
+                    <option value="Client" selected="@(Model.RoleFilter == "Client")">@Localizer["Client"]</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="statusFilter" class="form-select">
+                    <option value="">@Localizer["AllStatuses"]</option>
+                    <option value="active" selected="@(Model.StatusFilter == "active")">@Localizer["Active"]</option>
+                    <option value="inactive" selected="@(Model.StatusFilter == "inactive")">@Localizer["Inactive"]</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-filter me-1"></i>@Localizer["Filter"]
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- Employee List Section -->
+<section class="employees-list py-4">
+    <div class="container">
+        @if (Model.Employees.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>@Localizer["Username"]</th>
+                            <th>@Localizer["FullName"]</th>
+                            <th>@Localizer["Email"]</th>
+                            <th>@Localizer["Role"]</th>
+                            <th>@Localizer["Status"]</th>
+                            <th>@Localizer["Created"]</th>
+                            <th class="text-end">@Localizer["Actions"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var employee in Model.Employees)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle me-2">
+                                            @employee.FirstName.Substring(0, 1).ToUpper()@employee.LastName.Substring(0, 1).ToUpper()
+                                        </div>
+                                        <strong>@employee.Username</strong>
+                                    </div>
+                                </td>
+                                <td>@employee.FullName</td>
+                                <td>
+                                    @employee.Email
+                                    @if (employee.IsEmailVerified)
+                                    {
+                                        <i class="fas fa-check-circle text-success ms-1" title="@Localizer["Verified"]"></i>
+                                    }
+                                </td>
+                                <td>
+                                    @if (employee.Role == "Administrator")
+                                    {
+                                        <span class="badge bg-danger">@Localizer["Administrator"]</span>
+                                    }
+                                    else if (employee.Role == "Employee")
+                                    {
+                                        <span class="badge bg-primary">@Localizer["Employee"]</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">@Localizer["Client"]</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (employee.IsActive)
+                                    {
+                                        <span class="badge bg-success">@Localizer["Active"]</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">@Localizer["Inactive"]</span>
+                                    }
+                                </td>
+                                <td>
+                                    <small class="text-muted">@employee.CreatedAt.ToString("yyyy-MM-dd")</small>
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-outline-primary"
+                                                onclick="editEmployee(@employee.Id)"
+                                                title="@Localizer["Edit"]">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-warning"
+                                                onclick="toggleStatus(@employee.Id, '@employee.Username', @employee.IsActive.ToString().ToLower())"
+                                                title="@Localizer["ToggleStatus"]">
+                                            <i class="fas fa-power-off"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger"
+                                                onclick="deleteEmployee(@employee.Id, '@employee.Username')"
+                                                title="@Localizer["Delete"]">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">@Localizer["NoEmployeesFound"]</h4>
+                <p class="text-muted">@Localizer["NoEmployeesDescription"]</p>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- Create/Edit Employee Modal -->
+<div class="modal fade" id="createEmployeeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">@Localizer["AddEmployee"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="employeeForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="employeeId" name="employeeId" />
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="firstName" class="form-label">@Localizer["FirstName"] *</label>
+                            <input type="text" class="form-control" id="firstName" name="FirstName" required />
+                            <span class="text-danger small" data-valmsg-for="FirstName"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="lastName" class="form-label">@Localizer["LastName"] *</label>
+                            <input type="text" class="form-control" id="lastName" name="LastName" required />
+                            <span class="text-danger small" data-valmsg-for="LastName"></span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="username" class="form-label">@Localizer["Username"] *</label>
+                        <input type="text" class="form-control" id="username" name="Username" required />
+                        <span class="text-danger small" data-valmsg-for="Username"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">@Localizer["Email"] *</label>
+                        <input type="email" class="form-control" id="email" name="Email" required />
+                        <span class="text-danger small" data-valmsg-for="Email"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">@Localizer["Password"] <span id="passwordRequired">*</span></label>
+                        <input type="password" class="form-control" id="password" name="Password" />
+                        <span class="text-danger small" data-valmsg-for="Password"></span>
+                        <div class="form-text">
+                            <small id="passwordHint">@Localizer["PasswordMinLength"]</small>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="role" class="form-label">@Localizer["Role"] *</label>
+                        <select class="form-select" id="role" name="Role" required>
+                            <option value="Employee">@Localizer["Employee"]</option>
+                            <option value="Administrator">@Localizer["Administrator"]</option>
+                            <option value="Client">@Localizer["Client"]</option>
+                        </select>
+                        <span class="text-danger small" data-valmsg-for="Role"></span>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="isActive" name="IsActive" checked />
+                        <label class="form-check-label" for="isActive">@Localizer["Active"]</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
+                    <button type="submit" class="btn btn-primary">@Localizer["Save"]</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Localizer["ConfirmDelete"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">@Localizer["Delete"]</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toggle Status Modal -->
+<div class="modal fade" id="toggleStatusModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Localizer["ConfirmStatusChange"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="toggleStatusMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
+                <button type="button" class="btn btn-warning" id="confirmToggleStatus">@Localizer["Confirm"]</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .employees-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(102, 126, 234, 0.05);
+    }
+
+    .btn-group .btn {
+        padding: 0.25rem 0.5rem;
+    }
+
+    [data-valmsg-for] {
+        display: block;
+        margin-top: 0.25rem;
+    }
+
+    .is-invalid {
+        border-color: #dc3545 !important;
+    }
+</style>
+
+<script>
+    let currentEmployeeId = null;
+
+    function clearValidationErrors(formId) {
+        const form = document.getElementById(formId);
+        if (!form) return;
+
+        form.querySelectorAll('[data-valmsg-for]').forEach(span => {
+            span.textContent = '';
+        });
+
+        form.querySelectorAll('.is-invalid').forEach(el => {
+            el.classList.remove('is-invalid');
+        });
+    }
+
+    function displayValidationErrors(errors, formId) {
+        clearValidationErrors(formId);
+
+        if (errors.general) {
+            const form = document.getElementById(formId);
+            const alertHtml = `
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    ${errors.general}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            form.insertAdjacentHTML('beforebegin', alertHtml);
+            return;
+        }
+
+        for (const [field, messages] of Object.entries(errors)) {
+            const errorSpan = document.querySelector(`[data-valmsg-for="${field}"]`);
+            const input = document.querySelector(`[name="${field}"]`);
+
+            if (errorSpan && input) {
+                const errorMessage = Array.isArray(messages) ? messages[0] : messages;
+                errorSpan.textContent = errorMessage;
+                input.classList.add('is-invalid');
+            }
+        }
+    }
+
+    function editEmployee(id) {
+        clearValidationErrors('employeeForm');
+
+        fetch(`/Admin/GetEmployee/${id}`)
+            .then(response => response.json())
+            .then(employee => {
+                document.getElementById('modalTitle').textContent = '@Localizer["EditEmployee"]';
+                document.getElementById('employeeId').value = employee.id;
+                document.getElementById('firstName').value = employee.firstName;
+                document.getElementById('lastName').value = employee.lastName;
+                document.getElementById('username').value = employee.username;
+                document.getElementById('email').value = employee.email;
+                document.getElementById('password').value = '';
+                document.getElementById('password').removeAttribute('required');
+                document.getElementById('passwordRequired').style.display = 'none';
+                document.getElementById('passwordHint').textContent = '@Localizer["LeaveBlankToKeepCurrent"]';
+                document.getElementById('role').value = employee.role;
+                document.getElementById('isActive').checked = employee.isActive;
+
+                new bootstrap.Modal(document.getElementById('createEmployeeModal')).show();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('@Localizer["ErrorLoadingEmployee"]');
+            });
+    }
+
+    function deleteEmployee(id, username) {
+        currentEmployeeId = id;
+        document.getElementById('deleteMessage').textContent =
+            `@Localizer["DeleteEmployeeConfirm"]`.replace('{0}', username);
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+
+    function toggleStatus(id, username, isActive) {
+        currentEmployeeId = id;
+        const action = isActive ? '@Localizer["Deactivate"]' : '@Localizer["Activate"]';
+        document.getElementById('toggleStatusMessage').textContent =
+            `@Localizer["ToggleStatusConfirm"]`.replace('{0}', action.toLowerCase()).replace('{1}', username);
+        new bootstrap.Modal(document.getElementById('toggleStatusModal')).show();
+    }
+
+    document.getElementById('confirmDelete').addEventListener('click', function() {
+        const formData = new FormData();
+        formData.append('__RequestVerificationToken',
+            document.querySelector('#employeeForm [name="__RequestVerificationToken"]').value);
+
+        fetch(`/Admin/DeleteEmployee/${currentEmployeeId}`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+                location.reload();
+            } else {
+                alert(data.message || '@Localizer["DeleteError"]');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('@Localizer["DeleteError"]');
+        });
+    });
+
+    document.getElementById('confirmToggleStatus').addEventListener('click', function() {
+        const formData = new FormData();
+        formData.append('__RequestVerificationToken',
+            document.querySelector('#employeeForm [name="__RequestVerificationToken"]').value);
+
+        fetch(`/Admin/ToggleEmployeeStatus/${currentEmployeeId}`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                bootstrap.Modal.getInstance(document.getElementById('toggleStatusModal')).hide();
+                location.reload();
+            } else {
+                alert(data.message || '@Localizer["StatusUpdateError"]');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('@Localizer["StatusUpdateError"]');
+        });
+    });
+
+    document.getElementById('employeeForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        clearValidationErrors('employeeForm');
+
+        const formData = new FormData();
+        formData.append('__RequestVerificationToken',
+            document.querySelector('#employeeForm [name="__RequestVerificationToken"]').value);
+        formData.append('FirstName', document.getElementById('firstName').value);
+        formData.append('LastName', document.getElementById('lastName').value);
+        formData.append('Username', document.getElementById('username').value);
+        formData.append('Email', document.getElementById('email').value);
+
+        const password = document.getElementById('password').value;
+        if (password) {
+            formData.append('Password', password);
+        }
+
+        formData.append('Role', document.getElementById('role').value);
+        formData.append('IsActive', document.getElementById('isActive').checked);
+
+        const employeeId = document.getElementById('employeeId').value;
+        const url = employeeId ? `/Admin/UpdateEmployee/${employeeId}` : '/Admin/CreateEmployee';
+
+        fetch(url, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else if (data.errors) {
+                displayValidationErrors(data.errors, 'employeeForm');
+            } else {
+                alert(data.message || '@Localizer["SaveError"]');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('@Localizer["SaveError"]');
+        });
+    });
+
+    document.getElementById('createEmployeeModal').addEventListener('hidden.bs.modal', function() {
+        document.getElementById('employeeForm').reset();
+        document.getElementById('employeeId').value = '';
+        document.getElementById('modalTitle').textContent = '@Localizer["AddEmployee"]';
+        document.getElementById('password').setAttribute('required', 'required');
+        document.getElementById('passwordRequired').style.display = 'inline';
+        document.getElementById('passwordHint').textContent = '@Localizer["PasswordMinLength"]';
+        clearValidationErrors('employeeForm');
+    });
+</script>
