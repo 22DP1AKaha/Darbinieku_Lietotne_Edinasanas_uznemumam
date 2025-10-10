@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Mvc.Localization
+﻿﻿@using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
 @{
     var isAuthenticated = Context.Session.GetInt32("UserId") != null;
@@ -18,6 +18,9 @@
             <ul class="navbar-nav flex-row">
                 <li class="nav-item me-3">
                     <a class="nav-link" href="@Url.Action("Index", "Home")">@Localizer["Menu"]</a>
+                </li>
+                <li class="nav-item me-3">
+                    <a class="nav-link" href="@Url.Action("Products", "Product")">@Localizer["Products"]</a>
                 </li>
                 @if (isEmployee)
                 {
