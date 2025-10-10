@@ -15,7 +15,7 @@ namespace EIIOS.ViewModels
         [Range(0.01, 10000, ErrorMessageResourceType = typeof(Resources.ViewModels.ProductViewModel),
                ErrorMessageResourceName = "QuantityRange")]
         [Display(Name = "Quantity Produced")]
-        public decimal QuantityProduced { get; set; }
+        public int QuantityProduced { get; set; }
 
         public List<IngredientDisplay>? Ingredients { get; set; }
 

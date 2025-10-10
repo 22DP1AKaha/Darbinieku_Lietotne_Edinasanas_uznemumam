@@ -173,32 +173,31 @@
                 @Html.AntiForgeryToken()
                 <input type="hidden" id="employeeId" name="employeeId" />
                 <div class="modal-body">
+                    <div id="errorAlert" class="alert alert-danger alert-dismissible fade show d-none" role="alert">
+                        <span id="errorMessage"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="firstName" class="form-label">@Localizer["FirstName"] *</label>
                             <input type="text" class="form-control" id="firstName" name="FirstName" required />
-                            <span class="text-danger small" data-valmsg-for="FirstName"></span>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="lastName" class="form-label">@Localizer["LastName"] *</label>
                             <input type="text" class="form-control" id="lastName" name="LastName" required />
-                            <span class="text-danger small" data-valmsg-for="LastName"></span>
                         </div>
                     </div>
                     <div class="mb-3">
                         <label for="username" class="form-label">@Localizer["Username"] *</label>
                         <input type="text" class="form-control" id="username" name="Username" required />
-                        <span class="text-danger small" data-valmsg-for="Username"></span>
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">@Localizer["Email"] *</label>
                         <input type="email" class="form-control" id="email" name="Email" required />
-                        <span class="text-danger small" data-valmsg-for="Email"></span>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">@Localizer["Password"] <span id="passwordRequired">*</span></label>
                         <input type="password" class="form-control" id="password" name="Password" />
-                        <span class="text-danger small" data-valmsg-for="Password"></span>
                         <div class="form-text">
                             <small id="passwordHint">@Localizer["PasswordMinLength"]</small>
                         </div>
@@ -210,7 +209,6 @@
                             <option value="Administrator">@Localizer["Administrator"]</option>
                             <option value="Client">@Localizer["Client"]</option>
                         </select>
-                        <span class="text-danger small" data-valmsg-for="Role"></span>
                     </div>
                     <div class="form-check mb-3">
                         <input class="form-check-input" type="checkbox" id="isActive" name="IsActive" checked />
@@ -289,62 +287,25 @@
     .btn-group .btn {
         padding: 0.25rem 0.5rem;
     }
-
-    [data-valmsg-for] {
-        display: block;
-        margin-top: 0.25rem;
-    }
-
-    .is-invalid {
-        border-color: #dc3545 !important;
-    }
 </style>
 
 <script>
     let currentEmployeeId = null;
 
-    function clearValidationErrors(formId) {
-        const form = document.getElementById(formId);
-        if (!form) return;
-
-        form.querySelectorAll('[data-valmsg-for]').forEach(span => {
-            span.textContent = '';
-        });
-
-        form.querySelectorAll('.is-invalid').forEach(el => {
-            el.classList.remove('is-invalid');
-        });
+    function showError(message) {
+        const errorAlert = document.getElementById('errorAlert');
+        const errorMessage = document.getElementById('errorMessage');
+        errorMessage.textContent = message;
+        errorAlert.classList.remove('d-none');
     }
 
-    function displayValidationErrors(errors, formId) {
-        clearValidationErrors(formId);
-
-        if (errors.general) {
-            const form = document.getElementById(formId);
-            const alertHtml = `
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    ${errors.general}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            `;
-            form.insertAdjacentHTML('beforebegin', alertHtml);
-            return;
-        }
-
-        for (const [field, messages] of Object.entries(errors)) {
-            const errorSpan = document.querySelector(`[data-valmsg-for="${field}"]`);
-            const input = document.querySelector(`[name="${field}"]`);
-
-            if (errorSpan && input) {
-                const errorMessage = Array.isArray(messages) ? messages[0] : messages;
-                errorSpan.textContent = errorMessage;
-                input.classList.add('is-invalid');
-            }
-        }
+    function hideError() {
+        const errorAlert = document.getElementById('errorAlert');
+        errorAlert.classList.add('d-none');
     }
 
     function editEmployee(id) {
-        clearValidationErrors('employeeForm');
+        hideError();
 
         fetch(`/Admin/GetEmployee/${id}`)
             .then(response => response.json())
@@ -435,7 +396,7 @@
 
     document.getElementById('employeeForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        clearValidationErrors('employeeForm');
+        hideError();
 
         const formData = new FormData();
         formData.append('__RequestVerificationToken',
@@ -464,15 +425,13 @@
         .then(data => {
             if (data.success) {
                 location.reload();
-            } else if (data.errors) {
-                displayValidationErrors(data.errors, 'employeeForm');
             } else {
-                alert(data.message || '@Localizer["SaveError"]');
+                showError(data.message || '@Localizer["SaveError"]');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('@Localizer["SaveError"]');
+            showError('@Localizer["SaveError"]');
         });
     });
 
@@ -483,6 +442,6 @@
         document.getElementById('password').setAttribute('required', 'required');
         document.getElementById('passwordRequired').style.display = 'inline';
         document.getElementById('passwordHint').textContent = '@Localizer["PasswordMinLength"]';
-        clearValidationErrors('employeeForm');
+        hideError();
     });
 </script>

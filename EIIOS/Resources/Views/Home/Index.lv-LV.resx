@@ -117,7 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Active" xml:space="preserve">
+  <data name="\" xml:space="preserve">
     <value>Aktīvs</value>
   </data>
   <data name="ActiveDiscounts" xml:space="preserve">
@@ -278,5 +278,38 @@
   </data>
   <data name="DeleteDiscountMsg" xml:space="preserve">
     <value>Vai tiešām vēlēties dzēst šo atlaidi? Šī darbība ir neatgriezeniska.</value>
+  </data>
+  <data name="DailyMenu" xml:space="preserve">
+    <value>Dienas ēdienkarte</value>
+  </data>
+  <data name="ManageDailyMenu" xml:space="preserve">
+    <value>Rediģēt dienas ēdienkarti</value>
+  </data>
+  <data name="NoDailyMenuYet" xml:space="preserve">
+    <value>Vēl nav dienas ēdienkartes</value>
+  </data>
+  <data name="CreateDailyMenuMessage" xml:space="preserve">
+    <value>Izveidojiet dienas ēdienkarti</value>
+  </data>
+  <data name="CreateDailyMenu" xml:space="preserve">
+    <value>Ēdienkartes izveide</value>
+  </data>
+  <data name="MenuDate" xml:space="preserve">
+    <value>Ēdienkartes datums</value>
+  </data>
+  <data name="SelectProducts" xml:space="preserve">
+    <value>Izvēlēties produktus</value>
+  </data>
+  <data name="NoProductsSelected" xml:space="preserve">
+    <value>Nav izvēlēti produkti</value>
+  </data>
+  <data name="AddProducts" xml:space="preserve">
+    <value>Pievienot produktu</value>
+  </data>
+  <data name="SearchProducts" xml:space="preserve">
+    <value>Meklēt produktus</value>
+  </data>
+  <data name="Off" xml:space="preserve">
+    <value>Nost</value>
   </data>
 </root>
