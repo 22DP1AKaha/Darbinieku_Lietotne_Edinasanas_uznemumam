@@ -118,28 +118,28 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ChooseAction" xml:space="preserve">
-    <value>Choose Action</value>
+    <value>Izvēlieties darbību, lai sāktu</value>
   </data>
   <data name="ClockInOut" xml:space="preserve">
-    <value>Clock in or out</value>
+    <value>Atzīmēt ierašanos/aiziešanu</value>
   </data>
   <data name="ClockInOutDesc" xml:space="preserve">
-    <value>Clock in or out desc</value>
+    <value>Sekojiet darba stundām un pārvaldiet apmeklējumu</value>
   </data>
   <data name="Dashboard" xml:space="preserve">
-    <value>Dashboard</value>
+    <value>Vadības panelis</value>
   </data>
   <data name="InventoryManagement" xml:space="preserve">
-    <value>Inventory management</value>
+    <value>Inventāra pārvaldība</value>
   </data>
   <data name="InventoryManagementDesc" xml:space="preserve">
-    <value>Inventory management desc</value>
+    <value>Pārvaldiet krājumu līmeņus un inventāra priekšmetus</value>
   </data>
   <data name="MenuManagement" xml:space="preserve">
-    <value>Menu management</value>
+    <value>Menu Management</value>
   </data>
   <data name="MenuManagementDesc" xml:space="preserve">
-    <value>Menu management desc</value>
+    <value>Izveidojiet un pārvaldiet ikdienas ēdienkartes un produktus</value>
   </data>
   <data name="ProduceProduct" xml:space="preserve">
     <value>Gatavo produktu</value>

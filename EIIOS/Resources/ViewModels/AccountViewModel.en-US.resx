@@ -159,4 +159,14 @@
   <data name="AcceptTermsRequired" xml:space="preserve">
     <value>Accept terms is required!</value>
   </data>
+  <data name="CurrentPasswordRequired" xml:space="preserve">
+    <value>Current password is required</value>
+  </data>
+  <data name="NewPasswordRequired" xml:space="preserve">
+    <value>New password is required</value>
+  </data>
+  <data name="UsernameInvalid" xml:space="preserve">
+    <value>Username can only contain letters, numbers, and underscores
+</value>
+  </data>
 </root>

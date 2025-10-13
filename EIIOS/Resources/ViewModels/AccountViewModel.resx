@@ -159,4 +159,13 @@
   <data name="AcceptTermsRequired" xml:space="preserve">
     <value />
   </data>
+  <data name="CurrentPasswordRequired" xml:space="preserve">
+    <value />
+  </data>
+  <data name="NewPasswordRequired" xml:space="preserve">
+    <value />
+  </data>
+  <data name="UsernameInvalid" xml:space="preserve">
+    <value />
+  </data>
 </root>

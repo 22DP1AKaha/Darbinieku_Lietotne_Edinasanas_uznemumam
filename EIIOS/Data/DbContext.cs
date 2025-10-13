@@ -469,6 +469,284 @@ namespace EIIOS.Data
     new ProductIngredientModel { Id = 24, ProductId = 5, InventoryItemId = 15, QuantityNeeded = 0.01m, Unit = "kg" } 
 );
         }
+        // Add this method to your EIIOSDbContext class (after the SeedInitialData method)
+
+        public async Task SeedDataAsync()
+        {
+            try
+            {
+                // Seed Allergens (only if none exist)
+                if (!await Allergens.AnyAsync())
+                {
+                    Allergens.AddRange(
+                        new AllergenModel { Code = "GLU", Name = "Gluten" },
+                        new AllergenModel { Code = "NUT", Name = "Nuts" },
+                        new AllergenModel { Code = "DUI", Name = "Dairy" },
+                        new AllergenModel { Code = "EGA", Name = "Eggs" },
+                        new AllergenModel { Code = "SOY", Name = "Soy" },
+                        new AllergenModel { Code = "FIS", Name = "Fish" },
+                        new AllergenModel { Code = "SHE", Name = "Shellfish" },
+                        new AllergenModel { Code = "CEL", Name = "Celery" },
+                        new AllergenModel { Code = "MUS", Name = "Mustard" },
+                        new AllergenModel { Code = "SES", Name = "Sesame Seeds" },
+                        new AllergenModel { Code = "LUP", Name = "Lupin" },
+                        new AllergenModel { Code = "SUL", Name = "Sulphites" }
+                    );
+                    await SaveChangesAsync();
+                }
+
+                // Seed Admin User (only if no users exist)
+                if (!await Users.AnyAsync())
+                {
+                    var adminUser = new UserModel
+                    {
+                        Username = "admin",
+                        Email = "admin@eiios.com",
+                        PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"), // Changed from plain "1234"
+                        FirstName = "System",
+                        LastName = "Administrator",
+                        Role = UserRole.Administrator,
+                        IsEmailVerified = true,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow,
+                        IsActive = true
+                    };
+                    Users.Add(adminUser);
+                    await SaveChangesAsync();
+                }
+
+                // Seed Categories (only if none exist)
+                if (!await Categories.AnyAsync())
+                {
+                    Categories.AddRange(
+                        new CategoryModel { Name = "Starters", Description = "Appetizers and small plates", DisplayOrder = 1, IsActive = true },
+                        new CategoryModel { Name = "Main Courses", Description = "Hearty and filling meals", DisplayOrder = 2, IsActive = true },
+                        new CategoryModel { Name = "Desserts", Description = "Sweet treats to finish your meal", DisplayOrder = 3, IsActive = true },
+                        new CategoryModel { Name = "Beverages", Description = "Drinks and refreshments", DisplayOrder = 4, IsActive = true }
+                    );
+                    await SaveChangesAsync();
+                }
+
+                // Seed Inventory Items (only if none exist)
+                if (!await InventoryItems.AnyAsync())
+                {
+                    InventoryItems.AddRange(
+                        new InventoryItemModel { Name = "Chicken Breast", Unit = "kg", CurrentQuantity = 50, MinimumQuantity = 5, UnitCost = 6.50m, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                        new InventoryItemModel { Name = "Flour", Unit = "kg", CurrentQuantity = 100, MinimumQuantity = 10, UnitCost = 1.20m, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                        new InventoryItemModel { Name = "Milk", Unit = "l", CurrentQuantity = 30, MinimumQuantity = 5, UnitCost = 0.90m, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                        new InventoryItemModel { Name = "Eggs", Unit = "pieces", CurrentQuantity = 200, MinimumQuantity = 20, UnitCost = 0.15m, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                        new InventoryItemModel { Name = "Lamb Meat", Unit = "kg", CurrentQuantity = 40, MinimumQuantity = 5, UnitCost = 9.50m, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                        new InventoryItemModel { Name = "Beef Mince", Unit = "kg", CurrentQuantity = 30, MinimumQuantity = 5, UnitCost = 8.00m, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                        new InventoryItemModel { Name = "Pita Bread", Unit = "pieces", CurrentQuantity = 300, MinimumQuantity = 50, UnitCost = 0.40m, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                        new InventoryItemModel { Name = "Tortilla Wraps", Unit = "pieces", CurrentQuantity = 200, MinimumQuantity = 30, UnitCost = 0.50m, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                        new InventoryItemModel { Name = "Lettuce", Unit = "kg", CurrentQuantity = 15, MinimumQuantity = 2, UnitCost = 1.80m, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                        new InventoryItemModel { Name = "Tomatoes", Unit = "kg", CurrentQuantity = 20, MinimumQuantity = 3, UnitCost = 2.20m, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                        new InventoryItemModel { Name = "Onions", Unit = "kg", CurrentQuantity = 25, MinimumQuantity = 3, UnitCost = 1.50m, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                        new InventoryItemModel { Name = "Cabbage", Unit = "kg", CurrentQuantity = 10, MinimumQuantity = 2, UnitCost = 1.70m, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                        new InventoryItemModel { Name = "Cucumbers", Unit = "kg", CurrentQuantity = 12, MinimumQuantity = 2, UnitCost = 2.00m, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                        new InventoryItemModel { Name = "Yogurt", Unit = "kg", CurrentQuantity = 10, MinimumQuantity = 2, UnitCost = 3.50m, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                        new InventoryItemModel { Name = "Garlic", Unit = "kg", CurrentQuantity = 5, MinimumQuantity = 1, UnitCost = 4.00m, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                        new InventoryItemModel { Name = "Chili Sauce", Unit = "l", CurrentQuantity = 8, MinimumQuantity = 2, UnitCost = 5.00m, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                        new InventoryItemModel { Name = "Tahini Sauce", Unit = "l", CurrentQuantity = 6, MinimumQuantity = 1, UnitCost = 6.00m, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                        new InventoryItemModel { Name = "French Fries", Unit = "kg", CurrentQuantity = 25, MinimumQuantity = 5, UnitCost = 2.50m, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                        new InventoryItemModel { Name = "Olive Oil", Unit = "l", CurrentQuantity = 15, MinimumQuantity = 3, UnitCost = 7.00m, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                        new InventoryItemModel { Name = "Spice Mix (Kebab Seasoning)", Unit = "kg", CurrentQuantity = 5, MinimumQuantity = 1, UnitCost = 12.00m, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+                    );
+                    await SaveChangesAsync();
+                }
+
+                // Seed Products (only if none exist)
+                if (!await Products.AnyAsync())
+                {
+                    var adminUser = await Users.FirstOrDefaultAsync(u => u.Username == "admin");
+                    var adminId = adminUser?.Id ?? 1;
+
+                    Products.AddRange(
+                        new ProductModel
+                        {
+                            Name = "Chicken Kebab Wrap",
+                            Description = "Grilled chicken pieces served in a tortilla wrap with lettuce, tomatoes, onions, and garlic sauce.",
+                            BasePrice = 7.50m,
+                            PreparationTime = 10,
+                            IsAvailable = true,
+                            IsActive = true,
+                            CreatedAt = DateTime.UtcNow,
+                            UpdatedAt = DateTime.UtcNow,
+                            CreatedById = adminId
+                        },
+                        new ProductModel
+                        {
+                            Name = "Lamb Doner Kebab",
+                            Description = "Thin slices of seasoned lamb served in pita bread with fresh vegetables and chili sauce.",
+                            BasePrice = 8.50m,
+                            PreparationTime = 12,
+                            IsAvailable = true,
+                            IsActive = true,
+                            CreatedAt = DateTime.UtcNow,
+                            UpdatedAt = DateTime.UtcNow,
+                            CreatedById = adminId
+                        },
+                        new ProductModel
+                        {
+                            Name = "Beef Kofta Kebab",
+                            Description = "Spiced beef mince skewers served with fries and tahini sauce.",
+                            BasePrice = 9.00m,
+                            PreparationTime = 15,
+                            IsAvailable = true,
+                            IsActive = true,
+                            CreatedAt = DateTime.UtcNow,
+                            UpdatedAt = DateTime.UtcNow,
+                            CreatedById = adminId
+                        },
+                        new ProductModel
+                        {
+                            Name = "Falafel Wrap",
+                            Description = "Crispy falafel balls with lettuce, tomatoes, cucumbers, and tahini sauce in a tortilla wrap.",
+                            BasePrice = 6.50m,
+                            PreparationTime = 8,
+                            IsAvailable = true,
+                            IsActive = true,
+                            CreatedAt = DateTime.UtcNow,
+                            UpdatedAt = DateTime.UtcNow,
+                            CreatedById = adminId
+                        },
+                        new ProductModel
+                        {
+                            Name = "Chicken & Fries Box",
+                            Description = "Grilled chicken pieces served over a bed of crispy fries with garlic sauce.",
+                            BasePrice = 7.00m,
+                            PreparationTime = 10,
+                            IsAvailable = true,
+                            IsActive = true,
+                            CreatedAt = DateTime.UtcNow,
+                            UpdatedAt = DateTime.UtcNow,
+                            CreatedById = adminId
+                        }
+                    );
+                    await SaveChangesAsync();
+
+                    // After products are saved, add their relationships
+                    var products = await Products.ToListAsync();
+                    var categories = await Categories.ToListAsync();
+                    var allergens = await Allergens.ToListAsync();
+                    var inventoryItems = await InventoryItems.ToListAsync();
+
+                    if (products.Count >= 5 && categories.Count >= 2)
+                    {
+                        var mainCourseCategory = categories.FirstOrDefault(c => c.Name == "Main Courses");
+
+                        if (mainCourseCategory != null)
+                        {
+                            // Add product categories
+                            foreach (var product in products)
+                            {
+                                ProductCategories.Add(new ProductCategoryModel { ProductId = product.Id, CategoryId = mainCourseCategory.Id });
+                            }
+                            await SaveChangesAsync();
+                        }
+                    }
+
+                    // Add allergens to products
+                    if (products.Count >= 5 && allergens.Count >= 10)
+                    {
+                        var gluten = allergens.FirstOrDefault(a => a.Code == "GLU");
+                        var dairy = allergens.FirstOrDefault(a => a.Code == "DUI");
+                        var eggs = allergens.FirstOrDefault(a => a.Code == "EGA");
+                        var sesame = allergens.FirstOrDefault(a => a.Code == "SES");
+
+                        if (gluten != null && dairy != null && eggs != null && sesame != null)
+                        {
+                            var chickenWrap = products.FirstOrDefault(p => p.Name == "Chicken Kebab Wrap");
+                            var lambDoner = products.FirstOrDefault(p => p.Name == "Lamb Doner Kebab");
+                            var beefKofta = products.FirstOrDefault(p => p.Name == "Beef Kofta Kebab");
+                            var falafel = products.FirstOrDefault(p => p.Name == "Falafel Wrap");
+                            var chickenFries = products.FirstOrDefault(p => p.Name == "Chicken & Fries Box");
+
+                            ProductAllergens.AddRange(
+                                new ProductAllergenModel { ProductId = chickenWrap.Id, AllergenId = gluten.Id },
+                                new ProductAllergenModel { ProductId = chickenWrap.Id, AllergenId = dairy.Id },
+                                new ProductAllergenModel { ProductId = chickenWrap.Id, AllergenId = eggs.Id },
+                                new ProductAllergenModel { ProductId = lambDoner.Id, AllergenId = gluten.Id },
+                                new ProductAllergenModel { ProductId = lambDoner.Id, AllergenId = dairy.Id },
+                                new ProductAllergenModel { ProductId = lambDoner.Id, AllergenId = eggs.Id },
+                                new ProductAllergenModel { ProductId = beefKofta.Id, AllergenId = gluten.Id },
+                                new ProductAllergenModel { ProductId = beefKofta.Id, AllergenId = sesame.Id },
+                                new ProductAllergenModel { ProductId = falafel.Id, AllergenId = gluten.Id },
+                                new ProductAllergenModel { ProductId = falafel.Id, AllergenId = sesame.Id },
+                                new ProductAllergenModel { ProductId = chickenFries.Id, AllergenId = dairy.Id },
+                                new ProductAllergenModel { ProductId = chickenFries.Id, AllergenId = eggs.Id }
+                            );
+                            await SaveChangesAsync();
+                        }
+                    }
+
+                    // Add ingredients to products
+                    if (products.Count >= 5 && inventoryItems.Count >= 20)
+                    {
+                        var chickenWrap = products.FirstOrDefault(p => p.Name == "Chicken Kebab Wrap");
+                        var lambDoner = products.FirstOrDefault(p => p.Name == "Lamb Doner Kebab");
+                        var beefKofta = products.FirstOrDefault(p => p.Name == "Beef Kofta Kebab");
+                        var falafel = products.FirstOrDefault(p => p.Name == "Falafel Wrap");
+                        var chickenFries = products.FirstOrDefault(p => p.Name == "Chicken & Fries Box");
+
+                        var chicken = inventoryItems.FirstOrDefault(i => i.Name == "Chicken Breast");
+                        var lamb = inventoryItems.FirstOrDefault(i => i.Name == "Lamb Meat");
+                        var beef = inventoryItems.FirstOrDefault(i => i.Name == "Beef Mince");
+                        var tortilla = inventoryItems.FirstOrDefault(i => i.Name == "Tortilla Wraps");
+                        var pita = inventoryItems.FirstOrDefault(i => i.Name == "Pita Bread");
+                        var lettuce = inventoryItems.FirstOrDefault(i => i.Name == "Lettuce");
+                        var tomatoes = inventoryItems.FirstOrDefault(i => i.Name == "Tomatoes");
+                        var onions = inventoryItems.FirstOrDefault(i => i.Name == "Onions");
+                        var garlic = inventoryItems.FirstOrDefault(i => i.Name == "Garlic");
+                        var chili = inventoryItems.FirstOrDefault(i => i.Name == "Chili Sauce");
+                        var tahini = inventoryItems.FirstOrDefault(i => i.Name == "Tahini Sauce");
+                        var fries = inventoryItems.FirstOrDefault(i => i.Name == "French Fries");
+                        var spices = inventoryItems.FirstOrDefault(i => i.Name == "Spice Mix (Kebab Seasoning)");
+
+                        ProductIngredients.AddRange(
+                            // Chicken Kebab Wrap ingredients
+                            new ProductIngredientModel { ProductId = chickenWrap.Id, InventoryItemId = chicken.Id, QuantityNeeded = 0.20m, Unit = "kg" },
+                            new ProductIngredientModel { ProductId = chickenWrap.Id, InventoryItemId = tortilla.Id, QuantityNeeded = 1, Unit = "pieces" },
+                            new ProductIngredientModel { ProductId = chickenWrap.Id, InventoryItemId = lettuce.Id, QuantityNeeded = 0.05m, Unit = "kg" },
+                            new ProductIngredientModel { ProductId = chickenWrap.Id, InventoryItemId = tomatoes.Id, QuantityNeeded = 0.05m, Unit = "kg" },
+                            new ProductIngredientModel { ProductId = chickenWrap.Id, InventoryItemId = onions.Id, QuantityNeeded = 0.02m, Unit = "kg" },
+                            new ProductIngredientModel { ProductId = chickenWrap.Id, InventoryItemId = garlic.Id, QuantityNeeded = 0.01m, Unit = "kg" },
+
+                            // Lamb Doner Kebab ingredients
+                            new ProductIngredientModel { ProductId = lambDoner.Id, InventoryItemId = lamb.Id, QuantityNeeded = 0.25m, Unit = "kg" },
+                            new ProductIngredientModel { ProductId = lambDoner.Id, InventoryItemId = pita.Id, QuantityNeeded = 1, Unit = "pieces" },
+                            new ProductIngredientModel { ProductId = lambDoner.Id, InventoryItemId = lettuce.Id, QuantityNeeded = 0.05m, Unit = "kg" },
+                            new ProductIngredientModel { ProductId = lambDoner.Id, InventoryItemId = tomatoes.Id, QuantityNeeded = 0.05m, Unit = "kg" },
+                            new ProductIngredientModel { ProductId = lambDoner.Id, InventoryItemId = onions.Id, QuantityNeeded = 0.02m, Unit = "kg" },
+                            new ProductIngredientModel { ProductId = lambDoner.Id, InventoryItemId = chili.Id, QuantityNeeded = 0.02m, Unit = "l" },
+
+                            // Beef Kofta Kebab ingredients
+                            new ProductIngredientModel { ProductId = beefKofta.Id, InventoryItemId = beef.Id, QuantityNeeded = 0.25m, Unit = "kg" },
+                            new ProductIngredientModel { ProductId = beefKofta.Id, InventoryItemId = spices.Id, QuantityNeeded = 0.01m, Unit = "kg" },
+                            new ProductIngredientModel { ProductId = beefKofta.Id, InventoryItemId = fries.Id, QuantityNeeded = 0.15m, Unit = "kg" },
+                            new ProductIngredientModel { ProductId = beefKofta.Id, InventoryItemId = tahini.Id, QuantityNeeded = 0.02m, Unit = "l" },
+
+                            // Falafel Wrap ingredients
+                            new ProductIngredientModel { ProductId = falafel.Id, InventoryItemId = tortilla.Id, QuantityNeeded = 1, Unit = "pieces" },
+                            new ProductIngredientModel { ProductId = falafel.Id, InventoryItemId = lettuce.Id, QuantityNeeded = 0.05m, Unit = "kg" },
+                            new ProductIngredientModel { ProductId = falafel.Id, InventoryItemId = tomatoes.Id, QuantityNeeded = 0.05m, Unit = "kg" },
+                            new ProductIngredientModel { ProductId = falafel.Id, InventoryItemId = tahini.Id, QuantityNeeded = 0.02m, Unit = "l" },
+
+                            // Chicken & Fries Box ingredients
+                            new ProductIngredientModel { ProductId = chickenFries.Id, InventoryItemId = chicken.Id, QuantityNeeded = 0.20m, Unit = "kg" },
+                            new ProductIngredientModel { ProductId = chickenFries.Id, InventoryItemId = fries.Id, QuantityNeeded = 0.20m, Unit = "kg" },
+                            new ProductIngredientModel { ProductId = chickenFries.Id, InventoryItemId = garlic.Id, QuantityNeeded = 0.01m, Unit = "kg" }
+                        );
+                        await SaveChangesAsync();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error seeding data: {ex.Message}");
+                throw;
+            }
+        }
 
     }
 }

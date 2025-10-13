@@ -117,55 +117,37 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="FirstNameLength" xml:space="preserve">
-    <value>Vārdam jābūt līdz 50 simboliem!</value>
+  <data name="CategoryRequired" xml:space="preserve">
+    <value>Please select at least one category.</value>
   </data>
-  <data name="EmailLength" xml:space="preserve">
-    <value>Ē-pastam jābūt līdz 100 simboliem!</value>
+  <data name="ErrorCreatingProduct" xml:space="preserve">
+    <value>An error occurred while creating the product.</value>
   </data>
-  <data name="PasswordLength" xml:space="preserve">
-    <value>Parolei jābūt no 6 līdz 100 simboliem!</value>
+  <data name="ErrorDeletingProduct" xml:space="preserve">
+    <value>An error occurred while deleting the product.</value>
   </data>
-  <data name="FirstNameRequired" xml:space="preserve">
-    <value>Vārds ir obligāts!</value>
+  <data name="ErrorUpdatingProduct" xml:space="preserve">
+    <value>An error occurred while updating the product.</value>
   </data>
-  <data name="LastNameLength" xml:space="preserve">
-    <value>Uzvārdam jābūt līdz 50 simboliem!</value>
+  <data name="InvalidImageFile" xml:space="preserve">
+    <value>Invalid image file. Please upload a valid image.</value>
   </data>
-  <data name="UsernameLength" xml:space="preserve">
-    <value>Lietotājvārdam jābūt līdz 50 simboliem!</value>
+  <data name="ProductCreatedSuccess" xml:space="preserve">
+    <value>Product created successfully!</value>
   </data>
-  <data name="LastNameRequired" xml:space="preserve">
-    <value>Uzvārds ir obligāts!</value>
+  <data name="ProductDeletedSuccess" xml:space="preserve">
+    <value>Product deleted successfully!</value>
   </data>
-  <data name="UsernameRequired" xml:space="preserve">
-    <value>Lietotājvārds ir obligāts!</value>
+  <data name="ProductNotFound" xml:space="preserve">
+    <value>Product not found.</value>
   </data>
-  <data name="EmailRequired" xml:space="preserve">
-    <value>Ē-pasts ir obligāts!</value>
+  <data name="ProductUpdatedSuccess" xml:space="preserve">
+    <value>Product updated</value>
   </data>
-  <data name="PasswordRequired" xml:space="preserve">
-    <value>Parole ir obligāta!</value>
+  <data name="Unauthorized" xml:space="preserve">
+    <value>You are not authorized to perform this action.</value>
   </data>
-  <data name="EmailInvalid" xml:space="preserve">
-    <value>Nekorekts Ē-pasts</value>
-  </data>
-  <data name="ConfirmPasswordRequired" xml:space="preserve">
-    <value>Apstiprināt paroli ir obligāts!</value>
-  </data>
-  <data name="PasswordsDoNotMatch" xml:space="preserve">
-    <value>Paroles nesakrīt!</value>
-  </data>
-  <data name="AcceptTermsRequired" xml:space="preserve">
-    <value>Nepieciešams piekrist!</value>
-  </data>
-  <data name="CurrentPasswordRequired" xml:space="preserve">
-    <value>Parole ir obligāta!</value>
-  </data>
-  <data name="NewPasswordRequired" xml:space="preserve">
-    <value>Jauna parole ir obligāta!</value>
-  </data>
-  <data name="UsernameInvalid" xml:space="preserve">
-    <value>Lietotājvārds var saturēt tikai burtus, ciparus un apakšsvītras</value>
+  <data name="ValidationFailed" xml:space="preserve">
+    <value>Validation failed. Please check your input.</value>
   </data>
 </root>

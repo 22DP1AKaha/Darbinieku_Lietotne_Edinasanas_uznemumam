@@ -118,28 +118,28 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ChooseAction" xml:space="preserve">
-    <value>Choose Action</value>
+    <value>Choose an action to get started</value>
   </data>
   <data name="ClockInOut" xml:space="preserve">
-    <value>Clock in or out</value>
+    <value>Clock In/Out</value>
   </data>
   <data name="ClockInOutDesc" xml:space="preserve">
-    <value>Clock in or out desc</value>
+    <value>Track your work hours and manage attendance</value>
   </data>
   <data name="Dashboard" xml:space="preserve">
     <value>Dashboard</value>
   </data>
   <data name="InventoryManagement" xml:space="preserve">
-    <value>Inventory management</value>
+    <value>Inventory Management</value>
   </data>
   <data name="InventoryManagementDesc" xml:space="preserve">
-    <value>Inventory management desc</value>
+    <value>Manage stock levels and inventory items</value>
   </data>
   <data name="MenuManagement" xml:space="preserve">
     <value>Menu management</value>
   </data>
   <data name="MenuManagementDesc" xml:space="preserve">
-    <value>Menu management desc</value>
+    <value>Create and manage daily menus and products</value>
   </data>
   <data name="ProduceProduct" xml:space="preserve">
     <value>Produce product</value>

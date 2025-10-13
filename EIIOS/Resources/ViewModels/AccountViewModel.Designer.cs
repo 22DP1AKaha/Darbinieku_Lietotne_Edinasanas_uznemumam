@@ -81,6 +81,15 @@ namespace EIIOS.Resources.ViewModels {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        public static string CurrentPasswordRequired {
+            get {
+                return ResourceManager.GetString("CurrentPasswordRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         public static string EmailInvalid {
             get {
                 return ResourceManager.GetString("EmailInvalid", resourceCulture);
@@ -144,6 +153,15 @@ namespace EIIOS.Resources.ViewModels {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        public static string NewPasswordRequired {
+            get {
+                return ResourceManager.GetString("NewPasswordRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         public static string PasswordLength {
             get {
                 return ResourceManager.GetString("PasswordLength", resourceCulture);
@@ -165,6 +183,15 @@ namespace EIIOS.Resources.ViewModels {
         public static string PasswordsDoNotMatch {
             get {
                 return ResourceManager.GetString("PasswordsDoNotMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string UsernameInvalid {
+            get {
+                return ResourceManager.GetString("UsernameInvalid", resourceCulture);
             }
         }
         

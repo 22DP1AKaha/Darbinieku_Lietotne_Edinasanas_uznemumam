@@ -130,8 +130,7 @@
                 <div class="col-12 text-center py-5">
                     <i class="fas fa-search fa-3x text-muted mb-3"></i>
                     <h4 class="text-muted">@Localizer["NoMenuItems"]</h4>
-                    <p class="text-muted">@Localizer["NoMenuItemsDescription"]</p>
-                    <a href="@Url.Action("Index", "Home")" class="btn btn-primary">@Localizer["ViewAllItems"]</a>
+                    <a href="@Url.Action("Products", "Product")" class="btn btn-primary">@Localizer["ViewAllItems"]</a>
                 </div>
             </div>
         }
@@ -152,44 +151,42 @@
                     @Html.AntiForgeryToken()
                     <input type="hidden" id="productId" name="productId" />
                     <div class="modal-body">
+                        <div id="errorAlert" class="alert alert-danger alert-dismissible fade show d-none" role="alert">
+                            <span id="errorMessage"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
                         <div class="mb-3">
                             <label for="name" class="form-label">@Localizer["ProductName"] *</label>
                             <input type="text" class="form-control" id="name" name="Name" required />
-                            <span class="text-danger small" data-valmsg-for="Name"></span>
                         </div>
                         <div class="mb-3">
                             <label for="description" class="form-label">@Localizer["Description"]</label>
                             <textarea class="form-control" id="description" name="Description" rows="3"></textarea>
-                            <span class="text-danger small" data-valmsg-for="Description"></span>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="basePrice" class="form-label">@Localizer["Price"] (€) *</label>
                                 <input type="number" step="0.01" class="form-control" id="basePrice" name="BasePrice" required />
-                                <span class="text-danger small" data-valmsg-for="BasePrice"></span>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="preparationTime" class="form-label">@Localizer["PrepTime"] (@Localizer["Minutes"])</label>
                                 <input type="number" class="form-control" id="preparationTime" name="PreparationTime" />
-                                <span class="text-danger small" data-valmsg-for="PreparationTime"></span>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="imageFile" class="form-label">@Localizer["ProductImage"]</label>
                             <input type="file" class="form-control" id="imageFile" name="ImageFile" accept="image/*" />
-                            <span class="text-danger small" data-valmsg-for="ImageFile"></span>
                             <div id="currentImagePreview"></div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">@Localizer["Categories"] *</label>
+                            <label class="form-label">@Localizer["Category"] *</label>
                             @foreach (var category in allCategories)
                             {
                                 <div class="form-check">
-                                    <input class="form-check-input category-check" type="checkbox" name="SelectedCategoryIds" value="@category.Id" id="cat@(category.Id)" />
+                                    <input class="form-check-input category-radio" type="radio" name="CategoryId" value="@category.Id" id="cat@(category.Id)" required />
                                     <label class="form-check-label" for="cat@(category.Id)">@category.Name</label>
                                 </div>
                             }
-                            <span class="text-danger small" data-valmsg-for="SelectedCategoryIds"></span>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">@Localizer["Allergens"]</label>
@@ -270,7 +267,6 @@
 }
 
 <style>
-
     .menu-header {
         background: #fdf6e3;
         color: #333 !important;
@@ -313,25 +309,6 @@
         .btn-primary:hover {
             background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
         }
-
-    /* Validation styles */
-    [data-valmsg-for] {
-        display: block;
-        margin-top: 0.25rem;
-    }
-
-    .input-validation-error {
-        border-color: #dc3545 !important;
-    }
-
-    .field-validation-error {
-        color: #dc3545;
-        font-size: 0.875rem;
-    }
-
-    .is-invalid {
-        border-color: #dc3545 !important;
-    }
 </style>
 
 @if (isAdmin)
@@ -339,152 +316,80 @@
     <script>
         let currentProductId = null;
 
-        // Product functions
-        function editProduct(id) {
-            fetch(`/Home/GetProduct/${id}`)
-                .then(response => response.json())
-                .then(product => {
-                    document.getElementById('modalTitle').textContent = '@Localizer["EditProduct"]';
-                    document.getElementById('productId').value = product.id;
-                    document.getElementById('name').value = product.name;
-                    document.getElementById('description').value = product.description || '';
-                    document.getElementById('basePrice').value = product.basePrice;
-                    document.getElementById('preparationTime').value = product.preparationTime || '';
-                    document.getElementById('isAvailable').checked = product.isAvailable;
-                    document.getElementById('isActive').checked = product.isActive;
-
-                    document.querySelectorAll('.category-check').forEach(cb => cb.checked = false);
-                    product.categoryIds.forEach(id => {
-                        const cb = document.getElementById(`cat${id}`);
-                        if (cb) cb.checked = true;
-                    });
-
-                    document.querySelectorAll('.allergen-check').forEach(cb => cb.checked = false);
-                    product.allergenIds.forEach(id => {
-                        const cb = document.getElementById(`all${id}`);
-                        if (cb) cb.checked = true;
-                    });
-
-                    if (product.imageUrl) {
-                        document.getElementById('currentImagePreview').innerHTML =
-                            `<img src="${product.imageUrl}" class="img-thumbnail mt-2" style="max-width: 200px;">`;
-                    }
-
-                    new bootstrap.Modal(document.getElementById('createProductModal')).show();
-                });
+        function showError(message) {
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorAlert.classList.remove('d-none');
         }
 
-        function deleteProduct(id, name) {
-            currentProductId = id;
-            document.getElementById('deleteMessage').textContent =
-                '@Localizer["DeleteConfirmMessage"]'.replace('{0}', name);
-            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        function hideError() {
+            const errorAlert = document.getElementById('errorAlert');
+            errorAlert.classList.add('d-none');
         }
 
-        document.getElementById('confirmDelete').addEventListener('click', function() {
-            const formData = new FormData();
-            formData.append('__RequestVerificationToken', document.querySelector('[name="__RequestVerificationToken"]').value);
+        function createIngredientRow(inventoryItemId = '', quantity = '', unit = '') {
+            const row = document.createElement('div');
+            row.classList.add('ingredient-row', 'mb-2');
 
-            const url = `/Home/DeleteProduct/${currentProductId}`;
+            row.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <select class="form-select ingredient-select">
+                            <option value="">@Localizer["SelectIngredient"]</option>
+                            @foreach (var item in ViewBag.InventoryItems as List<InventoryItemModel> ?? new List<InventoryItemModel>())
+                            {
+                                        <text><option value="@item.Id" data-unit="@item.Unit">@item.Name (@item.Unit)</option></text>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" step="0.001" class="form-control ingredient-quantity" placeholder="@Localizer["Quantity"]" value="${quantity}" />
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" class="form-control ingredient-unit" readonly placeholder="@Localizer["Unit"]" value="${unit}" />
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-sm btn-danger remove-ingredient" style="${inventoryItemId ? 'display: inline-block;' : 'display: none;'}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
 
-            fetch(url, { method: 'POST', body: formData })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
-                        location.reload();
-                    } else {
-                        alert(data.message || 'Error deleting');
-                    }
-                });
-        });
+            if (inventoryItemId) {
+                row.querySelector('.ingredient-select').value = inventoryItemId;
+            }
 
-        document.getElementById('productForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData();
-            formData.append('__RequestVerificationToken', document.querySelector('[name="__RequestVerificationToken"]').value);
-
-            formData.append('Name', document.getElementById('name').value);
-            formData.append('Description', document.getElementById('description').value);
-
-            const basePrice = parseFloat(document.getElementById('basePrice').value.replace(',', '.'));
-            formData.append('BasePrice', isNaN(basePrice) ? 0 : basePrice.toFixed(2));
-
-            const prepTime = document.getElementById('preparationTime').value;
-            if (prepTime) formData.append('PreparationTime', parseInt(prepTime));
-
-            formData.append('IsAvailable', document.getElementById('isAvailable').checked ? 'true' : 'false');
-            formData.append('IsActive', document.getElementById('isActive').checked ? 'true' : 'false');
-
-            const imageFile = document.getElementById('imageFile').files[0];
-            if (imageFile) formData.append('ImageFile', imageFile);
-
-            document.querySelectorAll('.category-check:checked').forEach(cb => formData.append('SelectedCategoryIds', cb.value));
-            document.querySelectorAll('.allergen-check:checked').forEach(cb => formData.append('SelectedAllergenIds', cb.value));
-
-            const productId = document.getElementById('productId').value;
-            const url = productId ? `/Home/UpdateProduct/${productId}` : '/Home/CreateProduct';
-
-            fetch(url, { method: 'POST', body: formData })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) location.reload();
-                    else alert(data.message || 'Error saving product');
-                });
-        });
-
-        document.getElementById('createProductModal').addEventListener('hidden.bs.modal', function() {
-            document.getElementById('productForm').reset();
-            document.getElementById('productId').value = '';
-            document.getElementById('modalTitle').textContent = '@Localizer["AddProduct"]';
-            document.getElementById('currentImagePreview').innerHTML = '';
-        });
-
-                // Ingredient management
-        let ingredientRowIndex = 0;
-
-        document.getElementById('addIngredientBtn')?.addEventListener('click', function() {
-            const container = document.getElementById('ingredientsContainer');
-            const newRow = container.querySelector('.ingredient-row').cloneNode(true);
-
-            // Clear values
-            newRow.querySelector('.ingredient-select').value = '';
-            newRow.querySelector('.ingredient-quantity').value = '';
-            newRow.querySelector('.ingredient-unit').value = '';
-            newRow.querySelector('.remove-ingredient').style.display = 'inline-block';
-
-            container.appendChild(newRow);
-            attachIngredientListeners(newRow);
-        });
+            attachIngredientListeners(row);
+            return row;
+        }
 
         function attachIngredientListeners(row) {
             const select = row.querySelector('.ingredient-select');
             const removeBtn = row.querySelector('.remove-ingredient');
             const unitInput = row.querySelector('.ingredient-unit');
 
-            select?.addEventListener('change', function() {
+            select.addEventListener('change', function() {
                 const selectedOption = this.options[this.selectedIndex];
                 const unit = selectedOption.getAttribute('data-unit') || '';
                 unitInput.value = unit;
+                removeBtn.style.display = this.value ? 'inline-block' : 'none';
             });
 
-            removeBtn?.addEventListener('click', function() {
+            removeBtn.addEventListener('click', function() {
                 row.remove();
             });
         }
 
-        // Initialize listeners for first row
-        document.addEventListener('DOMContentLoaded', function() {
-            const firstRow = document.querySelector('.ingredient-row');
-            if (firstRow) {
-                attachIngredientListeners(firstRow);
-            }
-        });
-
-        // Update the editProduct function to include ingredients
         function editProduct(id) {
+            hideError();
+
             fetch(`/Product/GetProduct/${id}`)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to load product');
+                    return response.json();
+                })
                 .then(product => {
                     document.getElementById('modalTitle').textContent = '@Localizer["EditProduct"]';
                     document.getElementById('productId').value = product.id;
@@ -495,14 +400,17 @@
                     document.getElementById('isAvailable').checked = product.isAvailable;
                     document.getElementById('isActive').checked = product.isActive;
 
-                    document.querySelectorAll('.category-check').forEach(cb => cb.checked = false);
-                    product.categoryIds.forEach(id => {
-                        const cb = document.getElementById(`cat${id}`);
-                        if (cb) cb.checked = true;
-                    });
+                    // Set category (only one)
+                    document.querySelectorAll('.category-radio').forEach(rb => rb.checked = false);
+                    if (product.categoryIds && product.categoryIds.length > 0) {
+                        const categoryId = product.categoryIds[0];
+                        const rb = document.getElementById(`cat${categoryId}`);
+                        if (rb) rb.checked = true;
+                    }
 
+                    // Set allergens
                     document.querySelectorAll('.allergen-check').forEach(cb => cb.checked = false);
-                    product.allergenIds.forEach(id => {
+                    (product.allergenIds || []).forEach(id => {
                         const cb = document.getElementById(`all${id}`);
                         if (cb) cb.checked = true;
                     });
@@ -520,88 +428,97 @@
                         container.appendChild(createIngredientRow());
                     }
 
+                    // Set image preview
                     if (product.imageUrl) {
                         document.getElementById('currentImagePreview').innerHTML =
                             `<img src="${product.imageUrl}" class="img-thumbnail mt-2" style="max-width: 200px;">`;
                     }
 
                     new bootstrap.Modal(document.getElementById('createProductModal')).show();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('@Localizer["ErrorLoadingProduct"]');
                 });
         }
 
-        function createIngredientRow(inventoryItemId = '', quantity = '', unit = '') {
-            const template = document.querySelector('.ingredient-row');
-            const row = template ? template.cloneNode(true) : document.createElement('div');
-            row.classList.add('ingredient-row', 'mb-2');
-
-            if (!template) {
-                row.innerHTML = `
-                    <div class="row">
-                        <div class="col-md-6">
-                            <select class="form-select ingredient-select">
-                                <option value="">@Localizer["SelectIngredient"]</option>
-                                @foreach (var item in ViewBag.InventoryItems as List<InventoryItemModel> ?? new List<InventoryItemModel>())
-                                {
-                                        <option value="@item.Id" data-unit="@item.Unit">@item.Name (@item.Unit)</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <input type="number" step="0.001" class="form-control ingredient-quantity" placeholder="@Localizer["Quantity"]" />
-                        </div>
-                        <div class="col-md-2">
-                            <input type="text" class="form-control ingredient-unit" readonly placeholder="@Localizer["Unit"]" />
-                        </div>
-                        <div class="col-md-1">
-                            <button type="button" class="btn btn-sm btn-danger remove-ingredient"><i class="fas fa-times"></i></button>
-                        </div>
-                    </div>
-                `;
-            }
-
-            if (inventoryItemId) {
-                row.querySelector('.ingredient-select').value = inventoryItemId;
-                row.querySelector('.ingredient-quantity').value = quantity;
-                row.querySelector('.ingredient-unit').value = unit;
-                row.querySelector('.remove-ingredient').style.display = 'inline-block';
-            }
-
-            attachIngredientListeners(row);
-            return row;
+        function deleteProduct(id, name) {
+            currentProductId = id;
+            document.getElementById('deleteMessage').textContent =
+                '@Localizer["DeleteConfirmMessage"]'.replace('{0}', name);
+            new bootstrap.Modal(document.getElementById('deleteModal')).show();
         }
 
-        // Update the form submission to include ingredients
-        document.getElementById('productForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        document.getElementById('confirmDelete')?.addEventListener('click', function() {
             const formData = new FormData();
             formData.append('__RequestVerificationToken', document.querySelector('[name="__RequestVerificationToken"]').value);
 
+            fetch(`/Product/DeleteProduct/${currentProductId}`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+                    location.reload();
+                } else {
+                    alert(data.message || '@Localizer["ErrorDeleting"]');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('@Localizer["ErrorDeleting"]');
+            });
+        });
+
+        document.getElementById('addIngredientBtn')?.addEventListener('click', function() {
+            const container = document.getElementById('ingredientsContainer');
+            const newRow = createIngredientRow();
+            container.appendChild(newRow);
+        });
+
+        document.getElementById('productForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            hideError();
+
+            const formData = new FormData();
+            formData.append('__RequestVerificationToken', document.querySelector('[name="__RequestVerificationToken"]').value);
             formData.append('Name', document.getElementById('name').value);
             formData.append('Description', document.getElementById('description').value);
 
+            // Send as plain number - FormData handles conversion
             const basePrice = parseFloat(document.getElementById('basePrice').value.replace(',', '.'));
-            formData.append('BasePrice', isNaN(basePrice) ? 0 : basePrice.toFixed(2));
+            formData.append('BasePrice', basePrice);
 
             const prepTime = document.getElementById('preparationTime').value;
             if (prepTime) formData.append('PreparationTime', parseInt(prepTime));
 
-            formData.append('IsAvailable', document.getElementById('isAvailable').checked ? 'true' : 'false');
-            formData.append('IsActive', document.getElementById('isActive').checked ? 'true' : 'false');
+            formData.append('IsAvailable', document.getElementById('isAvailable').checked);
+            formData.append('IsActive', document.getElementById('isActive').checked);
 
             const imageFile = document.getElementById('imageFile').files[0];
             if (imageFile) formData.append('ImageFile', imageFile);
 
-            document.querySelectorAll('.category-check:checked').forEach(cb => formData.append('SelectedCategoryIds', cb.value));
-            document.querySelectorAll('.allergen-check:checked').forEach(cb => formData.append('SelectedAllergenIds', cb.value));
+            // Get selected category (only one radio button)
+            const selectedCategory = document.querySelector('.category-radio:checked');
+            if (selectedCategory) {
+                formData.append('SelectedCategoryIds', selectedCategory.value);
+            }
 
-            // Add ingredients
+            document.querySelectorAll('.allergen-check:checked').forEach(cb =>
+                formData.append('SelectedAllergenIds', cb.value)
+            );
+
+            // Add ingredients - send numbers directly
             let ingredientIndex = 0;
             document.querySelectorAll('.ingredient-row').forEach(row => {
                 const itemId = row.querySelector('.ingredient-select').value;
-                const quantity = row.querySelector('.ingredient-quantity').value;
+                const quantityInput = row.querySelector('.ingredient-quantity').value;
                 const unit = row.querySelector('.ingredient-unit').value;
 
-                if (itemId && quantity && parseFloat(quantity) > 0) {
+                if (itemId && quantityInput && parseFloat(quantityInput) > 0) {
+                    const quantity = parseFloat(quantityInput.replace(',', '.'));
                     formData.append(`Ingredients[${ingredientIndex}].InventoryItemId`, itemId);
                     formData.append(`Ingredients[${ingredientIndex}].QuantityNeeded`, quantity);
                     formData.append(`Ingredients[${ingredientIndex}].Unit`, unit);
@@ -615,13 +532,19 @@
             fetch(url, { method: 'POST', body: formData })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.success) location.reload();
-                    else alert(data.message || 'Error saving product');
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        showError(data.message || '@Localizer["ErrorSaving"]');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('@Localizer["ErrorSaving"]');
                 });
         });
 
-        // Reset modal when closed
-        document.getElementById('createProductModal').addEventListener('hidden.bs.modal', function() {
+        document.getElementById('createProductModal')?.addEventListener('hidden.bs.modal', function() {
             document.getElementById('productForm').reset();
             document.getElementById('productId').value = '';
             document.getElementById('modalTitle').textContent = '@Localizer["AddProduct"]';
@@ -630,6 +553,16 @@
             const container = document.getElementById('ingredientsContainer');
             container.innerHTML = '';
             container.appendChild(createIngredientRow());
+
+            hideError();
+        });
+
+        // Initialize first ingredient row
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstRow = document.querySelector('.ingredient-row');
+            if (firstRow) {
+                attachIngredientListeners(firstRow);
+            }
         });
     </script>
 }
