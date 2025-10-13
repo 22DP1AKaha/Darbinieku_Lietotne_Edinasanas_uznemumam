@@ -1,0 +1,56 @@
+﻿@model EIIOS.ViewModels.ProduceProductViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = Localizer["ProduceProduct"];
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="card p-4 shadow-sm">
+    <h4>@Model.ProductName</h4>
+    <hr />
+
+    <!-- Explicitly set action and controller to avoid routing issues -->
+    <form action="@Url.Action("Create", "Production")" method="post">
+        @* Anti-forgery token *@
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" asp-for="ProductId" />
+
+        <div class="mb-3">
+            <label asp-for="QuantityProduced" class="form-label">@Localizer["QuantityProduced"]</label>
+            <input asp-for="QuantityProduced" class="form-control" />
+            <span asp-validation-for="QuantityProduced" class="text-danger"></span>
+        </div>
+
+        <h5>@Localizer["IngredientsRequiredPerUnit"]</h5>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>@Localizer["Ingredient"]</th>
+                    <th>@Localizer["QuantityNeeded"]</th>
+                    <th>@Localizer["Unit"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ingredient in Model.Ingredients ?? Enumerable.Empty<EIIOS.ViewModels.ProduceProductViewModel.IngredientDisplay>())
+                {
+                    <tr>
+                        <td>@ingredient.Name</td>
+                        <td>@ingredient.QuantityNeeded</td>
+                        <td>@ingredient.Unit</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-primary">@Localizer["Produce"]</button>
+        <a asp-controller="Products" asp-action="Index" class="btn btn-secondary">@Localizer["Cancel"]</a>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

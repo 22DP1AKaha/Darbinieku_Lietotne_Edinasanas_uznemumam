@@ -1,0 +1,300 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Active" xml:space="preserve">
+    <value>Aktīvs</value>
+  </data>
+  <data name="ActiveDiscounts" xml:space="preserve">
+    <value>Aktīvās atlaides</value>
+  </data>
+  <data name="AddDiscount" xml:space="preserve">
+    <value>Pievienot atlaidi</value>
+  </data>
+  <data name="AddProduct" xml:space="preserve">
+    <value>Pievienot produktu</value>
+  </data>
+  <data name="AllCategories" xml:space="preserve">
+    <value>Visas kategorijas</value>
+  </data>
+  <data name="Allergens" xml:space="preserve">
+    <value>Allergēni</value>
+  </data>
+  <data name="ApplyToProducts" xml:space="preserve">
+    <value>Pievienot uz produktiem</value>
+  </data>
+  <data name="Available" xml:space="preserve">
+    <value>Pieejams</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Atcelt</value>
+  </data>
+  <data name="Categories" xml:space="preserve">
+    <value>Kategorijas</value>
+  </data>
+  <data name="ConfirmDelete" xml:space="preserve">
+    <value>Apstiprināt dzēšanu</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Dzēst</value>
+  </data>
+  <data name="DeleteConfirmMessage" xml:space="preserve">
+    <value>Dzēšot produktu, tas pazudīs uz visiem laikiem.</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Apraksts</value>
+  </data>
+  <data name="DiscountName" xml:space="preserve">
+    <value>Atlaides nosaukums</value>
+  </data>
+  <data name="DiscountSystem" xml:space="preserve">
+    <value>Atlaižu sistēma</value>
+  </data>
+  <data name="DiscountType" xml:space="preserve">
+    <value>Atlaides tips</value>
+  </data>
+  <data name="DiscountValue" xml:space="preserve">
+    <value>Atlaides vērtība</value>
+  </data>
+  <data name="EasyToUse" xml:space="preserve">
+    <value>Viegli lietojams</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Rediģēt</value>
+  </data>
+  <data name="EndDate" xml:space="preserve">
+    <value>Beigu datums</value>
+  </data>
+  <data name="Features" xml:space="preserve">
+    <value>Sistēmas iespējas</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filtrēt</value>
+  </data>
+  <data name="FixedAmount" xml:space="preserve">
+    <value>Fiksēta summa</value>
+  </data>
+  <data name="InventoryManagement" xml:space="preserve">
+    <value>Noliktavas uzskaite</value>
+  </data>
+  <data name="ManageDiscounts" xml:space="preserve">
+    <value>Pārvaldīt atlaides</value>
+  </data>
+  <data name="ProductDescription" xml:space="preserve">
+    <value>Apskatieties visus produktus, kas mums ir!</value>
+  </data>
+  <data name="MenuManagement" xml:space="preserve">
+    <value>Ēdienkartes pārvaldība</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>Minūtes</value>
+  </data>
+  <data name="NoDiscounts" xml:space="preserve">
+    <value>Nav atlaides</value>
+  </data>
+  <data name="NoMenuItems" xml:space="preserve">
+    <value>Nav neviens produkts kas atbilst kritērijiem</value>
+  </data>
+  <data name="OurMenu" xml:space="preserve">
+    <value>Ēdienkarte</value>
+  </data>
+  <data name="PercentageHint" xml:space="preserve">
+    <value>Procentos</value>
+  </data>
+  <data name="Percentage" xml:space="preserve">
+    <value>Procenti</value>
+  </data>
+  <data name="PrepTime" xml:space="preserve">
+    <value>Gatavošanas laiks</value>
+  </data>
+  <data name="Price" xml:space="preserve">
+    <value>Cena</value>
+  </data>
+  <data name="ProductImage" xml:space="preserve">
+    <value>Produktu bilde</value>
+  </data>
+  <data name="ProductName" xml:space="preserve">
+    <value>Produktu vārds</value>
+  </data>
+  <data name="ReadyToStart" xml:space="preserve">
+    <value>Gatavs sākt?</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Saglabāt</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Meklēt</value>
+  </data>
+  <data name="SortByCategory" xml:space="preserve">
+    <value>Kārtot pēc kategorijas</value>
+  </data>
+  <data name="SortByDiscount" xml:space="preserve">
+    <value>Kārtot pēc akcijas</value>
+  </data>
+  <data name="SortByName" xml:space="preserve">
+    <value>Kārtot pēc nosaukuma</value>
+  </data>
+  <data name="SortByPriceHigh" xml:space="preserve">
+    <value>Dilstoša cena</value>
+  </data>
+  <data name="SortByPriceLow" xml:space="preserve">
+    <value>Augoša cena</value>
+  </data>
+  <data name="StartDate" xml:space="preserve">
+    <value>Sākuma datums</value>
+  </data>
+  <data name="StartWorking" xml:space="preserve">
+    <value>Sākt darbu ar EIIOS</value>
+  </data>
+  <data name="TimeTracking" xml:space="preserve">
+    <value>Darba laika uzskaite</value>
+  </data>
+  <data name="UserRoles" xml:space="preserve">
+    <value>Lietotāju lomas</value>
+  </data>
+  <data name="ViewAllItems" xml:space="preserve">
+    <value>Skatīt visu produktus</value>
+  </data>
+  <data name="WelcomeTitle" xml:space="preserve">
+    <value>Laipni lūdzam</value>
+  </data>
+  <data name="NoDiscountsYet" xml:space="preserve">
+    <value>Nav aktīvu atlaižu</value>
+  </data>
+  <data name="DeleteDiscountMsg" xml:space="preserve">
+    <value>Vai tiešām vēlēties dzēst šo atlaidi? Šī darbība ir neatgriezeniska.</value>
+  </data>
+  <data name="Products" xml:space="preserve">
+    <value>Produkti</value>
+  </data>
+  <data name="Ingredients" xml:space="preserve">
+    <value>Sastāvdaļas</value>
+  </data>
+  <data name="SelectIngredient" xml:space="preserve">
+    <value>Izvēleties sastāvdaļu</value>
+  </data>
+  <data name="Quantity" xml:space="preserve">
+    <value>Daudzums</value>
+  </data>
+  <data name="Unit" xml:space="preserve">
+    <value>Mērvienība</value>
+  </data>
+  <data name="AddIngredient" xml:space="preserve">
+    <value>Pievienot sastāvdaļu</value>
+  </data>
+</root>

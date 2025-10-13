@@ -1,8 +1,800 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model EIIOS.ViewModels.MenuViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = Localizer["MenuTitle"];
+    var isAdmin = ViewBag.IsAdmin ?? false;
+    var isEmployee = ViewBag.IsEmployee ?? false;
+    var isLoggedIn = ViewBag.IsLoggedIn ?? false;
+    var allProducts = ViewBag.AllProducts as List<ProductModel> ?? new List<ProductModel>();
+    var today = DateTime.UtcNow.Date;
+
+    var dailyProducts = ViewBag.TodayMenuProducts as List<ProductModel> ?? new List<ProductModel>();
+
+    // Get the IDs of products in today's menu
+    var todayProductIds = dailyProducts.Select(p => p.Id).ToHashSet();
+
+    // Filter discounts to only show those that have at least one product in today's menu
+    var activeDiscounts = isLoggedIn
+        ? dailyProducts
+            .SelectMany(p => p.DiscountProducts?.Select(dp => dp.Discount) ?? Enumerable.Empty<DiscountModel>())
+            .Where(d => d != null && d.IsCurrentlyActive)
+            .Where(d => d.DiscountProducts?.Any(dp => todayProductIds.Contains(dp.ProductId)) == true)
+            .Distinct()
+            .ToList()
+        : new List<DiscountModel>();
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container my-4">
+    <h1 class="mb-4">@Localizer["DailyMenu"]</h1>
+
+    @if (isAdmin || isEmployee)
+    {
+        <!-- Admin/Employee toolbar -->
+        <div class="admin-toolbar mb-4 p-3 bg-light rounded-3 shadow-sm d-flex justify-content-between align-items-center">
+            <div>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#manageDailyMenusModal">
+                    <i class="fas fa-calendar-alt"></i> @Localizer["ManageDailyMenus"]
+                </button>
+                @if (isAdmin)
+                {
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createDiscountModal">
+                        <i class="fas fa-percent"></i> @Localizer["ManageDiscounts"]
+                    </button>
+                }
+            </div>
+        </div>
+    }
+
+    @if (!isLoggedIn && dailyProducts.Any())
+    {
+        <!-- Guest View - Show button to view discounts -->
+        <div class="discount-section mb-4 text-center p-4 bg-light rounded-3">
+            <i class="fas fa-percent fa-3x text-primary mb-3"></i>
+            <h5>@Localizer["SpecialOffersAvailable"]</h5>
+            <a href="@Url.Action("Login", "Account", new { returnUrl = Url.Action("Index", "Home") })" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt me-2"></i>@Localizer["LoginToViewDiscounts"]
+            </a>
+        </div>
+    }
+    else if (isLoggedIn && activeDiscounts.Any())
+    {
+        <!-- Logged in users - Show actual discounts -->
+        <div class="discount-section mb-4">
+            <h4 class="mb-3">@Localizer["ActiveDiscounts"]</h4>
+            <div class="discount-scroll d-flex flex-row overflow-auto pb-2">
+                @foreach (var discount in activeDiscounts)
+                {
+                    <div class="discount-card border rounded-3 p-3 me-3 bg-danger text-light flex-shrink-0" style="min-width: 250px;">
+                        <h5 class="fw-bold">@discount.Name</h5>
+                        <p class="mb-1">@discount.Description</p>
+                        <p class="mb-0">
+                            @if (discount.DiscountType == DiscountType.Percentage)
+                            {
+                                <span>-@discount.DiscountValue% @Localizer["Off"]</span>
+                            }
+                            else
+                            {
+                                <span>-@discount.DiscountValue.ToString("C") @Localizer["Off"]</span>
+                            }
+                        </p>
+                        <small>@Localizer["ValidUntil"]: @(discount.EndDate?.ToString("d") ?? Localizer["NoEndDate"].Value)</small>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    @if (dailyProducts.Any())
+    {
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            @foreach (var product in dailyProducts)
+            {
+                var imageUrl = product.Image != null ? $"data:{product.Image.ContentType};base64,{product.Image.Base64Data}" : "";
+
+                // Only show discount info for logged in users
+                var activeDiscount = isLoggedIn
+                ? product.DiscountProducts?
+                .Select(dp => dp.Discount)
+                .FirstOrDefault(d => d != null && d.IsCurrentlyActive)
+                : null;
+
+                decimal discountedPrice = product.BasePrice;
+                if (activeDiscount != null)
+                {
+                    if (activeDiscount.DiscountType == DiscountType.Percentage)
+                        discountedPrice = product.BasePrice * (1 - activeDiscount.DiscountValue / 100);
+                    else if (activeDiscount.DiscountType == DiscountType.FixedAmount)
+                        discountedPrice = product.BasePrice - activeDiscount.DiscountValue;
+                }
+
+                <div class="col">
+                    <div class="card daily-menu-card h-100 position-relative">
+                        @if (isLoggedIn && activeDiscount != null)
+                        {
+                            <div class="discount-badge position-absolute top-0 start-0 m-2">
+                                @if (activeDiscount.DiscountType == DiscountType.Percentage)
+                                {
+                                    <span class="badge bg-danger">-@activeDiscount.DiscountValue%</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">-@activeDiscount.DiscountValue.ToString("C")</span>
+                                }
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(imageUrl))
+                        {
+                            <img src="@imageUrl" class="card-img-top" alt="@product.Name" style="height: 200px; object-fit: cover;" />
+                        }
+                        else
+                        {
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="fas fa-utensils fa-3x text-muted"></i>
+                            </div>
+                        }
+
+                        <div class="card-body">
+                            <h5 class="card-title">@product.Name</h5>
+                            <p class="card-text">@product.Description</p>
+
+                            @if (isLoggedIn && activeDiscount != null)
+                            {
+                                <p class="card-text mb-0">
+                                    <span class="text-muted text-decoration-line-through">@product.BasePrice.ToString("C")</span>
+                                </p>
+                                <p class="card-text text-danger fw-bold">@discountedPrice.ToString("C")</p>
+                            }
+                            else
+                            {
+                                <p class="card-text fw-bold">@product.BasePrice.ToString("C")</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">@Localizer["NoDailyMenuYet"]</h4>
+            @if (isAdmin || isEmployee)
+            {
+                <p class="text-muted">@Localizer["CreateDailyMenuMessage"]</p>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#manageDailyMenusModal">
+                    <i class="fas fa-calendar-plus"></i> @Localizer["CreateDailyMenu"]
+                </button>
+            }
+        </div>
+    }
 </div>
+
+@if (isAdmin || isEmployee)
+{
+    <!-- Manage Daily Menus Modal (List View) -->
+    <div class="modal fade" id="manageDailyMenusModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@Localizer["ManageDailyMenus"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6>@Localizer["ExistingMenus"]</h6>
+                        <button class="btn btn-sm btn-primary" onclick="openAddMenuModal()">
+                            <i class="fas fa-plus me-1"></i>@Localizer["AddDailyMenu"]
+                        </button>
+                    </div>
+                    <div id="dailyMenusList" class="table-responsive">
+                        <!-- Menus will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Daily Menu Modal -->
+    <div class="modal fade" id="addEditDailyMenuModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="dailyMenuModalTitle">@Localizer["AddDailyMenu"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="dailyMenuForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="dailyMenuId" />
+                    <div class="modal-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="menuDate" class="form-label">@Localizer["MenuDate"] *</label>
+                                <input type="date" class="form-control" id="menuDate" required />
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mt-4">
+                                    <input class="form-check-input" type="checkbox" id="menuIsActive" checked />
+                                    <label class="form-check-label" for="menuIsActive">@Localizer["Active"]</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["SelectProducts"] *</label>
+                            <div id="selectedProductsList" class="border rounded p-3 mb-2" style="min-height: 200px;">
+                                <p class="text-muted text-center">@Localizer["NoProductsSelected"]</p>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#productSelectorModal">
+                                <i class="fas fa-plus me-1"></i>@Localizer["AddProducts"]
+                            </button>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeAddEditModal()">@Localizer["Cancel"]</button>
+                        <button type="submit" class="btn btn-primary">@Localizer["Save"]</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Selector Modal -->
+    <div class="modal fade" id="productSelectorModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@Localizer["SelectProducts"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="productSearchInput" class="form-control mb-3" placeholder="@Localizer["SearchProducts"]" />
+                    <div id="productSelectionList" style="max-height: 400px; overflow-y: auto;">
+                        @foreach (var product in allProducts)
+                        {
+                            <div class="form-check mb-2 product-item" data-product-name="@product.Name.ToLower()">
+                                <input class="form-check-input product-selector" type="checkbox" value="@product.Id" id="prodSel@(product.Id)" data-product-name="@product.Name" data-product-price="@product.BasePrice" />
+                                <label class="form-check-label d-flex justify-content-between w-100" for="prodSel@(product.Id)">
+                                    <span>@product.Name</span>
+                                    <span class="text-muted">€@product.BasePrice.ToString("0.00")</span>
+                                </label>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Close"]</button>
+                    <button type="button" class="btn btn-primary" onclick="confirmProductSelection()">@Localizer["Confirm"]</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Menu Confirmation Modal -->
+    <div class="modal fade" id="deleteMenuModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@Localizer["ConfirmDelete"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="deleteMenuMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteMenu">@Localizer["Delete"]</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (isAdmin)
+{
+    <!-- Discount Management Modal -->
+    <div class="modal fade" id="createDiscountModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@Localizer["ManageDiscounts"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Discount List -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6>@Localizer["ActiveDiscounts"]</h6>
+                            <button class="btn btn-sm btn-primary" onclick="showDiscountForm()">
+                                <i class="fas fa-plus me-1"></i>@Localizer["AddDiscount"]
+                            </button>
+                        </div>
+                        <div id="discountList" class="table-responsive">
+                        </div>
+                    </div>
+
+                    <!-- Discount Form -->
+                    <div id="discountFormContainer" style="display: none;">
+                        <hr />
+                        <h6 id="discountFormTitle">@Localizer["AddDiscount"]</h6>
+                        <form id="discountForm">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" id="discountId" name="discountId" />
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="discountName" class="form-label">@Localizer["DiscountName"] *</label>
+                                    <input type="text" class="form-control" id="discountName" name="Name" required />
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="discountType" class="form-label">@Localizer["DiscountType"] *</label>
+                                    <select class="form-select" id="discountType" name="DiscountType" required>
+                                        <option value="Percentage">@Localizer["Percentage"]</option>
+                                        <option value="FixedAmount">@Localizer["FixedAmount"]</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="discountDescription" class="form-label">@Localizer["Description"]</label>
+                                <textarea class="form-control" id="discountDescription" name="Description" rows="2"></textarea>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="discountValue" class="form-label">@Localizer["DiscountValue"] *</label>
+                                    <input type="number" step="0.01" class="form-control" id="discountValue" name="DiscountValue" required />
+                                    <small class="text-muted" id="discountValueHint">@Localizer["PercentageHint"]</small>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="startDate" class="form-label">@Localizer["StartDate"] *</label>
+                                    <input type="date" class="form-control" id="startDate" name="StartDate" required />
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="endDate" class="form-label">@Localizer["EndDate"]</label>
+                                    <input type="date" class="form-control" id="endDate" name="EndDate" />
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">@Localizer["ApplyToProducts"] *</label>
+                                <div style="max-height: 200px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem; padding: 0.5rem;">
+                                    @foreach (var product in allProducts)
+                                    {
+                                        <div class="form-check">
+                                            <input class="form-check-input discount-product-check" type="checkbox" name="SelectedProductIds" value="@product.Id" id="discProd@(product.Id)" />
+                                            <label class="form-check-label" for="discProd@(product.Id)">
+                                                @product.Name (€@product.BasePrice.ToString("0.00"))
+                                            </label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="discountIsActive" name="IsActive" checked />
+                                <label class="form-check-label" for="discountIsActive">@Localizer["Active"]</label>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">@Localizer["Save"]</button>
+                                <button type="button" class="btn btn-secondary" onclick="hideDiscountForm()">@Localizer["Cancel"]</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Discount Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@Localizer["ConfirmDelete"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="deleteMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteDiscount">@Localizer["Delete"]</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .daily-menu-card {
+        transition: all 0.3s ease;
+        border: 1px solid #e9ecef;
+        overflow: hidden;
+    }
+
+        .daily-menu-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .daily-menu-card img {
+            transition: transform 0.3s ease;
+        }
+
+        .daily-menu-card:hover img {
+            transform: scale(1.05);
+        }
+
+    .discount-badge {
+        z-index: 10;
+    }
+
+    .discount-section {
+        background-color: #fff;
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        padding: 1rem;
+    }
+
+    .discount-scroll::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .discount-scroll::-webkit-scrollbar-thumb {
+        background-color: #bbb;
+        border-radius: 4px;
+    }
+</style>
+
+<script>
+    let selectedProducts = [];
+    let currentDiscountId = null;
+    let currentMenuId = null;
+
+    // ========== DAILY MENU MANAGEMENT ==========
+
+    function loadDailyMenus() {
+        fetch('/Home/GetAllDailyMenus')
+            .then(res => res.json())
+            .then(menus => {
+                const container = document.getElementById('dailyMenusList');
+                if (!menus || menus.length === 0) {
+                    container.innerHTML = '<p class="text-muted text-center">No menus yet</p>';
+                    return;
+                }
+
+                let html = '<table class="table table-sm"><thead><tr><th>Date</th><th>Products</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+                menus.forEach(m => {
+                    const statusBadge = m.isActive ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>';
+                    const productsList = m.items.map(i => i.productName).join(', ');
+                    html += `<tr>
+                        <td><strong>${m.menuDate}</strong></td>
+                        <td><small>${productsList}</small></td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="editDailyMenu(${m.id})"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteDailyMenu(${m.id}, '${m.menuDate}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+                });
+                html += '</tbody></table>';
+                container.innerHTML = html;
+            });
+    }
+
+    function openAddMenuModal() {
+        document.getElementById('dailyMenuModalTitle').textContent = '@Localizer["AddDailyMenu"]';
+        document.getElementById('dailyMenuId').value = '';
+        document.getElementById('dailyMenuForm').reset();
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('menuDate').value = today;
+        document.getElementById('menuIsActive').checked = true;
+        selectedProducts = [];
+        updateSelectedProductsList();
+        document.querySelectorAll('.product-selector').forEach(cb => cb.checked = false);
+
+        new bootstrap.Modal(document.getElementById('addEditDailyMenuModal')).show();
+    }
+
+    function closeAddEditModal() {
+        bootstrap.Modal.getInstance(document.getElementById('addEditDailyMenuModal')).hide();
+    }
+
+    function editDailyMenu(id) {
+        fetch(`/Home/GetDailyMenu/${id}`)
+            .then(res => res.json())
+            .then(menu => {
+                document.getElementById('dailyMenuModalTitle').textContent = 'Edit Daily Menu';
+                document.getElementById('dailyMenuId').value = menu.id;
+                document.getElementById('menuDate').value = menu.menuDate;
+                document.getElementById('menuIsActive').checked = menu.isActive;
+
+                // Fetch product details to get prices
+                selectedProducts = [];
+                const productPromises = menu.items.map(item =>
+                    fetch(`/Product/GetProduct/${item.productId}`).then(res => res.json())
+                );
+
+                Promise.all(productPromises).then(products => {
+                    selectedProducts = products.map(product => ({
+                        id: product.id,
+                        name: product.name,
+                        price: product.basePrice
+                    }));
+
+                    document.querySelectorAll('.product-selector').forEach(cb => cb.checked = false);
+                    menu.items.forEach(item => {
+                        const cb = document.getElementById(`prodSel${item.productId}`);
+                        if (cb) cb.checked = true;
+                    });
+
+                    updateSelectedProductsList();
+                    new bootstrap.Modal(document.getElementById('addEditDailyMenuModal')).show();
+                });
+            });
+    }
+
+    function deleteDailyMenu(id, date) {
+        currentMenuId = id;
+        document.getElementById('deleteMenuMessage').textContent = `Are you sure you want to delete the menu for ${date}?`;
+        new bootstrap.Modal(document.getElementById('deleteMenuModal')).show();
+    }
+
+    document.getElementById('confirmDeleteMenu')?.addEventListener('click', function() {
+        const formData = new FormData();
+        formData.append('__RequestVerificationToken', document.querySelector('[name="__RequestVerificationToken"]').value);
+
+        fetch(`/Home/DeleteDailyMenu/${currentMenuId}`, { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error deleting menu');
+                }
+            });
+    });
+
+    document.getElementById('productSearchInput')?.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        document.querySelectorAll('.product-item').forEach(item => {
+            const productName = item.getAttribute('data-product-name');
+            item.style.display = productName.includes(searchTerm) ? 'block' : 'none';
+        });
+    });
+
+    function confirmProductSelection() {
+        selectedProducts = [];
+        document.querySelectorAll('.product-selector:checked').forEach(cb => {
+            selectedProducts.push({
+                id: parseInt(cb.value),
+                name: cb.getAttribute('data-product-name'),
+                price: parseFloat(cb.getAttribute('data-product-price'))
+            });
+        });
+
+        updateSelectedProductsList();
+        bootstrap.Modal.getInstance(document.getElementById('productSelectorModal')).hide();
+    }
+
+    function updateSelectedProductsList() {
+        const container = document.getElementById('selectedProductsList');
+
+        if (selectedProducts.length === 0) {
+            container.innerHTML = '<p class="text-muted text-center">No products selected</p>';
+            return;
+        }
+
+        let html = '<div class="list-group">';
+        selectedProducts.forEach((product, index) => {
+            html += `
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>${product.name}</strong>
+                        <div class="mt-1">
+                            <small class="text-muted">Price: €${product.price.toFixed(2)}</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="removeProduct(${index})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    function removeProduct(index) {
+        const productId = selectedProducts[index].id;
+        document.getElementById(`prodSel${productId}`).checked = false;
+        selectedProducts.splice(index, 1);
+        updateSelectedProductsList();
+    }
+
+    document.getElementById('dailyMenuForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        if (selectedProducts.length === 0) {
+            alert('Please select at least one product');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('__RequestVerificationToken', document.querySelector('[name="__RequestVerificationToken"]').value);
+        formData.append('MenuDate', document.getElementById('menuDate').value);
+        formData.append('IsActive', document.getElementById('menuIsActive').checked);
+
+        selectedProducts.forEach((product, index) => {
+            formData.append(`ProductIds[${index}]`, product.id);
+        });
+
+        const menuId = document.getElementById('dailyMenuId').value;
+        const url = menuId ? `/Home/UpdateDailyMenu/${menuId}` : '/Home/CreateDailyMenu';
+
+        fetch(url, { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error saving menu');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Error saving menu');
+            });
+    });
+
+    // Load menus when manage modal opens
+    document.getElementById('manageDailyMenusModal')?.addEventListener('shown.bs.modal', loadDailyMenus);
+
+    // ========== DISCOUNT FUNCTIONS (ADMIN ONLY) ==========
+
+    function loadDiscounts() {
+        fetch('/Home/GetAllDiscounts')
+            .then(res => res.json())
+            .then(discounts => {
+                const container = document.getElementById('discountList');
+                if (!discounts || discounts.length === 0) {
+                    container.innerHTML = '<p class="text-muted text-center">No discounts yet</p>';
+                    return;
+                }
+
+                let html = '<table class="table table-sm"><thead><tr><th>Name</th><th>Type</th><th>Value</th><th>Period</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+                discounts.forEach(d => {
+                    const typeLabel = d.discountType === 'Percentage' ? '%' : '€';
+                    const statusBadge = d.isActive ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>';
+                    const endDate = d.endDate || 'No end date';
+                    const period = `${d.startDate} - ${endDate}`;
+                    html += `<tr>
+                        <td>${d.name}</td>
+                        <td>${d.discountType}</td>
+                        <td>${d.discountValue}${typeLabel}</td>
+                        <td><small>${period}</small></td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="editDiscount(${d.id})"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteDiscount(${d.id})"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+                });
+                html += '</tbody></table>';
+                container.innerHTML = html;
+            });
+    }
+
+    function showDiscountForm() {
+        document.getElementById('discountFormContainer').style.display = 'block';
+        document.getElementById('discountFormTitle').textContent = 'Add Discount';
+        document.getElementById('discountForm').reset();
+        document.getElementById('discountId').value = '';
+    }
+
+    function hideDiscountForm() {
+        document.getElementById('discountFormContainer').style.display = 'none';
+        document.getElementById('discountForm').reset();
+    }
+
+    function editDiscount(id) {
+        fetch(`/Home/GetDiscount/${id}`)
+            .then(res => res.json())
+            .then(d => {
+                document.getElementById('discountFormTitle').textContent = 'Edit Discount';
+                document.getElementById('discountId').value = d.id;
+                document.getElementById('discountName').value = d.name;
+                document.getElementById('discountDescription').value = d.description || '';
+                document.getElementById('discountType').value = d.discountType;
+                document.getElementById('discountValue').value = d.discountValue;
+                document.getElementById('startDate').value = d.startDate;
+                document.getElementById('endDate').value = d.endDate || '';
+                document.getElementById('discountIsActive').checked = d.isActive;
+
+                document.querySelectorAll('.discount-product-check').forEach(cb => cb.checked = false);
+                d.productIds.forEach(pid => {
+                    const cb = document.getElementById(`discProd${pid}`);
+                    if (cb) cb.checked = true;
+                });
+
+                document.getElementById('discountFormContainer').style.display = 'block';
+            });
+    }
+
+    function deleteDiscount(id) {
+        currentDiscountId = id;
+        document.getElementById('deleteMessage').textContent = 'Are you sure you want to delete this discount?';
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+
+    document.getElementById('confirmDeleteDiscount')?.addEventListener('click', function() {
+        const formData = new FormData();
+        formData.append('__RequestVerificationToken', document.querySelector('[name="__RequestVerificationToken"]').value);
+
+        fetch(`/Home/DeleteDiscount/${currentDiscountId}`, { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error deleting discount');
+                }
+            });
+    });
+
+    document.getElementById('discountForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData();
+
+        const tokenEl = document.querySelector('#discountForm [name="__RequestVerificationToken"]');
+        if (tokenEl) formData.append('__RequestVerificationToken', tokenEl.value);
+
+        formData.append('Name', document.getElementById('discountName').value);
+        formData.append('Description', document.getElementById('discountDescription').value);
+        formData.append('DiscountType', document.getElementById('discountType').value);
+
+        const val = parseFloat(document.getElementById('discountValue').value);
+        if (!isNaN(val)) formData.append('DiscountValue', val);
+
+        formData.append('StartDate', document.getElementById('startDate').value);
+        const endVal = document.getElementById('endDate').value;
+        if (endVal) formData.append('EndDate', endVal);
+
+        formData.append('IsActive', document.getElementById('discountIsActive').checked);
+
+        document.querySelectorAll('.discount-product-check:checked').forEach(cb => {
+            formData.append('SelectedProductIds', cb.value);
+        });
+
+        const discountId = document.getElementById('discountId').value;
+        const url = discountId ? `/Home/UpdateDiscount/${discountId}` : '/Home/CreateDiscount';
+
+        fetch(url, { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error saving discount');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Error saving discount');
+            });
+    });
+
+    // Discount value hint
+    document.getElementById('discountType')?.addEventListener('change', function() {
+        const hint = document.getElementById('discountValueHint');
+        hint.textContent = this.value === 'Percentage' ? 'Enter percentage (0-100)' : 'Enter fixed amount in €';
+    });
+
+    // Load discounts on modal open
+    document.getElementById('createDiscountModal')?.addEventListener('shown.bs.modal', loadDiscounts);
+</script>

@@ -20,3 +20,28 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+/* Navbar improvements */
+.navbar-nav .nav-link {
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+    .navbar-nav .nav-link:hover {
+        color: var(--bs-warning) !important;
+        transform: translateY(-1px);
+    }
+
+.dropdown-item.active {
+    background-color: var(--bs-primary);
+    color: white;
+}
+
+.dropdown-item:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+}
+
+/* Language flags */
+.dropdown-item img {
+    border-radius: 2px;
+}

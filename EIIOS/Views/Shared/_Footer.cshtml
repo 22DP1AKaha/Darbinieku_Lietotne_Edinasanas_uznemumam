@@ -1,0 +1,43 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<footer class="footer mt-auto py-4">
+    <div class="container text-center text-md-start">
+        <div class="row align-items-center mb-3">
+            <!-- Left Column: Brand -->
+            <div class="col-md-6 mb-3 mb-md-0">
+                <h5 class="fw-bold mb-1">
+                    <i class="fas fa-utensils me-2 text-gradient"></i>EIIOS
+                </h5>
+                <p class="text-muted mb-0">@Localizer["EIIOSName"]</p>
+            </div>
+
+            <!-- Right Column: Copyright -->
+            <div class="col-md-6 text-md-end">
+                <p class="text-muted mb-0">&copy; @DateTime.Now.Year EIIOS.@Localizer["RightsReserved"]</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+
+    .footer {
+        background: #fdf6e3;
+        border-top: 20px solid white
+    }
+
+    .text-muted .footer {
+        color: black !important;
+    }
+
+    .footer-link {
+        transition: 0.3s ease;
+    }
+
+    .footer-link:hover {
+        transform: scale(1.1);
+        color: #d35400;
+    }
+
+</style>

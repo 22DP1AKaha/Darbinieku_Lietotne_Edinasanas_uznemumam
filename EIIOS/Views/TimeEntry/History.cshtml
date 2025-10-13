@@ -1,0 +1,185 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model EIIOS.ViewModels.TimeEntryHistoryViewModel
+@{
+    ViewData["Title"] = Localizer["TimeEntryHistory"];
+}
+
+<!-- History Section -->
+<section class="history-section py-5">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="fw-bold">@Localizer["TimeEntryHistory"]</h2>
+                    <a href="@Url.Action("Index")" class="btn btn-primary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        @Localizer["BackToDashboard"]
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <form method="get" class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label">@Localizer["StartDate"]</label>
+                                <input type="date" asp-for="Filter.StartDate" class="form-control" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">@Localizer["EndDate"]</label>
+                                <input type="date" asp-for="Filter.EndDate" class="form-control" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">@Localizer["Status"]</label>
+                                <select asp-for="Filter.Status" class="form-select">
+                                    <option value="">@Localizer["AllStatuses"]</option>
+                                    <option value="Pending">@Localizer["Pending"]</option>
+                                    <option value="Approved">@Localizer["Approved"]</option>
+                                    <option value="Rejected">@Localizer["Rejected"]</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="fas fa-filter me-2"></i>
+                                    @Localizer["Filter"]
+                                </button>
+                                <a href="@Url.Action("History")" class="btn btn-outline-secondary">
+                                    @Localizer["Clear"]
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Time Entries Table -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-0">
+                        @if (Model.TimeEntries.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th>@Localizer["Date"]</th>
+                                            <th>@Localizer["ClockIn"]</th>
+                                            <th>@Localizer["ClockOut"]</th>
+                                            <th>@Localizer["TotalHours"]</th>
+                                            <th>@Localizer["Status"]</th>
+                                            <th>@Localizer["Actions"]</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var entry in Model.TimeEntries)
+                                        {
+                                            <tr>
+                                                <td>@entry.Date.ToString("MMM dd, yyyy")</td>
+                                                <td>@entry.ClockIn.ToLocalTime().ToString("hh:mm tt")</td>
+                                                <td>
+                                                    @if (entry.ClockOut.HasValue)
+                                                    {
+                                                        @entry.ClockOut.Value.ToLocalTime().ToString("hh:mm tt")
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">@Localizer["InProgress"]</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (entry.TotalHours.HasValue)
+                                                    {
+                                                        <span class="fw-bold">@entry.TotalHours.Value.ToString("0.00")</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">-</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-@(entry.Status == TimeEntryStatus.Approved ? "success" : entry.Status == TimeEntryStatus.Rejected ? "danger" : "warning")">
+                                                        @entry.Status
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group btn-group-sm">
+                                                        @if (!entry.ClockOut.HasValue)
+                                                        {
+                                                            <form asp-action="ClockOut" method="post" class="d-inline">
+                                                                @Html.AntiForgeryToken()
+                                                                <input type="hidden" name="id" value="@entry.Id" />
+                                                                <button type="submit" class="btn btn-outline-danger">
+                                                                    @Localizer["ClockOut"]
+                                                                </button>
+                                                            </form>
+                                                        }
+                                                        <!-- Add View Details button -->
+                                                        <a href="@Url.Action("Details", new { id = entry.Id })"
+                                                           class="btn btn-outline-info"
+                                                           title="@Localizer["ViewDetails"]">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i class="fas fa-clock fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">@Localizer["NoTimeEntriesFound"]</h5>
+                                <p class="text-muted">@Localizer["NoEntriesMatchFilter"]</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    body {
+        background-color: #fdf6e3;
+    }
+
+    .card {
+        background-color: #fffbea;
+        border-radius: 1rem;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            padding: 1rem;
+        }
+
+        .table td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+
+    .btn {
+        border-radius: 0.5rem;
+    }
+
+    .btn-group-sm > .btn {
+        border-radius: 0.5rem;
+        padding: 0.25rem 0.5rem;
+    }
+</style>

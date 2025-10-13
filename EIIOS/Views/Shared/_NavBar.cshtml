@@ -1,0 +1,150 @@
+﻿﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    var isAuthenticated = Context.Session.GetInt32("UserId") != null;
+    var userRole = Context.Session.GetString("UserRole");
+    var isAdmin = userRole == "Administrator";
+    var isEmployee = userRole == "Employee" || isAdmin;
+}
+
+<nav class="navbar fixed-top navbar-expand-lg custom-navbar">
+    <div class="container d-flex justify-content-between align-items-center">
+
+        <!-- Left Side -->
+        <div class="d-flex align-items-center">
+            <a class="navbar-brand fw-bold me-3" href="@Url.Action("Index", "Home")">
+                <i class="fas fa-utensils me-1"></i> EIIOS
+            </a>
+            <ul class="navbar-nav flex-row">
+                <li class="nav-item me-3">
+                    <a class="nav-link" href="@Url.Action("Index", "Home")">@Localizer["Menu"]</a>
+                </li>
+                <li class="nav-item me-3">
+                    <a class="nav-link" href="@Url.Action("Products", "Product")">@Localizer["Products"]</a>
+                </li>
+                @if (isEmployee)
+                {
+                    <li class="nav-item me-3">
+                        <a class="nav-link" href="@Url.Action("Dashboard", "Dashboard")">@Localizer["Dashboard"]</a>
+                    </li>
+                }
+                @if (isAuthenticated)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Profile", "Account")">
+                            <i class="fas fa-user-circle me-1"></i>@Localizer["Profile"]
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+
+        <!-- Center Circle Toggle -->
+        <button class="navbar-toggler center-circle" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Right Side -->
+        <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
+            <ul class="navbar-nav flex-row align-items-center">
+                <li class="nav-item me-3">
+                    <a class="nav-link" href="@Url.Action("About", "Home")">@Localizer["About"]</a>
+                </li>
+
+                <!-- Language Dropdown -->
+                <li class="nav-item dropdown me-3">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-globe me-1"></i>@Localizer["Language"]
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <form asp-controller="Language" asp-action="SetLanguage" method="post" class="d-inline">
+                                <input type="hidden" name="culture" value="lv-LV" />
+                                <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                                <button type="submit" class="dropdown-item">🇱🇻 Latviešu</button>
+                            </form>
+                        </li>
+                        <li>
+                            <form asp-controller="Language" asp-action="SetLanguage" method="post" class="d-inline">
+                                <input type="hidden" name="culture" value="en-US" />
+                                <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                                <button type="submit" class="dropdown-item">🇺🇸 English</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+
+                @if (!isAuthenticated)
+                {
+                    <!-- Show Login/Register for non-authenticated users -->
+                    <li class="nav-item me-3">
+                        <a class="nav-link" href="@Url.Action("Register", "Account")">@Localizer["Register"]</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Login", "Account")">@Localizer["Login"]</a>
+                    </li>
+                }
+                else
+                {
+                    <!-- Show Logout for authenticated users -->
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-dark px-3 text-white" href="@Url.Action("Logout", "Account")">@Localizer["Signout"]</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<style>
+    /* Navbar background and styling */
+    .custom-navbar {
+        background-color: #fdf6e3;
+        padding: 0.5rem 1rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    /* Circle toggle in the center */
+    .center-circle {
+        border: 2px solid #333;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto;
+        background-color: #fffbea;
+        transition: transform 0.3s;
+    }
+
+        .center-circle:hover {
+            transform: scale(1.1);
+        }
+
+    /* Adjust navbar links */
+    .nav-link {
+        color: #333 !important;
+        font-weight: 500;
+    }
+
+        .nav-link.btn {
+            font-weight: 600;
+            border: none;
+        }
+
+            .nav-link.btn:hover {
+                opacity: 0.8;
+            }
+
+    /* Navbar-toggler icon color */
+    .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0,0,0,0.7)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/ %3E%3C/svg%3E");
+    }
+
+    /* Form button styling */
+    form button.nav-link {
+        background: none;
+        cursor: pointer;
+    }
+</style>

@@ -1,0 +1,312 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model EIIOS.Models.TimeEntryModel
+@{
+    ViewData["Title"] = Localizer["TimeEntryDetails"];
+    var currentUserId = Context.Session.GetInt32("UserId");
+    var currentUserRole = Context.Session.GetString("UserRole");
+    var isAdmin = currentUserRole == "Administrator";
+    var isOwner = Model.EmployeeId == currentUserId;
+}
+
+<!-- Details Section -->
+<section class="details-section py-5">
+    <div class="container">
+        <!-- Updated Back Button Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="fw-bold">@Localizer["TimeEntryDetails"]</h2>
+                    <div>
+                        @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
+                        {
+                            <a href="@ViewBag.ReturnUrl" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                @Localizer["Back"]
+                            </a>
+                        }
+                        else
+                        {
+                            <!-- Default navigation based on user role -->
+                            @if (Context.Session.GetString("UserRole") == "Administrator")
+                            {
+                                <a href="@Url.Action("Admin")" class="btn btn-outline-primary">
+                                    <i class="fas fa-arrow-left me-2"></i>
+                                    @Localizer["BackToAdmin"]
+                                </a>
+                            }
+                            else
+                            {
+                                <a href="@Url.Action("Index")" class="btn btn-outline-primary">
+                                    <i class="fas fa-arrow-left me-2"></i>
+                                    @Localizer["BackToDashboard"]
+                                </a>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <!-- Main Details Card -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-light border-0 py-3">
+                        <h5 class="fw-bold mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            @Localizer["EntryInformation"]
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-muted">@Localizer["Employee"]</label>
+                                    <p class="fs-5">@Model.Employee?.FullName</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-muted">@Localizer["Date"]</label>
+                                    <p class="fs-5">@Model.Date.ToString("MMMM dd, yyyy")</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-muted">@Localizer["ClockIn"]</label>
+                                    <p class="fs-5">@Model.ClockIn.ToLocalTime().ToString("MMMM dd, yyyy hh:mm tt")</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-muted">@Localizer["Status"]</label>
+                                    <div>
+                                        <span class="badge bg-@(Model.Status == TimeEntryStatus.Approved ? "success" : Model.Status == TimeEntryStatus.Rejected ? "danger" : "warning") fs-6">
+                                            @Model.Status
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-muted">@Localizer["ClockOut"]</label>
+                                    <p class="fs-5">
+                                        @if (Model.ClockOut.HasValue)
+                                        {
+                                            @Model.ClockOut.Value.ToLocalTime().ToString("MMMM dd, yyyy hh:mm tt")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">@Localizer["NotClockedOut"]</span>
+                                        }
+                                    </p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-muted">@Localizer["TotalHours"]</label>
+                                    <p class="fs-5">
+                                        @if (Model.TotalHours.HasValue)
+                                        {
+                                            <span class="fw-bold text-primary">@Model.TotalHours.Value.ToString("0.00") @Localizer["Hours"]</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">@Localizer["NotAvailable"]</span>
+                                        }
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Work Duration -->
+                        @if (Model.ClockOut.HasValue)
+                        {
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <div class="alert alert-info">
+                                        <div class="row text-center">
+                                            <div class="col-md-4">
+                                                <h6 class="text-muted mb-1">@Localizer["WorkDuration"]</h6>
+                                                <h4 class="fw-bold text-primary">@Model.WorkDuration?.ToString(@"hh\:mm")</h4>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <h6 class="text-muted mb-1">@Localizer["StartTime"]</h6>
+                                                <h5 class="fw-bold">@Model.ClockIn.ToLocalTime().ToString("hh:mm tt")</h5>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <h6 class="text-muted mb-1">@Localizer["EndTime"]</h6>
+                                                <h5 class="fw-bold">@Model.ClockOut.Value.ToLocalTime().ToString("hh:mm tt")</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Approval Information Card (if approved/rejected) -->
+                @if (Model.ApprovedBy != null)
+                {
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-light border-0 py-3">
+                            <h5 class="fw-bold mb-0">
+                                <i class="fas fa-user-check me-2"></i>
+                                @Localizer["ApprovalInformation"]
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold text-muted">@Localizer["ApprovedBy"]</label>
+                                        <p class="fs-5">@Model.ApprovedBy.FullName</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold text-muted">@Localizer["ApprovedAt"]</label>
+                                        <p class="fs-5">@Model.ApprovedAt?.ToLocalTime().ToString("MMMM dd, yyyy hh:mm tt")</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Notes Card -->
+                @if (!string.IsNullOrEmpty(Model.Notes))
+                {
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-light border-0 py-3">
+                            <h5 class="fw-bold mb-0">
+                                <i class="fas fa-sticky-note me-2"></i>
+                                @Localizer["Notes"]
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="fs-5">@Model.Notes</p>
+                        </div>
+                    </div>
+                }
+
+                <!-- Action Buttons -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="btn-group" role="group">
+                            @if (Model.Status == TimeEntryStatus.Pending && (isOwner || isAdmin))
+                            {
+                                <a href="@Url.Action("Edit", new { id = Model.Id })" class="btn btn-warning">
+                                    <i class="fas fa-edit me-2"></i>@Localizer["Edit"]
+                                </a>
+                            }
+
+                            @if (Model.Status == TimeEntryStatus.Pending && isAdmin)
+                            {
+                                <form asp-action="Approve" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@Model.Id" />
+                                    <button type="submit" class="btn btn-success ms-2">
+                                        <i class="fas fa-check me-2"></i>@Localizer["Approve"]
+                                    </button>
+                                </form>
+
+                                <button type="button" class="btn btn-danger ms-2"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#rejectModal"
+                                        data-entry-id="@Model.Id"
+                                        data-employee-name="@Model.Employee?.FullName">
+                                    <i class="fas fa-times me-2"></i>@Localizer["Reject"]
+                                </button>
+                            }
+
+                            @if (Model.Status == TimeEntryStatus.Pending && (isOwner || isAdmin))
+                            {
+                                <form asp-action="Delete" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@Model.Id" />
+                                    <button type="submit" class="btn btn-outline-danger ms-2"
+                                            onclick="return confirm('@Localizer["DeleteConfirmation"]')">
+                                        <i class="fas fa-trash me-2"></i>@Localizer["Delete"]
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Reject Modal -->
+<div class="modal fade" id="rejectModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Localizer["RejectTimeEntry"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>@Localizer["RejectConfirmation"]: <strong id="employeeName"></strong></p>
+                <form id="rejectForm" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="rejectEntryId" name="id" />
+                    <div class="mb-3">
+                        <label for="rejectionReason" class="form-label">@Localizer["RejectionReason"] (Optional)</label>
+                        <textarea class="form-control" id="rejectionReason" name="rejectionReason" rows="3"
+                                  placeholder="@Localizer["RejectionReasonPlaceholder"]"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
+                <button type="button" class="btn btn-danger" onclick="document.getElementById('rejectForm').submit();">
+                    @Localizer["Reject"]
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #fdf6e3;
+    }
+
+    .card {
+        background-color: #fffbea;
+        border-radius: 1rem;
+    }
+
+    .btn {
+        border-radius: 0.5rem;
+        font-weight: 600;
+    }
+
+    .badge {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .alert-info {
+        background-color: #e3f2fd;
+        border: none;
+        border-radius: 0.75rem;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        // Reject modal functionality
+        const rejectModal = document.getElementById('rejectModal');
+        if (rejectModal) {
+            rejectModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const entryId = button.getAttribute('data-entry-id');
+                const employeeName = button.getAttribute('data-employee-name');
+
+                document.getElementById('rejectEntryId').value = entryId;
+                document.getElementById('employeeName').textContent = employeeName;
+
+                // Set form action
+                const form = document.getElementById('rejectForm');
+                form.action = '@Url.Action("Reject")';
+            });
+        }
+    </script>
+}

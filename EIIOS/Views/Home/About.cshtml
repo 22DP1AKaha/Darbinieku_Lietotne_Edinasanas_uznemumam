@@ -1,0 +1,163 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["AboutTitle"];
+}
+
+<!-- Header Section -->
+<section class="about-header bg-primary text-white py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold mb-4">@Localizer["AboutTitle"]</h1>
+                <p class="lead mb-0">@Localizer["AboutSubtitle"]</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Google Maps Section -->
+<section class="map-section py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="text-center mb-4">@Localizer["OurLocation"]</h2>
+                <div class="map-container rounded shadow-sm" style="height: 400px;">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d21764.728470601447!2d24.0956561!3d56.9493977!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46eecfb0e5073ded%3A0x400cfcd68f2fe30!2sRiga%2C%20Latvia!5e0!3m2!1sen!2s!4v1620000000000!5m2!1sen!2s"
+                            width="100%"
+                            height="100%"
+                            style="border:0;"
+                            allowfullscreen=""
+                            loading="lazy"
+                            title="@Localizer["MapLocation"]">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Content Sections -->
+<section class="content-sections py-5 bg-light">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Section 1 -->
+            <div class="col-lg-6">
+                <div class="content-card bg-white rounded shadow-sm p-4 h-100">
+                    <h3 class="fw-bold mb-3">@Localizer["OurStoryTitle"]</h3>
+                    <p class="mb-0">@Localizer["OurStoryContent"]</p>
+                </div>
+            </div>
+
+            <!-- Section 2 -->
+            <div class="col-lg-6">
+                <div class="content-card bg-white rounded shadow-sm p-4 h-100">
+                    <h3 class="fw-bold mb-3">@Localizer["OurMissionTitle"]</h3>
+                    <p class="mb-0">@Localizer["OurMissionContent"]</p>
+                </div>
+            </div>
+
+            <!-- Section 3 -->
+            <div class="col-lg-6">
+                <div class="content-card bg-white rounded shadow-sm p-4 h-100">
+                    <h3 class="fw-bold mb-3">@Localizer["OurValuesTitle"]</h3>
+                    <p class="mb-0">@Localizer["OurValuesContent"]</p>
+                </div>
+            </div>
+
+            <!-- Section 4 -->
+            <div class="col-lg-6">
+                <div class="content-card bg-white rounded shadow-sm p-4 h-100">
+                    <h3 class="fw-bold mb-3">@Localizer["OurTeamTitle"]</h3>
+                    <p class="mb-0">@Localizer["OurTeamContent"]</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Additional Info Section -->
+<section class="additional-info py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="mb-4">@Localizer["ContactInfoTitle"]</h2>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="info-item">
+                            <i class="fas fa-map-marker-alt fa-2x text-primary mb-3"></i>
+                            <h5 class="fw-bold">@Localizer["AddressTitle"]</h5>
+                            <p class="text-muted mb-0">@Localizer["AddressContent"]</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-item">
+                            <i class="fas fa-phone fa-2x text-primary mb-3"></i>
+                            <h5 class="fw-bold">@Localizer["PhoneTitle"]</h5>
+                            <p class="text-muted mb-0">@Localizer["PhoneContent"]</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-item">
+                            <i class="fas fa-envelope fa-2x text-primary mb-3"></i>
+                            <h5 class="fw-bold">@Localizer["EmailTitle"]</h5>
+                            <p class="text-muted mb-0">@Localizer["EmailContent"]</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    :root {
+        --gradient-primary: linear-gradient(135deg, #fdfdb4 0%, #d9d7b6 100%);
+        --shadow-soft: 0 10px 40px rgba(0,0,0,0.1);
+        --shadow-hover: 0 20px 60px rgba(0,0,0,0.15);
+    }
+
+    .about-header {
+        background: var(--gradient-primary);
+        color: #333 !important;
+    }
+
+        .about-header h1,
+        .about-header p {
+            color: #333 !important;
+        }
+
+    .map-container {
+        border: 1px solid #e9ecef;
+        overflow: hidden;
+    }
+
+    .content-card {
+        transition: all 0.3s ease;
+        border: 1px solid #e9ecef;
+    }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover) !important;
+        }
+
+    .info-item {
+        padding: 20px;
+    }
+
+    .display-4 {
+        font-size: 3.5rem;
+        font-weight: 700;
+    }
+
+    @@media (max-width: 768px) {
+        .display-4 {
+            font-size: 2.5rem;
+        }
+
+        .map-container {
+            height: 300px !important;
+        }
+    }
+</style>

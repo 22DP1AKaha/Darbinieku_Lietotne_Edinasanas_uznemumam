@@ -1,0 +1,568 @@
+﻿@model EIIOS.ViewModels.MenuViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["MenuTitle"];
+    var isAdmin = ViewBag.IsAdmin ?? false;
+    var allCategories = ViewBag.AllCategories as List<CategoryModel> ?? new List<CategoryModel>();
+    var allergens = ViewBag.Allergens as List<AllergenModel> ?? new List<AllergenModel>();
+}
+
+<!-- Header Section -->
+<section class="menu-header text-white py-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="fw-bold mb-2">@Localizer["Products"]</h1>
+                <p class="mb-0">@Localizer["ProductDescription"]</p>
+            </div>
+            @if (isAdmin)
+            {
+                <div class="col-md-6 text-end">
+                    <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#createProductModal">
+                        <i class="fas fa-plus me-1"></i>@Localizer["AddProduct"]
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Search and Filter Section -->
+<section class="search-filters py-4">
+    <div class="container">
+        <form method="get" asp-action="Products" asp-controller="Product" class="row g-3">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                    <input type="text" name="searchTerm" value="@Model.SearchTerm" class="form-control border-start-0" placeholder="@Localizer["SearchPlaceholder"]">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select name="category" class="form-select">
+                    <option value="">@Localizer["AllCategories"]</option>
+                    @foreach (var category in Model.Categories)
+                    {
+                        <option value="@category.Name" selected="@(Model.Category == category.Name)">@category.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="sortBy" class="form-select">
+                    <option value="name" selected="@(Model.SortBy == "name")">@Localizer["SortByName"]</option>
+                    <option value="price" selected="@(Model.SortBy == "price")">@Localizer["SortByPriceLow"]</option>
+                    <option value="pricedesc" selected="@(Model.SortBy == "pricedesc")">@Localizer["SortByPriceHigh"]</option>
+                    <option value="category" selected="@(Model.SortBy == "category")">@Localizer["SortByCategory"]</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter me-1"></i>@Localizer["Filter"]</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- Menu Items Section -->
+<section class="menu-items py-4">
+    <div class="container">
+        @if (Model != null && Model.Products.Any())
+        {
+            <div class="row g-4">
+                @foreach (var product in Model.Products)
+                {
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="card menu-item-card h-100 border-0 shadow-sm hover-scale">
+                            @if (isAdmin)
+                            {
+                                <div class="position-absolute top-0 start-0 m-2" style="z-index: 10;">
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-light" onclick="editProduct(@product.Id)" title="@Localizer["Edit"]">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-light text-danger" onclick="deleteProduct(@product.Id, '@product.Name')" title="@Localizer["Delete"]">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                            <div class="position-relative">
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    @if (product.Image != null && !string.IsNullOrEmpty(product.Image.Base64Data))
+                                    {
+                                        <img src="data:@product.Image.ContentType;base64,@product.Image.Base64Data"
+                                             alt="@(product.Image.AltText ?? product.Name)"
+                                             class="img-fluid rounded-top"
+                                             style="height: 100%; width: 100%; object-fit: cover;">
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-utensils fa-3x text-muted"></i>
+                                    }
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                @if (product.ProductCategories?.Any() == true)
+                                {
+                                    <span class="badge bg-light text-dark small">@product.ProductCategories.First().Category?.Name</span>
+                                }
+                                <h5 class="card-title mb-2">@product.Name</h5>
+                                <p class="card-text text-muted small flex-grow-1">
+                                    @(product.Description?.Length > 80 ? product.Description.Substring(0, 80) + "..." : product.Description)
+                                </p>
+                                @if (product.PreparationTime.HasValue)
+                                {
+                                    <div class="mb-2">
+                                        <small class="text-muted"><i class="fas fa-clock me-1"></i>@product.PreparationTime @Localizer["Minutes"]</small>
+                                    </div>
+                                }
+                                <div class="price-info mt-auto">
+                                    <span class="text-primary fw-bold fs-5">€@product.BasePrice.ToString("0.00")</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-12 text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">@Localizer["NoMenuItems"]</h4>
+                    <a href="@Url.Action("Products", "Product")" class="btn btn-primary">@Localizer["ViewAllItems"]</a>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- Create/Edit Product Modal -->
+@if (isAdmin)
+{
+    <div class="modal fade" id="createProductModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">@Localizer["AddProduct"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="productForm" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="productId" name="productId" />
+                    <div class="modal-body">
+                        <div id="errorAlert" class="alert alert-danger alert-dismissible fade show d-none" role="alert">
+                            <span id="errorMessage"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">@Localizer["ProductName"] *</label>
+                            <input type="text" class="form-control" id="name" name="Name" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">@Localizer["Description"]</label>
+                            <textarea class="form-control" id="description" name="Description" rows="3"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="basePrice" class="form-label">@Localizer["Price"] (€) *</label>
+                                <input type="number" step="0.01" class="form-control" id="basePrice" name="BasePrice" required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="preparationTime" class="form-label">@Localizer["PrepTime"] (@Localizer["Minutes"])</label>
+                                <input type="number" class="form-control" id="preparationTime" name="PreparationTime" />
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="imageFile" class="form-label">@Localizer["ProductImage"]</label>
+                            <input type="file" class="form-control" id="imageFile" name="ImageFile" accept="image/*" />
+                            <div id="currentImagePreview"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["Category"] *</label>
+                            @foreach (var category in allCategories)
+                            {
+                                <div class="form-check">
+                                    <input class="form-check-input category-radio" type="radio" name="CategoryId" value="@category.Id" id="cat@(category.Id)" required />
+                                    <label class="form-check-label" for="cat@(category.Id)">@category.Name</label>
+                                </div>
+                            }
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["Allergens"]</label>
+                            @foreach (var allergen in allergens)
+                            {
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input allergen-check" type="checkbox" name="SelectedAllergenIds" value="@allergen.Id" id="all@(allergen.Id)" />
+                                    <label class="form-check-label" for="all@(allergen.Id)">@allergen.Name</label>
+                                </div>
+                            }
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["Ingredients"]</label>
+                            <div id="ingredientsContainer">
+                                <div class="ingredient-row mb-2">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <select class="form-select ingredient-select">
+                                                <option value="">@Localizer["SelectIngredient"]</option>
+                                                @foreach (var item in ViewBag.InventoryItems as List<InventoryItemModel> ?? new List<InventoryItemModel>())
+                                                {
+                                                    <option value="@item.Id" data-unit="@item.Unit">@item.Name (@item.Unit)</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="number" step="0.001" class="form-control ingredient-quantity" placeholder="@Localizer["Quantity"]" />
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="text" class="form-control ingredient-unit" readonly placeholder="@Localizer["Unit"]" />
+                                        </div>
+                                        <div class="col-md-1">
+                                            <button type="button" class="btn btn-sm btn-danger remove-ingredient" style="display: none;"><i class="fas fa-times"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-secondary" id="addIngredientBtn">
+                                <i class="fas fa-plus me-1"></i>@Localizer["AddIngredient"]
+                            </button>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="isAvailable" name="IsAvailable" checked />
+                            <label class="form-check-label" for="isAvailable">@Localizer["Available"]</label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="isActive" name="IsActive" checked />
+                            <label class="form-check-label" for="isActive">@Localizer["Active"]</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
+                        <button type="submit" class="btn btn-primary">@Localizer["Save"]</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@Localizer["ConfirmDelete"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="deleteMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
+                    <button type="button" class="btn btn-danger" id="confirmDelete">@Localizer["Delete"]</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .menu-header {
+        background: #fdf6e3;
+        color: #333 !important;
+    }
+
+        .menu-header h1,
+        .menu-header p {
+            color: #333 !important;
+        }
+
+    .menu-item-card {
+        transition: all 0.3s ease;
+        border: 1px solid #e9ecef;
+    }
+
+        .menu-item-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover) !important;
+        }
+
+    .hover-scale {
+        transition: all 0.3s ease;
+    }
+
+    .search-filters {
+        background: #f8f9fa;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #ffc107;
+        box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        border: none;
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+        }
+</style>
+
+@if (isAdmin)
+{
+    <script>
+        let currentProductId = null;
+
+        function showError(message) {
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorAlert.classList.remove('d-none');
+        }
+
+        function hideError() {
+            const errorAlert = document.getElementById('errorAlert');
+            errorAlert.classList.add('d-none');
+        }
+
+        function createIngredientRow(inventoryItemId = '', quantity = '', unit = '') {
+            const row = document.createElement('div');
+            row.classList.add('ingredient-row', 'mb-2');
+
+            row.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <select class="form-select ingredient-select">
+                            <option value="">@Localizer["SelectIngredient"]</option>
+                            @foreach (var item in ViewBag.InventoryItems as List<InventoryItemModel> ?? new List<InventoryItemModel>())
+                            {
+                                        <text><option value="@item.Id" data-unit="@item.Unit">@item.Name (@item.Unit)</option></text>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" step="0.001" class="form-control ingredient-quantity" placeholder="@Localizer["Quantity"]" value="${quantity}" />
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" class="form-control ingredient-unit" readonly placeholder="@Localizer["Unit"]" value="${unit}" />
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-sm btn-danger remove-ingredient" style="${inventoryItemId ? 'display: inline-block;' : 'display: none;'}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            if (inventoryItemId) {
+                row.querySelector('.ingredient-select').value = inventoryItemId;
+            }
+
+            attachIngredientListeners(row);
+            return row;
+        }
+
+        function attachIngredientListeners(row) {
+            const select = row.querySelector('.ingredient-select');
+            const removeBtn = row.querySelector('.remove-ingredient');
+            const unitInput = row.querySelector('.ingredient-unit');
+
+            select.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const unit = selectedOption.getAttribute('data-unit') || '';
+                unitInput.value = unit;
+                removeBtn.style.display = this.value ? 'inline-block' : 'none';
+            });
+
+            removeBtn.addEventListener('click', function() {
+                row.remove();
+            });
+        }
+
+        function editProduct(id) {
+            hideError();
+
+            fetch(`/Product/GetProduct/${id}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to load product');
+                    return response.json();
+                })
+                .then(product => {
+                    document.getElementById('modalTitle').textContent = '@Localizer["EditProduct"]';
+                    document.getElementById('productId').value = product.id;
+                    document.getElementById('name').value = product.name;
+                    document.getElementById('description').value = product.description || '';
+                    document.getElementById('basePrice').value = product.basePrice;
+                    document.getElementById('preparationTime').value = product.preparationTime || '';
+                    document.getElementById('isAvailable').checked = product.isAvailable;
+                    document.getElementById('isActive').checked = product.isActive;
+
+                    // Set category (only one)
+                    document.querySelectorAll('.category-radio').forEach(rb => rb.checked = false);
+                    if (product.categoryIds && product.categoryIds.length > 0) {
+                        const categoryId = product.categoryIds[0];
+                        const rb = document.getElementById(`cat${categoryId}`);
+                        if (rb) rb.checked = true;
+                    }
+
+                    // Set allergens
+                    document.querySelectorAll('.allergen-check').forEach(cb => cb.checked = false);
+                    (product.allergenIds || []).forEach(id => {
+                        const cb = document.getElementById(`all${id}`);
+                        if (cb) cb.checked = true;
+                    });
+
+                    // Load ingredients
+                    const container = document.getElementById('ingredientsContainer');
+                    container.innerHTML = '';
+
+                    if (product.ingredients && product.ingredients.length > 0) {
+                        product.ingredients.forEach(ing => {
+                            const row = createIngredientRow(ing.inventoryItemId, ing.quantityNeeded, ing.unit);
+                            container.appendChild(row);
+                        });
+                    } else {
+                        container.appendChild(createIngredientRow());
+                    }
+
+                    // Set image preview
+                    if (product.imageUrl) {
+                        document.getElementById('currentImagePreview').innerHTML =
+                            `<img src="${product.imageUrl}" class="img-thumbnail mt-2" style="max-width: 200px;">`;
+                    }
+
+                    new bootstrap.Modal(document.getElementById('createProductModal')).show();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('@Localizer["ErrorLoadingProduct"]');
+                });
+        }
+
+        function deleteProduct(id, name) {
+            currentProductId = id;
+            document.getElementById('deleteMessage').textContent =
+                '@Localizer["DeleteConfirmMessage"]'.replace('{0}', name);
+            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        }
+
+        document.getElementById('confirmDelete')?.addEventListener('click', function() {
+            const formData = new FormData();
+            formData.append('__RequestVerificationToken', document.querySelector('[name="__RequestVerificationToken"]').value);
+
+            fetch(`/Product/DeleteProduct/${currentProductId}`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+                    location.reload();
+                } else {
+                    alert(data.message || '@Localizer["ErrorDeleting"]');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('@Localizer["ErrorDeleting"]');
+            });
+        });
+
+        document.getElementById('addIngredientBtn')?.addEventListener('click', function() {
+            const container = document.getElementById('ingredientsContainer');
+            const newRow = createIngredientRow();
+            container.appendChild(newRow);
+        });
+
+        document.getElementById('productForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            hideError();
+
+            const formData = new FormData();
+            formData.append('__RequestVerificationToken', document.querySelector('[name="__RequestVerificationToken"]').value);
+            formData.append('Name', document.getElementById('name').value);
+            formData.append('Description', document.getElementById('description').value);
+
+            // Send as plain number - FormData handles conversion
+            const basePrice = parseFloat(document.getElementById('basePrice').value.replace(',', '.'));
+            formData.append('BasePrice', basePrice);
+
+            const prepTime = document.getElementById('preparationTime').value;
+            if (prepTime) formData.append('PreparationTime', parseInt(prepTime));
+
+            formData.append('IsAvailable', document.getElementById('isAvailable').checked);
+            formData.append('IsActive', document.getElementById('isActive').checked);
+
+            const imageFile = document.getElementById('imageFile').files[0];
+            if (imageFile) formData.append('ImageFile', imageFile);
+
+            // Get selected category (only one radio button)
+            const selectedCategory = document.querySelector('.category-radio:checked');
+            if (selectedCategory) {
+                formData.append('SelectedCategoryIds', selectedCategory.value);
+            }
+
+            document.querySelectorAll('.allergen-check:checked').forEach(cb =>
+                formData.append('SelectedAllergenIds', cb.value)
+            );
+
+            // Add ingredients - send numbers directly
+            let ingredientIndex = 0;
+            document.querySelectorAll('.ingredient-row').forEach(row => {
+                const itemId = row.querySelector('.ingredient-select').value;
+                const quantityInput = row.querySelector('.ingredient-quantity').value;
+                const unit = row.querySelector('.ingredient-unit').value;
+
+                if (itemId && quantityInput && parseFloat(quantityInput) > 0) {
+                    const quantity = parseFloat(quantityInput.replace(',', '.'));
+                    formData.append(`Ingredients[${ingredientIndex}].InventoryItemId`, itemId);
+                    formData.append(`Ingredients[${ingredientIndex}].QuantityNeeded`, quantity);
+                    formData.append(`Ingredients[${ingredientIndex}].Unit`, unit);
+                    ingredientIndex++;
+                }
+            });
+
+            const productId = document.getElementById('productId').value;
+            const url = productId ? `/Product/UpdateProduct/${productId}` : '/Product/CreateProduct';
+
+            fetch(url, { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        showError(data.message || '@Localizer["ErrorSaving"]');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('@Localizer["ErrorSaving"]');
+                });
+        });
+
+        document.getElementById('createProductModal')?.addEventListener('hidden.bs.modal', function() {
+            document.getElementById('productForm').reset();
+            document.getElementById('productId').value = '';
+            document.getElementById('modalTitle').textContent = '@Localizer["AddProduct"]';
+            document.getElementById('currentImagePreview').innerHTML = '';
+
+            const container = document.getElementById('ingredientsContainer');
+            container.innerHTML = '';
+            container.appendChild(createIngredientRow());
+
+            hideError();
+        });
+
+        // Initialize first ingredient row
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstRow = document.querySelector('.ingredient-row');
+            if (firstRow) {
+                attachIngredientListeners(firstRow);
+            }
+        });
+    </script>
+}

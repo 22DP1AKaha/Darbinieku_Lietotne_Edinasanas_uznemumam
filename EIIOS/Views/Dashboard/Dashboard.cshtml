@@ -1,0 +1,183 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["Dashboard"];
+    var isAdmin = ViewBag.IsAdmin ?? false;
+    var userRole = Context.Session.GetString("UserRole");
+}
+
+<!-- Dashboard Section -->
+<section class="dashboard-section py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="fw-bold mb-3">@Localizer["Dashboard"]</h2>
+                <p class="lead text-muted">@Localizer["ChooseAction"]</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <!-- Time Tracking -->
+            <div class="col-md-4">
+                <a href="/TimeEntry" class="text-decoration-none">
+                    <div class="card h-100 border-0 shadow-sm hover-scale dashboard-card">
+                        <div class="card-body text-center p-4">
+                            <div class="icon-circle bg-warning">
+                                <i class="fas fa-clock fa-2x text-warning"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3 text-dark">@Localizer["ClockInOut"]</h4>
+                            <p class="text-muted">@Localizer["ClockInOutDesc"]</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Inventory Management -->
+            <div class="col-md-4">
+                <a asp-controller="inventoryItems" asp-action="Manage" class="text-decoration-none">
+                    <div class="card h-100 border-0 shadow-sm hover-scale dashboard-card">
+                        <div class="card-body text-center p-4">
+                            <div class="icon-circle bg-success">
+                                <i class="fas fa-boxes fa-2x text-success"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3 text-dark">@Localizer["InventoryManagement"]</h4>
+                            <p class="text-muted">@Localizer["InventoryManagementDesc"]</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Menu Management -->
+            <div class="col-md-4">
+                <a href="/manage-menu" class="text-decoration-none">
+                    <div class="card h-100 border-0 shadow-sm hover-scale dashboard-card">
+                        <div class="card-body text-center p-4">
+                            <div class="icon-circle bg-primary">
+                                <i class="fas fa-book-open fa-2x text-primary"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3 text-dark">@Localizer["MenuManagement"]</h4>
+                            <p class="text-muted">@Localizer["MenuManagementDesc"]</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!-- Produce Product -->
+            <div class="col-md-4">
+                <a asp-controller="Production" asp-action="SelectProduct" class="text-decoration-none">
+                    <div class="card h-100 border-0 shadow-sm hover-scale dashboard-card">
+                        <div class="card-body text-center p-4">
+                            <div class="icon-circle bg-success">
+                                <i class="fas fa-cogs fa-2x text-success"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3 text-dark">@Localizer["ProduceProduct"]</h4>
+                            <p class="text-muted">@Localizer["ProduceProductDesc"]</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+        </div>
+
+        <!-- Admin Only Section -->
+        @if (userRole == "Administrator")
+        {
+            <div class="row mt-5">
+                <div class="col-12 text-center mb-4">
+                    <h3 class="fw-bold text-muted">@Localizer["Administration"]</h3>
+                    <p class="text-muted">@Localizer["AdminToolsDesc"]</p>
+                </div>
+            </div>
+
+            <div class="row g-4 justify-content-center">
+                <!-- Time Entry Admin -->
+                <div class="col-md-4">
+                    <a href="/TimeEntry/Admin" class="text-decoration-none">
+                        <div class="card h-100 border-0 shadow-sm hover-scale dashboard-card admin-only-card">
+                            <div class="card-body text-center p-4">
+                                <div class="icon-circle bg-info">
+                                    <i class="fas fa-check-circle fa-2x text-info"></i>
+                                </div>
+                                <h4 class="fw-bold mb-3 text-dark">@Localizer["TimeApproval"]</h4>
+                                <p class="text-muted">@Localizer["TimeApprovalDesc"]</p>
+                                <span class="badge bg-info mt-2">@Localizer["AdminOnly"]</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Time Reports -->
+                <div class="col-md-4">
+                    <a href="/TimeEntry/Summary" class="text-decoration-none">
+                        <div class="card h-100 border-0 shadow-sm hover-scale dashboard-card admin-only-card">
+                            <div class="card-body text-center p-4">
+                                <div class="icon-circle bg-purple">
+                                    <i class="fas fa-chart-bar fa-2x text-purple"></i>
+                                </div>
+                                <h4 class="fw-bold mb-3 text-dark">@Localizer["TimeReports"]</h4>
+                                <p class="text-muted">@Localizer["TimeReportsDesc"]</p>
+                                <span class="badge bg-purple mt-2">@Localizer["AdminOnly"]</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Worker Management -->
+                <div class="col-md-4">
+                    <a asp-controller="Admin" asp-action="Employees" class="text-decoration-none">
+                        <div class="card h-100 border-0 shadow-sm hover-scale dashboard-card admin-only-card">
+                            <div class="card-body text-center p-4">
+                                <div class="icon-circle bg-danger">
+                                    <i class="fas fa-users-cog fa-2x text-danger"></i>
+                                </div>
+                                <h4 class="fw-bold mb-3 text-dark">@Localizer["WorkerManagement"]</h4>
+                                <p class="text-muted">@Localizer["WorkerManagementDesc"]</p>
+                                <span class="badge bg-danger mt-2">@Localizer["AdminOnly"]</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+        }
+    </div>
+</section>
+
+<style>
+    body {
+        background-color: #fdf6e3;
+    }
+
+    .dashboard-card {
+        background-color: #fffbea;
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+    }
+
+        .dashboard-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15) !important;
+        }
+
+    .admin-only-card {
+        border: 2px solid rgba(0,0,0,0.1);
+        background-color: #fff;
+    }
+
+    .icon-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem auto;
+    }
+
+    .bg-purple {
+        background-color: #6f42c1 !important;
+    }
+
+    .text-purple {
+        color: #6f42c1 !important;
+    }
+</style>
