@@ -117,9 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="\" xml:space="preserve">
-    <value>Aktīvs</value>
-  </data>
   <data name="ActiveDiscounts" xml:space="preserve">
     <value>Aktīvās atlaides</value>
   </data>
@@ -279,6 +276,9 @@
   <data name="DeleteDiscountMsg" xml:space="preserve">
     <value>Vai tiešām vēlēties dzēst šo atlaidi? Šī darbība ir neatgriezeniska.</value>
   </data>
+  <data name="\" xml:space="preserve">
+    <value>Aktīvs</value>
+  </data>
   <data name="DailyMenu" xml:space="preserve">
     <value>Dienas ēdienkarte</value>
   </data>
@@ -326,5 +326,32 @@
   </data>
   <data name="LoginToViewDiscounts" xml:space="preserve">
     <value>Pieslēdzieties, lai skatītu atlaides!</value>
+  </data>
+  <data name="ManageDailyMenus" xml:space="preserve">
+    <value>Pārvaldīt dienas ēdienkartes</value>
+  </data>
+  <data name="ExistingMenus" xml:space="preserve">
+    <value>Esošās ēdienkartes</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>Datums</value>
+  </data>
+  <data name="Products" xml:space="preserve">
+    <value>Produkti</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Statuss</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Darbības</value>
+  </data>
+  <data name="Active" xml:space="preserve">
+    <value>Aktīvs</value>
+  </data>
+  <data name="Inactive" xml:space="preserve">
+    <value>Neaktīvs</value>
+  </data>
+  <data name="AddDailyMenu" xml:space="preserve">
+    <value>Pievienot dienas ēdienkarti</value>
   </data>
 </root>

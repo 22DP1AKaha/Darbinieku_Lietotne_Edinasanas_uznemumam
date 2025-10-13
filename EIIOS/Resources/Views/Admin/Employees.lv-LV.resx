@@ -117,61 +117,124 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Administration" xml:space="preserve">
-    <value>Administrācijai</value>
+  <data name="Actions" xml:space="preserve">
+    <value>Darbības</value>
   </data>
-  <data name="AdminOnly" xml:space="preserve">
-    <value>Tikai administratoram</value>
+  <data name="Active" xml:space="preserve">
+    <value>Aktīvs</value>
   </data>
-  <data name="AdminToolsDesc" xml:space="preserve">
-    <value>Adminstratora rīki</value>
+  <data name="AddEmployee" xml:space="preserve">
+    <value>Pievienot darbinieku</value>
   </data>
-  <data name="ChooseAction" xml:space="preserve">
-    <value>Izvēlies darbību</value>
+  <data name="Administrator" xml:space="preserve">
+    <value>Administrators</value>
   </data>
-  <data name="ClockInOut" xml:space="preserve">
-    <value>Atzīmēties vai beigt atzīmeties</value>
+  <data name="AllRoles" xml:space="preserve">
+    <value>Visas lomas</value>
   </data>
-  <data name="ClockInOutDesc" xml:space="preserve">
-    <value>Apraksts</value>
+  <data name="AllStatuses" xml:space="preserve">
+    <value>Visi statusi</value>
   </data>
-  <data name="Dashboard" xml:space="preserve">
-    <value>Vadības panelis</value>
+  <data name="Cancel" xml:space="preserve">
+    <value>Atcelt</value>
   </data>
-  <data name="InventoryManagement" xml:space="preserve">
-    <value>Noliktavas pārvalde</value>
+  <data name="Client" xml:space="preserve">
+    <value>Klients</value>
   </data>
-  <data name="InventoryManagementDesc" xml:space="preserve">
-    <value>Apraksts</value>
+  <data name="Confirm" xml:space="preserve">
+    <value>Apstiprināt</value>
   </data>
-  <data name="MenuManagement" xml:space="preserve">
-    <value>Ēdienkartes pārvalde</value>
+  <data name="ConfirmDelete" xml:space="preserve">
+    <value>Apstiprināt dzēšanu</value>
   </data>
-  <data name="MenuManagementDesc" xml:space="preserve">
-    <value>Apraksts</value>
+  <data name="ConfirmStatusChange" xml:space="preserve">
+    <value>Apstiprināt statuss maiņu</value>
   </data>
-  <data name="ProduceProduct" xml:space="preserve">
-    <value>Produkta gatavošana</value>
+  <data name="Created" xml:space="preserve">
+    <value>Izveidots</value>
   </data>
-  <data name="ProduceProductDesc" xml:space="preserve">
-    <value>Apraksts</value>
+  <data name="Delete" xml:space="preserve">
+    <value>Dzēst</value>
   </data>
-  <data name="TimeApproval" xml:space="preserve">
-    <value>Apstiprināt atzīmētos darbiniekus</value>
+  <data name="DeleteEmployeeConfirm" xml:space="preserve">
+    <value>Vai jūs tiešām vēlaties dzēst šo darbinieku?</value>
   </data>
-  <data name="TimeApprovalDesc" xml:space="preserve">
-    <value>Apraksts</value>
+  <data name="DeleteError" xml:space="preserve">
+    <value>Dzēšot šo, radās kļūda</value>
   </data>
-  <data name="TimeReports" xml:space="preserve">
-    <value>Atzīmju reportāža</value>
+  <data name="Edit" xml:space="preserve">
+    <value>Rediģēt</value>
   </data>
-  <data name="TimeReportsDesc" xml:space="preserve">
-    <value>Apraksts</value>
+  <data name="Email" xml:space="preserve">
+    <value>e-pasts</value>
   </data>
-  <data name="WorkerManagement" xml:space="preserve">
-    <value>Darbinieku pārvalde</value>
+  <data name="Employee" xml:space="preserve">
+    <value>Darbinieks</value>
   </data>
-  <data name="WorkerManagementDesc" xml:space="preserve">
-    <value>Apraksts</value>
+  <data name="EmployeeManagement" xml:space="preserve">
+    <value>Darbinieku vadība</value>
+  </data>
+  <data name="ErrorLoadingEmployee" xml:space="preserve">
+    <value>lādējot darbinieku, radās kļūda</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filtrēt</value>
+  </data>
+  <data name="FirstName" xml:space="preserve">
+    <value>Vārds</value>
+  </data>
+  <data name="FullName" xml:space="preserve">
+    <value>Vārds</value>
+  </data>
+  <data name="Inactive" xml:space="preserve">
+    <value>Neaktīvs</value>
+  </data>
+  <data name="LastName" xml:space="preserve">
+    <value>Uzvārds</value>
+  </data>
+  <data name="ManageSystemUsers" xml:space="preserve">
+    <value>Pārvaldīt sistēmas lietotājus</value>
+  </data>
+  <data name="NoEmployeesDescription" xml:space="preserve">
+    <value>Nav atrasts apraksts</value>
+  </data>
+  <data name="NoEmployeesFound" xml:space="preserve">
+    <value>Nav neviens darbinieks atrasts</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Parole</value>
+  </data>
+  <data name="PasswordMinLength" xml:space="preserve">
+    <value>Paroles minimālais garums</value>
+  </data>
+  <data name="Role" xml:space="preserve">
+    <value>Loma</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Saglabāt</value>
+  </data>
+  <data name="SaveError" xml:space="preserve">
+    <value>Ir radusies kļūda</value>
+  </data>
+  <data name="SearchEmployees" xml:space="preserve">
+    <value>Meklēt darbiniekus</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Statuss</value>
+  </data>
+  <data name="StatusUpdateError" xml:space="preserve">
+    <value>Ir radusies kļūda</value>
+  </data>
+  <data name="ToggleStatus" xml:space="preserve">
+    <value>Pārslēgt statusu</value>
+  </data>
+  <data name="ToggleStatusConfirm" xml:space="preserve">
+    <value>Vai esat pārliecināti par statusu maiņu?</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>Lietotājvards</value>
+  </data>
+  <data name="Verified" xml:space="preserve">
+    <value>Verificēts</value>
   </data>
 </root>
