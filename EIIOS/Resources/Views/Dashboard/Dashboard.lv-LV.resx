@@ -117,34 +117,61 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Administration" xml:space="preserve">
+    <value>Administrācijai</value>
+  </data>
+  <data name="AdminOnly" xml:space="preserve">
+    <value>Tikai administratoram</value>
+  </data>
+  <data name="AdminToolsDesc" xml:space="preserve">
+    <value>Adminstratora rīki</value>
+  </data>
   <data name="ChooseAction" xml:space="preserve">
-    <value>Choose Action</value>
+    <value>Izvēlies darbību</value>
   </data>
   <data name="ClockInOut" xml:space="preserve">
-    <value>Clock in or out</value>
+    <value>Atzīmēties vai beigt atzīmeties</value>
   </data>
   <data name="ClockInOutDesc" xml:space="preserve">
-    <value>Clock in or out desc</value>
+    <value>Apraksts</value>
   </data>
   <data name="Dashboard" xml:space="preserve">
-    <value>Dashboard</value>
+    <value>Vadības panelis</value>
   </data>
   <data name="InventoryManagement" xml:space="preserve">
-    <value>Inventory management</value>
+    <value>Noliktavas pārvalde</value>
   </data>
   <data name="InventoryManagementDesc" xml:space="preserve">
-    <value>Inventory management desc</value>
+    <value>Apraksts</value>
   </data>
   <data name="MenuManagement" xml:space="preserve">
-    <value>Menu management</value>
+    <value>Ēdienkartes pārvalde</value>
   </data>
   <data name="MenuManagementDesc" xml:space="preserve">
-    <value>Menu management desc</value>
+    <value>Apraksts</value>
   </data>
   <data name="ProduceProduct" xml:space="preserve">
-    <value>Gatavo produktu</value>
+    <value>Produkta gatavošana</value>
   </data>
   <data name="ProduceProductDesc" xml:space="preserve">
-    <value>Gatavo produktu apraksts</value>
+    <value>Apraksts</value>
+  </data>
+  <data name="TimeApproval" xml:space="preserve">
+    <value>Apstiprināt atzīmētos darbiniekus</value>
+  </data>
+  <data name="TimeApprovalDesc" xml:space="preserve">
+    <value>Apraksts</value>
+  </data>
+  <data name="TimeReports" xml:space="preserve">
+    <value>Atzīmju reportāža</value>
+  </data>
+  <data name="TimeReportsDesc" xml:space="preserve">
+    <value>Apraksts</value>
+  </data>
+  <data name="WorkerManagement" xml:space="preserve">
+    <value>Darbinieku pārvalde</value>
+  </data>
+  <data name="WorkerManagementDesc" xml:space="preserve">
+    <value>Apraksts</value>
   </data>
 </root>

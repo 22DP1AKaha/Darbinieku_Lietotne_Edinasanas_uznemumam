@@ -22,11 +22,11 @@
                             <table class="table table-borderless">
                                 <tr>
                                     <td><strong>@Localizer["FullName"]:</strong></td>
-                                    <td>@Model.FullName</td>
+                                    <td id="displayFullName">@Model.FullName</td>
                                 </tr>
                                 <tr>
                                     <td><strong>@Localizer["Username"]:</strong></td>
-                                    <td>@Model.Username</td>
+                                    <td id="displayUsername">@Model.Username</td>
                                 </tr>
                                 <tr>
                                     <td><strong>@Localizer["Email"]:</strong></td>
@@ -90,12 +90,12 @@
                     <div class="row mt-4">
                         <div class="col-12">
                             <div class="d-flex gap-2">
-                                <a href="@Url.Action("EditProfile", "Account")" class="btn btn-primary">
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
                                     <i class="fas fa-edit me-2"></i>@Localizer["EditProfile"]
-                                </a>
-                                <a href="@Url.Action("ChangePassword", "Account")" class="btn btn-outline-secondary">
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
                                     <i class="fas fa-key me-2"></i>@Localizer["ChangePassword"]
-                                </a>
+                                </button>
                                 @if (!Model.IsEmailVerified)
                                 {
                                     <a href="@Url.Action("ResendVerification", "Account")" class="btn btn-outline-warning">
@@ -110,3 +110,312 @@
         </div>
     </div>
 </div>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="editProfileModalLabel">
+                    <i class="fas fa-user-edit me-2"></i>@Localizer["EditProfile"]
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editProfileForm">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label for="editFirstName" class="form-label">
+                            <i class="fas fa-user me-1"></i>@Localizer["FirstName"]
+                        </label>
+                        <input type="text" class="form-control" id="editFirstName" name="FirstName" required />
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editLastName" class="form-label">
+                            <i class="fas fa-user me-1"></i>@Localizer["LastName"]
+                        </label>
+                        <input type="text" class="form-control" id="editLastName" name="LastName" required />
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editUsername" class="form-label">
+                            <i class="fas fa-at me-1"></i>@Localizer["Username"]
+                        </label>
+                        <input type="text" class="form-control" id="editUsername" name="Username" required />
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEmail" class="form-label">
+                            <i class="fas fa-envelope me-1"></i>@Localizer["Email"]
+                        </label>
+                        <input type="email" class="form-control" id="editEmail" readonly disabled />
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>@Localizer["EmailCannotBeChanged"]
+                        </small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>@Localizer["Cancel"]
+                </button>
+                <button type="button" class="btn btn-primary" onclick="saveProfileChanges()">
+                    <i class="fas fa-save me-2"></i>@Localizer["SaveChanges"]
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="changePasswordModalLabel">
+                    <i class="fas fa-key me-2"></i>@Localizer["ChangePassword"]
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="changePasswordForm">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label for="currentPassword" class="form-label">
+                            <i class="fas fa-lock me-1"></i>@Localizer["CurrentPassword"]
+                        </label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="currentPassword" name="CurrentPassword" required />
+                            <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('currentPassword', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">
+                            <i class="fas fa-lock me-1"></i>@Localizer["NewPassword"]
+                        </label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="newPassword" name="NewPassword" required minlength="6" />
+                            <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('newPassword', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>@Localizer["PasswordRequirements"]
+                        </small>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmNewPassword" class="form-label">
+                            <i class="fas fa-lock me-1"></i>@Localizer["ConfirmNewPassword"]
+                        </label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="confirmNewPassword" name="ConfirmNewPassword" required />
+                            <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('confirmNewPassword', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-shield-alt me-2"></i>@Localizer["PasswordChangeNote"]
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>@Localizer["Cancel"]
+                </button>
+                <button type="button" class="btn btn-primary" onclick="changePassword()">
+                    <i class="fas fa-check me-2"></i>@Localizer["ChangePassword"]
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Load profile data when edit modal is opened
+        document.getElementById('editProfileModal').addEventListener('show.bs.modal', function () {
+            fetch('@Url.Action("GetEditProfileData", "Account")')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('editFirstName').value = data.data.firstName;
+                        document.getElementById('editLastName').value = data.data.lastName;
+                        document.getElementById('editUsername').value = data.data.username;
+                        document.getElementById('editEmail').value = data.data.email;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        // Reset password form when modal is closed
+        document.getElementById('changePasswordModal').addEventListener('hidden.bs.modal', function () {
+            document.getElementById('changePasswordForm').reset();
+            document.querySelectorAll('#changePasswordForm .is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        });
+
+        // Save profile changes
+        function saveProfileChanges() {
+            const form = document.getElementById('editProfileForm');
+            const formData = {
+                FirstName: document.getElementById('editFirstName').value.trim(),
+                LastName: document.getElementById('editLastName').value.trim(),
+                Username: document.getElementById('editUsername').value.trim()
+            };
+
+            // Client-side validation
+            let isValid = true;
+            if (!formData.FirstName) {
+                showFieldError('editFirstName', '@Localizer["FirstNameRequired"]');
+                isValid = false;
+            }
+            if (!formData.LastName) {
+                showFieldError('editLastName', '@Localizer["LastNameRequired"]');
+                isValid = false;
+            }
+            if (!formData.Username) {
+                showFieldError('editUsername', '@Localizer["UsernameRequired"]');
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            fetch('@Url.Action("EditProfile", "Account")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update displayed values
+                    document.getElementById('displayFullName').textContent = data.data.fullName;
+                    document.getElementById('displayUsername').textContent = data.data.username;
+
+                    // Close modal
+                    bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
+
+                    // Show success message
+                    showNotification(data.message, 'success');
+                } else {
+                    showNotification(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('@Localizer["AnErrorOccurred"]', 'danger');
+            });
+        }
+
+        // Change password
+        function changePassword() {
+            const formData = {
+                CurrentPassword: document.getElementById('currentPassword').value,
+                NewPassword: document.getElementById('newPassword').value,
+                ConfirmNewPassword: document.getElementById('confirmNewPassword').value
+            };
+
+            // Client-side validation
+            let isValid = true;
+            document.querySelectorAll('#changePasswordForm .is-invalid').forEach(el => el.classList.remove('is-invalid'));
+
+            if (!formData.CurrentPassword) {
+                showFieldError('currentPassword', '@Localizer["CurrentPasswordRequired"]');
+                isValid = false;
+            }
+            if (!formData.NewPassword || formData.NewPassword.length < 6) {
+                showFieldError('newPassword', '@Localizer["PasswordMinLength"]');
+                isValid = false;
+            }
+            if (formData.NewPassword !== formData.ConfirmNewPassword) {
+                showFieldError('confirmNewPassword', '@Localizer["PasswordsDoNotMatch"]');
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            const token = document.querySelector('#changePasswordForm input[name="__RequestVerificationToken"]').value;
+
+            fetch('@Url.Action("ChangePassword", "Account")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Close modal
+                    bootstrap.Modal.getInstance(document.getElementById('changePasswordModal')).hide();
+
+                    // Reset form
+                    document.getElementById('changePasswordForm').reset();
+
+                    // Show success message
+                    showNotification(data.message, 'success');
+                } else {
+                    showNotification(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('@Localizer["AnErrorOccurred"]', 'danger');
+            });
+        }
+
+        // Toggle password visibility
+        function togglePasswordVisibility(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('i');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Show field error
+        function showFieldError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            field.classList.add('is-invalid');
+            const feedback = field.parentElement.querySelector('.invalid-feedback') || field.nextElementSibling;
+            if (feedback && feedback.classList.contains('invalid-feedback')) {
+                feedback.textContent = message;
+            }
+        }
+
+        // Show notification
+        function showNotification(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+            alertDiv.style.zIndex = '9999';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+    </script>
+}

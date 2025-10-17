@@ -123,4 +123,7 @@
   <data name="RightsReserved" xml:space="preserve">
     <value>All rights reserved</value>
   </data>
+  <data name="Version" xml:space="preserve">
+    <value>Version</value>
+  </data>
 </root>

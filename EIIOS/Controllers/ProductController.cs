@@ -14,13 +14,20 @@ namespace EIIOS.Controllers
         private readonly IStringLocalizer<ProductController> _localizer;
         private readonly EIIOSDataQuery _dataQuery;
         private readonly UserService _userService;
+        private readonly ILogger<ProductController> _logger;
 
-        public ProductController(EIIOSDbContext context, IStringLocalizer<ProductController> localizer, EIIOSDataQuery dataQuery, UserService userService)
+        public ProductController(
+            EIIOSDbContext context,
+            IStringLocalizer<ProductController> localizer,
+            EIIOSDataQuery dataQuery,
+            UserService userService,
+            ILogger<ProductController> logger)
         {
             _context = context;
             _localizer = localizer;
             _dataQuery = dataQuery;
             _userService = userService;
+            _logger = logger;
         }
 
         public async Task<bool> IsCurrentUserAdmin()
@@ -54,11 +61,14 @@ namespace EIIOS.Controllers
         [HttpGet]
         public async Task<IActionResult> GetProduct(int id)
         {
+            if (!await IsCurrentUserAdmin())
+                return Unauthorized();
+
             var product = await _context.Products
                 .Include(p => p.ProductCategories)
                 .Include(p => p.ProductAllergens)
                 .Include(p => p.ProductIngredients)
-                .ThenInclude(pi => pi.InventoryItem)
+                    .ThenInclude(pi => pi.InventoryItem)
                 .Include(p => p.Image)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
@@ -76,7 +86,7 @@ namespace EIIOS.Controllers
                 isActive = product.IsActive,
                 categoryIds = product.ProductCategories.Select(pc => pc.CategoryId).ToList(),
                 allergenIds = product.ProductAllergens.Select(pa => pa.AllergenId).ToList(),
-                ingredients = product.ProductIngredients?.Select(pi => new
+                ingredients = product.ProductIngredients.Select(pi => new
                 {
                     inventoryItemId = pi.InventoryItemId,
                     quantityNeeded = pi.QuantityNeeded,
@@ -92,83 +102,102 @@ namespace EIIOS.Controllers
         {
             if (!await IsCurrentUserAdmin())
             {
-                return Json(new { success = false, errors = new { general = _localizer["Unauthorized"].Value } });
+                return Json(new { success = false, message = _localizer["Unauthorized"].Value });
             }
 
             if (!ModelState.IsValid)
             {
                 var errors = ModelState
                     .Where(x => x.Value.Errors.Count > 0)
-                    .ToDictionary(
-                        kvp => kvp.Key,
-                        kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
-                    );
-                return Json(new { success = false, errors });
+                    .Select(x => $"{x.Key}: {string.Join(", ", x.Value.Errors.Select(e => e.ErrorMessage))}")
+                    .ToList();
+
+                _logger.LogWarning("Product creation validation failed. Errors: {Errors}", string.Join("; ", errors));
+                return Json(new { success = false, message = _localizer["ValidationFailed"].Value });
             }
 
-            var imageService = HttpContext.RequestServices.GetRequiredService<ImageService>();
-
-            ImageModel? image = null;
-            if (model.ImageFile != null)
+            if (model.SelectedCategoryIds == null || !model.SelectedCategoryIds.Any())
             {
-                image = await imageService.SaveImageAsync(model.ImageFile, model.ImageAltText);
-                if (image == null)
+                return Json(new { success = false, message = _localizer["CategoryRequired"].Value });
+            }
+
+            try
+            {
+                var imageService = HttpContext.RequestServices.GetRequiredService<ImageService>();
+
+                ImageModel? image = null;
+                if (model.ImageFile != null)
                 {
-                    return Json(new { success = false, errors = new { ImageFile = new[] { _localizer["InvalidImageFile"].Value } } });
+                    image = await imageService.SaveImageAsync(model.ImageFile, model.ImageAltText);
+                    if (image == null)
+                    {
+                        return Json(new { success = false, message = _localizer["InvalidImageFile"].Value });
+                    }
                 }
-            }
 
-            var product = new ProductModel
-            {
-                Name = model.Name,
-                Description = model.Description,
-                BasePrice = model.BasePrice,
-                PreparationTime = model.PreparationTime,
-                IsAvailable = model.IsAvailable,
-                IsActive = model.IsActive,
-                ImageId = image?.Id,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                CreatedById = HttpContext.Session.GetInt32("UserId") ?? 1
-            };
-
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
-
-            foreach (var categoryId in model.SelectedCategoryIds)
-            {
-                _context.ProductCategories.Add(new ProductCategoryModel
+                var product = new ProductModel
                 {
-                    ProductId = product.Id,
-                    CategoryId = categoryId
-                });
-            }
+                    Name = model.Name,
+                    Description = model.Description,
+                    BasePrice = model.BasePrice,
+                    PreparationTime = model.PreparationTime,
+                    IsAvailable = model.IsAvailable,
+                    IsActive = model.IsActive,
+                    ImageId = image?.Id,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    CreatedById = HttpContext.Session.GetInt32("UserId") ?? 1
+                };
 
-            foreach (var allergenId in model.SelectedAllergenIds)
-            {
-                _context.ProductAllergens.Add(new ProductAllergenModel
+                _context.Products.Add(product);
+                await _context.SaveChangesAsync();
+
+                foreach (var categoryId in model.SelectedCategoryIds)
                 {
-                    ProductId = product.Id,
-                    AllergenId = allergenId
-                });
-            }
+                    _context.ProductCategories.Add(new ProductCategoryModel
+                    {
+                        ProductId = product.Id,
+                        CategoryId = categoryId
+                    });
+                }
 
-            // NEW: Add ingredients
-            foreach (var ingredient in model.Ingredients.Where(i => i.InventoryItemId > 0 && i.QuantityNeeded > 0))
-            {
-                _context.ProductIngredients.Add(new ProductIngredientModel
+                if (model.SelectedAllergenIds != null)
                 {
-                    ProductId = product.Id,
-                    InventoryItemId = ingredient.InventoryItemId,
-                    QuantityNeeded = ingredient.QuantityNeeded,
-                    Unit = ingredient.Unit
-                });
+                    foreach (var allergenId in model.SelectedAllergenIds)
+                    {
+                        _context.ProductAllergens.Add(new ProductAllergenModel
+                        {
+                            ProductId = product.Id,
+                            AllergenId = allergenId
+                        });
+                    }
+                }
+
+                if (model.Ingredients != null)
+                {
+                    foreach (var ingredient in model.Ingredients.Where(i => i.InventoryItemId > 0 && i.QuantityNeeded > 0))
+                    {
+                        _context.ProductIngredients.Add(new ProductIngredientModel
+                        {
+                            ProductId = product.Id,
+                            InventoryItemId = ingredient.InventoryItemId,
+                            QuantityNeeded = ingredient.QuantityNeeded,
+                            Unit = ingredient.Unit
+                        });
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Product created: {ProductName}", product.Name);
+                TempData["SuccessMessage"] = _localizer["ProductCreatedSuccess"].Value;
+                return Json(new { success = true });
             }
-
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = _localizer["ProductCreatedSuccess"].Value;
-            return Json(new { success = true });
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating product");
+                return Json(new { success = false, message = _localizer["ErrorCreatingProduct"].Value });
+            }
         }
 
         [HttpPost]
@@ -177,18 +206,21 @@ namespace EIIOS.Controllers
         {
             if (!await IsCurrentUserAdmin())
             {
-                return Json(new { success = false, errors = new { general = _localizer["Unauthorized"].Value } });
+                return Json(new { success = false, message = _localizer["Unauthorized"].Value });
             }
 
             if (!ModelState.IsValid)
             {
-                var errors = ModelState
-                    .Where(x => x.Value.Errors.Count > 0)
-                    .ToDictionary(
-                        kvp => kvp.Key,
-                        kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
-                    );
-                return Json(new { success = false, errors });
+                var errors = string.Join("; ", ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage));
+                _logger.LogWarning("Product update validation failed: {Errors}", errors);
+                return Json(new { success = false, message = _localizer["ValidationFailed"].Value });
+            }
+
+            if (model.SelectedCategoryIds == null || !model.SelectedCategoryIds.Any())
+            {
+                return Json(new { success = false, message = _localizer["CategoryRequired"].Value });
             }
 
             var product = await _context.Products
@@ -199,72 +231,86 @@ namespace EIIOS.Controllers
 
             if (product == null)
             {
-                return Json(new { success = false, errors = new { general = _localizer["ProductNotFound"].Value } });
+                return Json(new { success = false, message = _localizer["ProductNotFound"].Value });
             }
 
-            var imageService = HttpContext.RequestServices.GetRequiredService<ImageService>();
-
-            if (model.ImageFile != null)
+            try
             {
-                if (product.ImageId.HasValue)
+                var imageService = HttpContext.RequestServices.GetRequiredService<ImageService>();
+
+                if (model.ImageFile != null)
                 {
-                    await imageService.DeleteImageAsync(product.ImageId.Value);
+                    if (product.ImageId.HasValue)
+                    {
+                        await imageService.DeleteImageAsync(product.ImageId.Value);
+                    }
+
+                    var newImage = await imageService.SaveImageAsync(model.ImageFile, model.ImageAltText);
+                    if (newImage == null)
+                    {
+                        return Json(new { success = false, message = _localizer["InvalidImageFile"].Value });
+                    }
+
+                    product.ImageId = newImage?.Id;
                 }
 
-                var newImage = await imageService.SaveImageAsync(model.ImageFile, model.ImageAltText);
-                if (newImage == null)
+                product.Name = model.Name;
+                product.Description = model.Description;
+                product.BasePrice = model.BasePrice;
+                product.PreparationTime = model.PreparationTime;
+                product.IsAvailable = model.IsAvailable;
+                product.IsActive = model.IsActive;
+                product.UpdatedAt = DateTime.UtcNow;
+
+                _context.ProductCategories.RemoveRange(product.ProductCategories);
+                foreach (var categoryId in model.SelectedCategoryIds)
                 {
-                    return Json(new { success = false, errors = new { ImageFile = new[] { _localizer["InvalidImageFile"].Value } } });
+                    _context.ProductCategories.Add(new ProductCategoryModel
+                    {
+                        ProductId = product.Id,
+                        CategoryId = categoryId
+                    });
                 }
 
-                product.ImageId = newImage?.Id;
-            }
-
-            product.Name = model.Name;
-            product.Description = model.Description;
-            product.BasePrice = model.BasePrice;
-            product.PreparationTime = model.PreparationTime;
-            product.IsAvailable = model.IsAvailable;
-            product.IsActive = model.IsActive;
-            product.UpdatedAt = DateTime.UtcNow;
-
-            _context.ProductCategories.RemoveRange(product.ProductCategories);
-            foreach (var categoryId in model.SelectedCategoryIds)
-            {
-                _context.ProductCategories.Add(new ProductCategoryModel
+                _context.ProductAllergens.RemoveRange(product.ProductAllergens);
+                if (model.SelectedAllergenIds != null)
                 {
-                    ProductId = product.Id,
-                    CategoryId = categoryId
-                });
-            }
+                    foreach (var allergenId in model.SelectedAllergenIds)
+                    {
+                        _context.ProductAllergens.Add(new ProductAllergenModel
+                        {
+                            ProductId = product.Id,
+                            AllergenId = allergenId
+                        });
+                    }
+                }
 
-            _context.ProductAllergens.RemoveRange(product.ProductAllergens);
-            foreach (var allergenId in model.SelectedAllergenIds)
-            {
-                _context.ProductAllergens.Add(new ProductAllergenModel
+                _context.ProductIngredients.RemoveRange(product.ProductIngredients);
+                if (model.Ingredients != null)
                 {
-                    ProductId = product.Id,
-                    AllergenId = allergenId
-                });
-            }
+                    foreach (var ingredient in model.Ingredients.Where(i => i.InventoryItemId > 0 && i.QuantityNeeded > 0))
+                    {
+                        _context.ProductIngredients.Add(new ProductIngredientModel
+                        {
+                            ProductId = product.Id,
+                            InventoryItemId = ingredient.InventoryItemId,
+                            QuantityNeeded = ingredient.QuantityNeeded,
+                            Unit = ingredient.Unit
+                        });
+                    }
+                }
 
-            // NEW: Update ingredients
-            _context.ProductIngredients.RemoveRange(product.ProductIngredients);
-            foreach (var ingredient in model.Ingredients.Where(i => i.InventoryItemId > 0 && i.QuantityNeeded > 0))
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Product updated: {ProductName}", product.Name);
+                TempData["SuccessMessage"] = _localizer["ProductUpdatedSuccess"].Value;
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
             {
-                _context.ProductIngredients.Add(new ProductIngredientModel
-                {
-                    ProductId = product.Id,
-                    InventoryItemId = ingredient.InventoryItemId,
-                    QuantityNeeded = ingredient.QuantityNeeded,
-                    Unit = ingredient.Unit
-                });
+                _logger.LogError(ex, "Error updating product");
+                return Json(new { success = false, message = _localizer["ErrorUpdatingProduct"].Value });
             }
-
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = _localizer["ProductUpdatedSuccess"].Value;
-            return Json(new { success = true });
         }
 
         [HttpPost]
@@ -273,29 +319,71 @@ namespace EIIOS.Controllers
         {
             if (!await IsCurrentUserAdmin())
             {
-                TempData["ErrorMessage"] = _localizer["Unauthorized"].Value;
-                return RedirectToAction("Products");
+                return Json(new { success = false, message = _localizer["Unauthorized"].Value });
             }
 
-            var product = await _context.Products.FindAsync(id);
+            // Load product with all related entities
+            var product = await _context.Products
+                .Include(p => p.ProductCategories)
+                .Include(p => p.ProductAllergens)
+                .Include(p => p.ProductIngredients)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null)
             {
                 return Json(new { success = false, message = _localizer["ProductNotFound"].Value });
             }
 
-            var imageService = HttpContext.RequestServices.GetRequiredService<ImageService>();
-
-            if (product.ImageId.HasValue)
+            try
             {
-                await imageService.DeleteImageAsync(product.ImageId.Value);
+                // Check if product is used in any daily menus
+                var dailyMenuItems = await _context.DailyMenuItems
+                    .Where(dmi => dmi.ProductId == id)
+                    .ToListAsync();
+
+                if (dailyMenuItems.Any())
+                {
+                    // Remove from daily menus first
+                    _context.DailyMenuItems.RemoveRange(dailyMenuItems);
+                    _logger.LogInformation("Removed {Count} daily menu items for product {ProductId}", dailyMenuItems.Count, id);
+                }
+
+                // Remove related entities
+                if (product.ProductCategories != null && product.ProductCategories.Any())
+                {
+                    _context.ProductCategories.RemoveRange(product.ProductCategories);
+                }
+
+                if (product.ProductAllergens != null && product.ProductAllergens.Any())
+                {
+                    _context.ProductAllergens.RemoveRange(product.ProductAllergens);
+                }
+
+                if (product.ProductIngredients != null && product.ProductIngredients.Any())
+                {
+                    _context.ProductIngredients.RemoveRange(product.ProductIngredients);
+                }
+
+                // Delete image if exists
+                if (product.ImageId.HasValue)
+                {
+                    var imageService = HttpContext.RequestServices.GetRequiredService<ImageService>();
+                    await imageService.DeleteImageAsync(product.ImageId.Value);
+                }
+
+                // Now delete the product
+                _context.Products.Remove(product);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Product deleted: {ProductName} (ID: {ProductId})", product.Name, product.Id);
+                TempData["SuccessMessage"] = _localizer["ProductDeletedSuccess"].Value;
+                return Json(new { success = true });
             }
-
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = _localizer["ProductDeletedSuccess"].Value;
-            return Json(new { success = true });
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting product {ProductId}", id);
+                return Json(new { success = false, message = _localizer["ErrorDeletingProduct"].Value });
+            }
         }
     }
 }

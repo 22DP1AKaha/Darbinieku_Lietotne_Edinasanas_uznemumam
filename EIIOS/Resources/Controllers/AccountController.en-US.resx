@@ -117,6 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AccountRestricted" xml:space="preserve">
+    <value>Your account has been restricted. Please contact support for assistance.
+</value>
+  </data>
   <data name="EmailExists" xml:space="preserve">
     <value>This email address is already registered.</value>
   </data>
@@ -128,6 +132,12 @@
   </data>
   <data name="LogoutSuccess" xml:space="preserve">
     <value>You have been logged out successfully.</value>
+  </data>
+  <data name="PasswordChangedSuccess" xml:space="preserve">
+    <value>Password changed</value>
+  </data>
+  <data name="ProfileUpdatedSuccess" xml:space="preserve">
+    <value>Profile updated</value>
   </data>
   <data name="RegistrationError" xml:space="preserve">
     <value>An error occurred during registration. Please try again.</value>

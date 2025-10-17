@@ -19,7 +19,7 @@ builder.Services.AddControllersWithViews()
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromHours(2); // Session timeout
+    options.IdleTimeout = TimeSpan.FromHours(2);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
     options.Cookie.SameSite = SameSiteMode.Lax;
@@ -40,22 +40,21 @@ builder.Services.AddLocalization(options =>
 
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
-    var supportedCultures = new[]
-    {
-        new CultureInfo("en-US"),
-        new CultureInfo("lv-LV")
-    };
+    var enUS = new CultureInfo("en-US");
+    options.DefaultRequestCulture = new RequestCulture(enUS, new CultureInfo("lv-LV"));
+    options.SupportedCultures = new[] { enUS };
+    options.SupportedUICultures = new[] { new CultureInfo("en-US"), new CultureInfo("lv-LV") };
+    options.RequestCultureProviders.Clear();
+    options.RequestCultureProviders.Add(new QueryStringRequestCultureProvider());
+    options.RequestCultureProviders.Add(new CookieRequestCultureProvider());
+    CultureInfo.DefaultThreadCurrentCulture = enUS;
+    CultureInfo.DefaultThreadCurrentUICulture = enUS;
+});
 
-    // Use en-US for number formatting, lv-LV for UI text
-    options.DefaultRequestCulture = new RequestCulture(
-        culture: "en-US",      // Numbers use period as decimal separator
-        uiCulture: "lv-LV"     // UI text in Latvian
-    );
-
-    options.SupportedCultures = supportedCultures;
-    options.SupportedUICultures = supportedCultures;
-    options.RequestCultureProviders.Insert(0, new QueryStringRequestCultureProvider());
-    options.RequestCultureProviders.Insert(1, new CookieRequestCultureProvider());
+// Configure Antiforgery for JSON requests
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "RequestVerificationToken";
 });
 
 builder.Services.AddScoped<EIIOSDataQuery>();
@@ -66,6 +65,32 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<InventoryConsumptionService>();
 
 var app = builder.Build();
+
+// Seed the database on startup
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<EIIOSDbContext>();
+        var logger = services.GetRequiredService<ILogger<Program>>();
+
+        logger.LogInformation("Checking database and seeding initial data...");
+
+        // Ensure database exists
+        await context.Database.EnsureCreatedAsync();
+
+        // Seed initial data (only adds data that doesn't exist)
+        await context.SeedDataAsync();
+
+        logger.LogInformation("Database seeding completed successfully.");
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while seeding the database.");
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -84,6 +109,7 @@ app.UseSession();
 app.UseRequestLocalization();
 
 app.UseRouting();
+
 app.UseAuthorization();
 
 app.MapControllerRoute(

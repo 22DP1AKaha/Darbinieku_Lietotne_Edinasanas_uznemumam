@@ -117,55 +117,124 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="FirstNameLength" xml:space="preserve">
-    <value>Vārdam jābūt līdz 50 simboliem!</value>
+  <data name="Actions" xml:space="preserve">
+    <value>Actions</value>
   </data>
-  <data name="EmailLength" xml:space="preserve">
-    <value>Ē-pastam jābūt līdz 100 simboliem!</value>
+  <data name="Active" xml:space="preserve">
+    <value>Active</value>
   </data>
-  <data name="PasswordLength" xml:space="preserve">
-    <value>Parolei jābūt no 6 līdz 100 simboliem!</value>
+  <data name="AddEmployee" xml:space="preserve">
+    <value>Add employee</value>
   </data>
-  <data name="FirstNameRequired" xml:space="preserve">
-    <value>Vārds ir obligāts!</value>
+  <data name="Administrator" xml:space="preserve">
+    <value>Administrator</value>
   </data>
-  <data name="LastNameLength" xml:space="preserve">
-    <value>Uzvārdam jābūt līdz 50 simboliem!</value>
+  <data name="AllRoles" xml:space="preserve">
+    <value>All roles</value>
   </data>
-  <data name="UsernameLength" xml:space="preserve">
-    <value>Lietotājvārdam jābūt līdz 50 simboliem!</value>
+  <data name="AllStatuses" xml:space="preserve">
+    <value>All statuses</value>
   </data>
-  <data name="LastNameRequired" xml:space="preserve">
-    <value>Uzvārds ir obligāts!</value>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
   </data>
-  <data name="UsernameRequired" xml:space="preserve">
-    <value>Lietotājvārds ir obligāts!</value>
+  <data name="Client" xml:space="preserve">
+    <value>Client</value>
   </data>
-  <data name="EmailRequired" xml:space="preserve">
-    <value>Ē-pasts ir obligāts!</value>
+  <data name="Confirm" xml:space="preserve">
+    <value>Confirm</value>
   </data>
-  <data name="PasswordRequired" xml:space="preserve">
-    <value>Parole ir obligāta!</value>
+  <data name="ConfirmDelete" xml:space="preserve">
+    <value>Confirm delete</value>
   </data>
-  <data name="EmailInvalid" xml:space="preserve">
-    <value>Nekorekts Ē-pasts</value>
+  <data name="ConfirmStatusChange" xml:space="preserve">
+    <value>Confirm status change</value>
   </data>
-  <data name="ConfirmPasswordRequired" xml:space="preserve">
-    <value>Apstiprināt paroli ir obligāts!</value>
+  <data name="Created" xml:space="preserve">
+    <value>Created</value>
   </data>
-  <data name="PasswordsDoNotMatch" xml:space="preserve">
-    <value>Paroles nesakrīt!</value>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
   </data>
-  <data name="AcceptTermsRequired" xml:space="preserve">
-    <value>Nepieciešams piekrist!</value>
+  <data name="DeleteEmployeeConfirm" xml:space="preserve">
+    <value>Are you sure you want to delete this employee?</value>
   </data>
-  <data name="CurrentPasswordRequired" xml:space="preserve">
-    <value>Parole ir obligāta!</value>
+  <data name="DeleteError" xml:space="preserve">
+    <value>There has been an error deleting this</value>
   </data>
-  <data name="NewPasswordRequired" xml:space="preserve">
-    <value>Jauna parole ir obligāta!</value>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
   </data>
-  <data name="UsernameInvalid" xml:space="preserve">
-    <value>Lietotājvārds var saturēt tikai burtus, ciparus un apakšsvītras</value>
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="Employee" xml:space="preserve">
+    <value>Employee</value>
+  </data>
+  <data name="EmployeeManagement" xml:space="preserve">
+    <value>Employee management</value>
+  </data>
+  <data name="ErrorLoadingEmployee" xml:space="preserve">
+    <value>Error loading employee</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="FirstName" xml:space="preserve">
+    <value>First Name</value>
+  </data>
+  <data name="FullName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Inactive" xml:space="preserve">
+    <value>Inactive</value>
+  </data>
+  <data name="LastName" xml:space="preserve">
+    <value>Last Name</value>
+  </data>
+  <data name="ManageSystemUsers" xml:space="preserve">
+    <value>Manage system users</value>
+  </data>
+  <data name="NoEmployeesDescription" xml:space="preserve">
+    <value>No description found</value>
+  </data>
+  <data name="NoEmployeesFound" xml:space="preserve">
+    <value>No employees found</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="PasswordMinLength" xml:space="preserve">
+    <value>Password minimum length</value>
+  </data>
+  <data name="Role" xml:space="preserve">
+    <value>Role</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="SaveError" xml:space="preserve">
+    <value>There has been an error</value>
+  </data>
+  <data name="SearchEmployees" xml:space="preserve">
+    <value>Search employees</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="StatusUpdateError" xml:space="preserve">
+    <value>There has been an error</value>
+  </data>
+  <data name="ToggleStatus" xml:space="preserve">
+    <value>Toggle status</value>
+  </data>
+  <data name="ToggleStatusConfirm" xml:space="preserve">
+    <value>Are you sure?</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>Username</value>
+  </data>
+  <data name="Verified" xml:space="preserve">
+    <value>Verified</value>
   </data>
 </root>

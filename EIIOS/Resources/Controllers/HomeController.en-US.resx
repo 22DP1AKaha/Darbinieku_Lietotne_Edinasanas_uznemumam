@@ -117,11 +117,20 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="DailyMenuDeletedSuccess" xml:space="preserve">
+    <value>Daily menu deleted</value>
+  </data>
+  <data name="DailyMenuUpdatedSuccess" xml:space="preserve">
+    <value>Daily menu updated</value>
+  </data>
   <data name="DiscountCreatedSuccess" xml:space="preserve">
     <value>Discount has been sucessfully created</value>
   </data>
   <data name="DiscountDeletedSuccess" xml:space="preserve">
     <value>Discount has been sucessfully deleted</value>
+  </data>
+  <data name="DiscountUpdatedSuccess" xml:space="preserve">
+    <value>Discount updated</value>
   </data>
   <data name="InvalidImageFile" xml:space="preserve">
     <value>Invalid image file</value>

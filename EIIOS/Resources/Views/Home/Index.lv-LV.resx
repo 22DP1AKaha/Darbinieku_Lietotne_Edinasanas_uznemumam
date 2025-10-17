@@ -282,9 +282,6 @@
   <data name="DailyMenu" xml:space="preserve">
     <value>Dienas ēdienkarte</value>
   </data>
-  <data name="ManageDailyMenu" xml:space="preserve">
-    <value>Rediģēt dienas ēdienkarti</value>
-  </data>
   <data name="NoDailyMenuYet" xml:space="preserve">
     <value>Vēl nav dienas ēdienkartes</value>
   </data>
@@ -311,6 +308,24 @@
   </data>
   <data name="Off" xml:space="preserve">
     <value>Nost</value>
+  </data>
+  <data name="ManageDailyMenus" xml:space="preserve">
+    <value>Rediģēt dienas ēdienkartes</value>
+  </data>
+  <data name="ExistingMenus" xml:space="preserve">
+    <value>Eksistējošās ēdienkartes</value>
+  </data>
+  <data name="AddDailyMenu" xml:space="preserve">
+    <value>Pievienot ēdienkarti</value>
+  </data>
+  <data name="ValidUntil" xml:space="preserve">
+    <value>Derīga līdz</value>
+  </data>
+  <data name="SpecialOffersAvailable" xml:space="preserve">
+    <value>Īpaši piedāvājumi pieejami!</value>
+  </data>
+  <data name="LoginToViewDiscounts" xml:space="preserve">
+    <value>Pieslēdzieties, lai skatītu atlaides!</value>
   </data>
   <data name="ManageDailyMenus" xml:space="preserve">
     <value>Pārvaldīt dienas ēdienkartes</value>

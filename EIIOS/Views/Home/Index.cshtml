@@ -6,16 +6,24 @@
     ViewData["Title"] = Localizer["MenuTitle"];
     var isAdmin = ViewBag.IsAdmin ?? false;
     var isEmployee = ViewBag.IsEmployee ?? false;
+    var isLoggedIn = ViewBag.IsLoggedIn ?? false;
     var allProducts = ViewBag.AllProducts as List<ProductModel> ?? new List<ProductModel>();
     var today = DateTime.UtcNow.Date;
 
     var dailyProducts = ViewBag.TodayMenuProducts as List<ProductModel> ?? new List<ProductModel>();
 
-    var activeDiscounts = dailyProducts
-        .SelectMany(p => p.DiscountProducts?.Select(dp => dp.Discount) ?? Enumerable.Empty<DiscountModel>())
-        .Where(d => d != null && d.IsCurrentlyActive)
-        .Distinct()
-        .ToList();
+    // Get the IDs of products in today's menu
+    var todayProductIds = dailyProducts.Select(p => p.Id).ToHashSet();
+
+    // Filter discounts to only show those that have at least one product in today's menu
+    var activeDiscounts = isLoggedIn
+        ? dailyProducts
+            .SelectMany(p => p.DiscountProducts?.Select(dp => dp.Discount) ?? Enumerable.Empty<DiscountModel>())
+            .Where(d => d != null && d.IsCurrentlyActive)
+            .Where(d => d.DiscountProducts?.Any(dp => todayProductIds.Contains(dp.ProductId)) == true)
+            .Distinct()
+            .ToList()
+        : new List<DiscountModel>();
 }
 
 <div class="container my-4">
@@ -39,9 +47,20 @@
         </div>
     }
 
-    @if (activeDiscounts.Any())
+    @if (!isLoggedIn && dailyProducts.Any())
     {
-        <!-- Horizontal discounts section -->
+        <!-- Guest View - Show button to view discounts -->
+        <div class="discount-section mb-4 text-center p-4 bg-light rounded-3">
+            <i class="fas fa-percent fa-3x text-primary mb-3"></i>
+            <h5>@Localizer["SpecialOffersAvailable"]</h5>
+            <a href="@Url.Action("Login", "Account", new { returnUrl = Url.Action("Index", "Home") })" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt me-2"></i>@Localizer["LoginToViewDiscounts"]
+            </a>
+        </div>
+    }
+    else if (isLoggedIn && activeDiscounts.Any())
+    {
+        <!-- Logged in users - Show actual discounts -->
         <div class="discount-section mb-4">
             <h4 class="mb-3">@Localizer["ActiveDiscounts"]</h4>
             <div class="discount-scroll d-flex flex-row overflow-auto pb-2">
@@ -73,9 +92,13 @@
             @foreach (var product in dailyProducts)
             {
                 var imageUrl = product.Image != null ? $"data:{product.Image.ContentType};base64,{product.Image.Base64Data}" : "";
-                var activeDiscount = product.DiscountProducts?
+
+                // Only show discount info for logged in users
+                var activeDiscount = isLoggedIn
+                ? product.DiscountProducts?
                 .Select(dp => dp.Discount)
-                .FirstOrDefault(d => d != null && d.IsCurrentlyActive);
+                .FirstOrDefault(d => d != null && d.IsCurrentlyActive)
+                : null;
 
                 decimal discountedPrice = product.BasePrice;
                 if (activeDiscount != null)
@@ -88,7 +111,7 @@
 
                 <div class="col">
                     <div class="card daily-menu-card h-100 position-relative">
-                        @if (activeDiscount != null)
+                        @if (isLoggedIn && activeDiscount != null)
                         {
                             <div class="discount-badge position-absolute top-0 start-0 m-2">
                                 @if (activeDiscount.DiscountType == DiscountType.Percentage)
@@ -117,7 +140,7 @@
                             <h5 class="card-title">@product.Name</h5>
                             <p class="card-text">@product.Description</p>
 
-                            @if (activeDiscount != null)
+                            @if (isLoggedIn && activeDiscount != null)
                             {
                                 <p class="card-text mb-0">
                                     <span class="text-muted text-decoration-line-through">@product.BasePrice.ToString("C")</span>
@@ -661,7 +684,8 @@
                             <button class="btn btn-sm btn-outline-danger" onclick="deleteDiscount(${d.id})"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>`;
-                }); html += '</tbody></table>';
+                });
+                html += '</tbody></table>';
                 container.innerHTML = html;
             });
     }

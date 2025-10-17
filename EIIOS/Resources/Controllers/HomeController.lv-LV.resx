@@ -117,11 +117,20 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="DailyMenuDeletedSuccess" xml:space="preserve">
+    <value>Dienas ēdienkarte izdzēsta</value>
+  </data>
+  <data name="DailyMenuUpdatedSuccess" xml:space="preserve">
+    <value>Dienas ēdienkarte atjaunota</value>
+  </data>
   <data name="DiscountCreatedSuccess" xml:space="preserve">
     <value>Atlaide ir veiksmīgi izveidota</value>
   </data>
   <data name="DiscountDeletedSuccess" xml:space="preserve">
     <value>Atlaide ir veiksmīgi dzēsta</value>
+  </data>
+  <data name="DiscountUpdatedSuccess" xml:space="preserve">
+    <value>Atlaide atjaunota</value>
   </data>
   <data name="InvalidImageFile" xml:space="preserve">
     <value>Nekorekts bildes fails</value>

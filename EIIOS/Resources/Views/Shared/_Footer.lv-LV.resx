@@ -123,4 +123,7 @@
   <data name="RightsReserved" xml:space="preserve">
     <value>Visas tiesības ir aizsargātas</value>
   </data>
+  <data name="Version" xml:space="preserve">
+    <value>Versija</value>
+  </data>
 </root>

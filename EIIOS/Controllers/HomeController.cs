@@ -71,6 +71,7 @@ namespace EIIOS.Controllers
 
             ViewBag.IsAdmin = await IsCurrentUserAdmin();
             ViewBag.IsEmployee = await IsCurrentUserEmployee();
+            ViewBag.IsLoggedIn = HttpContext.Session.GetInt32("UserId").HasValue;
 
             // Always load products for today's menu (for all users to see)
             if (todayMenu != null)

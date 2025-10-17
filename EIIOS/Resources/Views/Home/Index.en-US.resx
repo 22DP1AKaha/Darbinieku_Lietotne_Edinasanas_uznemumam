@@ -282,9 +282,6 @@
   <data name="DailyMenu" xml:space="preserve">
     <value>Daily menu</value>
   </data>
-  <data name="ManageDailyMenu" xml:space="preserve">
-    <value>Manage Daily Menu</value>
-  </data>
   <data name="NoDailyMenuYet" xml:space="preserve">
     <value>No daily menu yet</value>
   </data>
@@ -311,6 +308,25 @@
   </data>
   <data name="Off" xml:space="preserve">
     <value>Off</value>
+  </data>
+  <data name="ManageDailyMenus" xml:space="preserve">
+    <value>Manage Daily Menus</value>
+  </data>
+  <data name="ExistingMenus" xml:space="preserve">
+    <value>Existing Menus</value>
+  </data>
+  <data name="AddDailyMenu" xml:space="preserve">
+    <value>Add daily menu</value>
+  </data>
+  <data name="ValidUntil" xml:space="preserve">
+    <value>Valid until</value>
+  </data>
+  <data name="SpecialOffersAvailable" xml:space="preserve">
+    <value>Special Offers Available!</value>
+  </data>
+  <data name="LoginToViewDiscounts" xml:space="preserve">
+    <value>Login to View Discounts
+</value>
   </data>
   <data name="ManageDailyMenus" xml:space="preserve">
     <value>Manage daily menus</value>

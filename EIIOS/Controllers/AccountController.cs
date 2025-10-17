@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
+using Microsoft.AspNetCore.Antiforgery;
 using EIIOS.Data;
 using EIIOS.Models;
 using EIIOS.ViewModels;
@@ -16,17 +17,20 @@ namespace EIIOS.Controllers
         private readonly IStringLocalizer<AccountController> _localizer;
         private readonly ILogger<AccountController> _logger;
         private readonly EmailService _emailService;
+        private readonly IAntiforgery _antiforgery;
 
         public AccountController(
             EIIOSDbContext context,
             IStringLocalizer<AccountController> localizer,
             ILogger<AccountController> logger,
-            EmailService emailService)
+            EmailService emailService,
+            IAntiforgery antiforgery)
         {
             _context = context;
             _localizer = localizer;
             _logger = logger;
             _emailService = emailService;
+            _antiforgery = antiforgery;
         }
 
         // GET: Account/Login
@@ -49,10 +53,10 @@ namespace EIIOS.Controllers
 
             try
             {
+                // First, find the user without the IsActive check
                 var user = await _context.Users
                     .FirstOrDefaultAsync(u =>
-                        (u.Username == model.Username || u.Email == model.Username)
-                        && u.IsActive);
+                        u.Username == model.Username || u.Email == model.Username);
 
                 if (user == null)
                 {
@@ -60,6 +64,7 @@ namespace EIIOS.Controllers
                     return View(model);
                 }
 
+                // Check password before checking account status
                 bool isPasswordValid;
                 if (user.PasswordHash.StartsWith("$2"))
                 {
@@ -73,6 +78,14 @@ namespace EIIOS.Controllers
                 if (!isPasswordValid)
                 {
                     ModelState.AddModelError("", _localizer["InvalidCredentials"]);
+                    return View(model);
+                }
+
+                // Check if account is active
+                if (!user.IsActive)
+                {
+                    TempData["ErrorMessage"] = _localizer["AccountRestricted"].Value;
+                    _logger.LogWarning("Inactive user attempted to login: {Username}", user.Username);
                     return View(model);
                 }
 
@@ -353,6 +366,187 @@ namespace EIIOS.Controllers
             }
 
             return View(user);
+        }
+
+        // GET: Account/GetEditProfileData (for modal)
+        [HttpGet]
+        public async Task<IActionResult> GetEditProfileData()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(new { success = false, message = _localizer["SessionExpired"].Value });
+            }
+
+            var user = await _context.Users.FindAsync(userId.Value);
+            if (user == null)
+            {
+                return Json(new { success = false, message = _localizer["UserNotFound"].Value });
+            }
+
+            return Json(new
+            {
+                success = true,
+                data = new
+                {
+                    username = user.Username,
+                    firstName = user.FirstName,
+                    lastName = user.LastName,
+                    email = user.Email
+                }
+            });
+        }
+
+        // POST: Account/EditProfile (Modal)
+        [HttpPost]
+        public async Task<IActionResult> EditProfile([FromBody] EditProfileViewModel model)
+        {
+            // Validate antiforgery token
+            try
+            {
+                await _antiforgery.ValidateRequestAsync(HttpContext);
+            }
+            catch
+            {
+                return Json(new { success = false, message = "Invalid security token. Please refresh the page and try again." });
+            }
+
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(new { success = false, message = _localizer["SessionExpired"].Value });
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+                return Json(new { success = false, message = string.Join(", ", errors) });
+            }
+
+            try
+            {
+                var user = await _context.Users.FindAsync(userId.Value);
+                if (user == null)
+                {
+                    return Json(new { success = false, message = _localizer["UserNotFound"].Value });
+                }
+
+                // Check if username is being changed and if it's already taken
+                if (user.Username != model.Username)
+                {
+                    var usernameExists = await _context.Users
+                        .AnyAsync(u => u.Username.ToLower() == model.Username.ToLower() && u.Id != userId.Value);
+
+                    if (usernameExists)
+                    {
+                        return Json(new { success = false, message = _localizer["UsernameExists"].Value });
+                    }
+
+                    user.Username = model.Username.Trim();
+                    HttpContext.Session.SetString("Username", user.Username);
+                }
+
+                user.FirstName = model.FirstName.Trim();
+                user.LastName = model.LastName.Trim();
+                user.UpdatedAt = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+
+                // Update session with new full name
+                HttpContext.Session.SetString("UserName", user.FullName);
+
+                _logger.LogInformation("User {UserId} updated profile", userId.Value);
+
+                return Json(new
+                {
+                    success = true,
+                    message = _localizer["ProfileUpdatedSuccess"].Value,
+                    data = new
+                    {
+                        fullName = user.FullName,
+                        username = user.Username
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating profile for user {UserId}", userId.Value);
+                return Json(new { success = false, message = _localizer["ProfileUpdateError"].Value });
+            }
+        }
+
+        // POST: Account/ChangePassword (Modal)
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordViewModel model)
+        {
+            // Validate antiforgery token
+            try
+            {
+                await _antiforgery.ValidateRequestAsync(HttpContext);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Antiforgery validation failed");
+                return Json(new { success = false, message = "Invalid security token. Please refresh the page and try again." });
+            }
+
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(new { success = false, message = _localizer["SessionExpired"].Value });
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+                return Json(new { success = false, message = string.Join(", ", errors) });
+            }
+
+            try
+            {
+                var user = await _context.Users.FindAsync(userId.Value);
+                if (user == null)
+                {
+                    return Json(new { success = false, message = _localizer["UserNotFound"].Value });
+                }
+
+                // Verify current password
+                bool isCurrentPasswordValid;
+                if (user.PasswordHash.StartsWith("$2"))
+                {
+                    isCurrentPasswordValid = BCrypt.Net.BCrypt.Verify(model.CurrentPassword, user.PasswordHash);
+                }
+                else
+                {
+                    isCurrentPasswordValid = user.PasswordHash == model.CurrentPassword;
+                }
+
+                if (!isCurrentPasswordValid)
+                {
+                    return Json(new { success = false, message = _localizer["CurrentPasswordIncorrect"].Value });
+                }
+
+                // Update password
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
+                user.UpdatedAt = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("User {UserId} changed password", userId.Value);
+
+                return Json(new { success = true, message = _localizer["PasswordChangedSuccess"].Value });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error changing password for user {UserId}", userId.Value);
+                return Json(new { success = false, message = _localizer["PasswordChangeError"].Value });
+            }
         }
 
         // Helper method to generate secure verification token

@@ -123,8 +123,17 @@
   <data name="AccountStatus" xml:space="preserve">
     <value>Konta statuss</value>
   </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Atcelt</value>
+  </data>
   <data name="ChangePassword" xml:space="preserve">
     <value>Nomainīt paroli</value>
+  </data>
+  <data name="ConfirmNewPassword" xml:space="preserve">
+    <value>Apstiprināt jauno paroli</value>
+  </data>
+  <data name="CurrentPassword" xml:space="preserve">
+    <value>Patreizējā parole</value>
   </data>
   <data name="EditProfile" xml:space="preserve">
     <value>Atjaunināt profilu</value>
@@ -132,8 +141,17 @@
   <data name="Email" xml:space="preserve">
     <value>Epasts</value>
   </data>
+  <data name="EmailCannotBeChanged" xml:space="preserve">
+    <value>Epastu nevar mainīt</value>
+  </data>
+  <data name="FirstName" xml:space="preserve">
+    <value>Vārds</value>
+  </data>
   <data name="FullName" xml:space="preserve">
     <value>Vārds</value>
+  </data>
+  <data name="LastName" xml:space="preserve">
+    <value>Uzvārds</value>
   </data>
   <data name="LastUpdated" xml:space="preserve">
     <value>Pēdējo reizi atjaunināts</value>
@@ -141,11 +159,23 @@
   <data name="MemberSince" xml:space="preserve">
     <value>Lietotājs kopš</value>
   </data>
+  <data name="NewPassword" xml:space="preserve">
+    <value>Jaunā parole</value>
+  </data>
+  <data name="PasswordChangeNote" xml:space="preserve">
+    <value>Parole tiek šifrēta un tā ir droši uzglabāta</value>
+  </data>
+  <data name="PasswordRequirements" xml:space="preserve">
+    <value>Parolei jābut vismaz 6 simbolus garai</value>
+  </data>
   <data name="PersonalInformation" xml:space="preserve">
     <value>Personīgā informācija</value>
   </data>
   <data name="Role" xml:space="preserve">
     <value>Loma</value>
+  </data>
+  <data name="SaveChanges" xml:space="preserve">
+    <value>Saglabāt izmaiņas</value>
   </data>
   <data name="Username" xml:space="preserve">
     <value>Lietotājvārds</value>
