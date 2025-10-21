@@ -19,7 +19,7 @@
     <div class="container">
         <div class="card shadow-sm border-0 rounded-4 p-4">
             <h3 class="fw-bold mb-4 text-center">@Localizer["AddNewIngredient"]</h3>
-            <form asp-action="Add" method="post" class="row g-3">
+            <form asp-action="Manage" method="post" class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label">@Localizer["Name"]</label>
                     <input asp-for="NewItem.Name" class="form-control" placeholder="@Localizer["NamePlaceholder"]" />
@@ -94,9 +94,12 @@
                                     data-minimum="@item.MinimumQuantity">
                                 <i class="fas fa-edit"></i> @Localizer["Edit"]
                             </button>
-                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger btn-sm">
-                                <i class="fas fa-trash"></i> @Localizer["Delete"]
-                            </a>
+                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-outline-danger btn-sm"
+                                        onclick="return confirm('@Localizer["AreYouSureDelete"]');">
+                                    <i class="fas fa-trash"></i> @Localizer["Delete"]
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
