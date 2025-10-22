@@ -34,6 +34,10 @@ namespace EIIOS.Controllers
         {
             return await _userService.IsCurrentUserAdmin();
         }
+        public async Task<bool> IsCurrentUserEmployee()
+        {
+            return await _userService.IsCurrentUserEmployee();
+        }
 
         public async Task<IActionResult> Products(string searchTerm = "", string category = "", string sortBy = "name")
         {
@@ -61,7 +65,7 @@ namespace EIIOS.Controllers
         [HttpGet]
         public async Task<IActionResult> GetProduct(int id)
         {
-            if (!await IsCurrentUserAdmin())
+            if (!await IsCurrentUserAdmin() && !await IsCurrentUserEmployee())
                 return Unauthorized();
 
             var product = await _context.Products
